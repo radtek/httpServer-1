@@ -1,0 +1,23 @@
+﻿<Application x:Class="httpServer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:httpServer"
+             StartupUri="/assembly/mainWin/MainWindow.xaml">
+    <Application.Resources>
+
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/sdk/superscene/TextBoxTip/TextBoxTip.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/TextBoxLabel/TextBoxLabel.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/CheckBoxBan/CheckBoxBan.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/LabelSingle/LabelSingle.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/TextBoxCheckbox/TextBoxCheckbox.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/TextBoxFile/TextBoxFile.xaml" ></ResourceDictionary>
+				<!--<ResourceDictionary Source="/sdk/superscene/ButtonLabel/ButtonLabel.xaml" ></ResourceDictionary>-->
+
+				<ResourceDictionary Source="view/style/ComStyle.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+		
+	</Application.Resources>
+</Application>
