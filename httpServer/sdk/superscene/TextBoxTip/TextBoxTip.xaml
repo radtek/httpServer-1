@@ -27,15 +27,17 @@
 							VerticalScrollBarVisibility="{Binding VerticalScrollBarVisibility,RelativeSource={RelativeSource TemplatedParent}}"
 							MaxLength="{Binding MaxLength,RelativeSource={RelativeSource TemplatedParent}}"
 							IsReadOnly="{Binding IsReadOnly,RelativeSource={RelativeSource TemplatedParent}}"
-							IsEnabled="{Binding IsEnabled,RelativeSource={RelativeSource TemplatedParent}}"/>
+							IsEnabled="{Binding IsEnabled,RelativeSource={RelativeSource TemplatedParent}}"
+							Padding="0,0,0,3" 
+							/>
 
 						<Label Content="{Binding Tip, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 							Width="{Binding Width,RelativeSource={RelativeSource TemplatedParent}}"
 							Height="{Binding Height,RelativeSource={RelativeSource TemplatedParent}}"
 							Foreground="{Binding TipColor,RelativeSource={RelativeSource TemplatedParent}}"
 							Visibility="{Binding _ShowTip,RelativeSource={RelativeSource TemplatedParent}}"
-							VerticalContentAlignment="Center"
-							Padding="5,0,0,0" 
+							VerticalContentAlignment="{Binding VerticalContentAlignment,RelativeSource={RelativeSource TemplatedParent}}"
+							Padding="5,0,0,3" 
 							IsHitTestVisible="False"/>
 					</Grid>
 				</ControlTemplate>

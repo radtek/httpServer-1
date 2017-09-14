@@ -44,6 +44,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,6 +77,7 @@
     <Compile Include="sdk\superscene\HttpCtl.cs" />
     <Compile Include="sdk\superscene\kernel32.cs" />
     <Compile Include="sdk\superscene\LabelSingle\LabelSingle.cs" />
+    <Compile Include="sdk\superscene\ListCtl.cs" />
     <Compile Include="sdk\superscene\MultiAsyn.cs" />
     <Compile Include="sdk\superscene\RegistryCtl.cs" />
     <Compile Include="sdk\superscene\SingleEvent.cs" />
@@ -170,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resource\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="sdk\orther\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

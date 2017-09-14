@@ -19,7 +19,9 @@ namespace com.superscene.util {
 
 		public XmlCtl() { }
 
-		public XmlCtl load(string _path) {
+		public XmlCtl load(string _path, Encoding encoding = null) {
+			Encoding loadEncoding = (encoding == null ? Encoding.Default : encoding);
+
 			path = _path;
 			doc = null;
 
@@ -28,8 +30,9 @@ namespace com.superscene.util {
 				return this;
 			}
 
-			root = new XmlDocument();
-			root.Load(path);
+			//root = new XmlDocument();
+			//root.Load(path);
+			loadXml(File.ReadAllText(path, loadEncoding));
 
 			//root.SelectSingleNode("");
 
@@ -50,11 +53,12 @@ namespace com.superscene.util {
 		public void save(string _path, Encoding encoding) {
 			string savePath = _path == "" ? path : _path;
 			Encoding saveEncoding = encoding == null ? Encoding.Default : encoding;
+			//Encoding saveEncoding = encoding == null ? new UTF8Encoding() : encoding;
 
 			string dir = Path.GetDirectoryName(savePath);
-			try {
+			if(!Directory.Exists(dir)) {
 				Directory.CreateDirectory(dir);
-			} catch(Exception) { }
+			}
 
 			XmlWriterSettings settings = new XmlWriterSettings();
 			settings.Indent = true;
@@ -66,6 +70,7 @@ namespace com.superscene.util {
 			using(StreamWriter sr = new StreamWriter(memstream, saveEncoding))
 			using(XmlWriter writer = XmlWriter.Create(sr, settings))
 			using(FileStream fileWriter = new FileStream(savePath, FileMode.Create)) {
+				Debug.WriteLine(root.ChildNodes[0].NodeType);
 				if(root.ChildNodes.Count > 0 && root.ChildNodes[0] is XmlProcessingInstruction) {
 					root.RemoveChild(root.ChildNodes[0]);
 				}
@@ -112,7 +117,7 @@ namespace com.superscene.util {
 
 		public List<XmlCtl> children(string strNode) {
 			List<XmlCtl> result = new List<XmlCtl>();
-		    int idx = strNode.LastIndexOf(".");
+			int idx = strNode.LastIndexOf(".");
 			XmlCtl xml = this;
 			if(idx >= 0) {
 				xml = child(strNode.Substring(0, idx));
@@ -145,7 +150,7 @@ namespace com.superscene.util {
 			XmlNode temp = null;
 			if(doc == null) {
 				temp = root.SelectSingleNode(lstNode[0]);
-				if (temp == null) {
+				if(temp == null) {
 					XmlElement ele = root.CreateElement(lstNode[0]);
 					root.AppendChild(ele);
 					temp = ele;
@@ -238,7 +243,7 @@ namespace com.superscene.util {
 			if(strNode == "") {
 				data = doc.InnerText;
 			} else {
-				data = child(strNode).value();
+				data = child(strNode).value("", initData);
 			}
 
 			if(data == "") {
@@ -259,6 +264,32 @@ namespace com.superscene.util {
 			//return "";
 		}
 
+		public double valueDouble(string strNode, double initData = 0) {
+			double result = 0;
+			bool isOk = double.TryParse(value(strNode), out result);
+			if(!isOk) {
+				return initData;
+			}
+			return result;
+		}
+
+		public int valueInt(string strNode, int initData = 0) {
+			int result = 0;
+			bool isOk = int.TryParse(value(strNode), out result);
+			if(!isOk) {
+				return initData;
+			}
+			return result;
+		}
+
+		public Boolean valueBool(string strNode, bool initData = false) {
+			string data = value(strNode);
+			if(data == "") {
+				return initData;
+			}
+			return data == "true";
+		}
+
 		public string attr(string strNode, string initData = "") {
 			string result = "";
 			try {
@@ -266,15 +297,23 @@ namespace com.superscene.util {
 				if(idx < 0) {
 					if(doc != null && doc.NodeType == XmlNodeType.Element) {
 						XmlElement eleNode = (XmlElement)doc;
-						result = eleNode.GetAttribute(strNode);
+						if(!eleNode.HasAttribute(strNode)) {
+							return initData;
+						} else {
+							result = eleNode.GetAttribute(strNode);
+						}
 						return result;
 					}
 				} else {
 					XmlCtl ele = child(strNode.Substring(0, idx));
-					result = ele.attr(strNode.Substring(idx + 1));
+					result = ele.attr(strNode.Substring(idx + 1), initData);
 				}
 			} catch(Exception) {
 				setAttr(strNode, initData);
+				return initData;
+			}
+
+			if(result == "") {
 				return initData;
 			}
 			return result;
@@ -299,10 +338,11 @@ namespace com.superscene.util {
 		}
 
 		public Boolean attrBool(string strNode, bool initData = false) {
-			if(attr(strNode) == "") {
+			string data = attr(strNode);
+			if(data == "") {
 				return false;
 			}
-			return attr(strNode) == "true";
+			return data == "true";
 		}
 
 		public void setAttr(string strNode, string attr) {
@@ -405,7 +445,7 @@ namespace com.superscene.util {
 		public XmlCtl each(string strNode, Action<int, XmlCtl> fun) {
 			try {
 				XmlCtl ele = child(strNode);
-				for(int i = 0; i <  ele.doc.ChildNodes.Count; ++i) {
+				for(int i = 0; i < ele.doc.ChildNodes.Count; ++i) {
 					if(ele.doc.ChildNodes[i].NodeType != XmlNodeType.Element) {
 						continue;
 					}

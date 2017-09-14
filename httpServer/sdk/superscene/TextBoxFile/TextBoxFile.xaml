@@ -51,9 +51,9 @@
 							Grid.Column="1"
 							Grid.Row="0"
 							Content="{Binding ButtonContent,RelativeSource={RelativeSource TemplatedParent}}"
-							Padding="0"
+							Padding="0,0,0,3"
 							HorizontalContentAlignment="Center"
-							VerticalContentAlignment="Center"
+							VerticalContentAlignment="{Binding VerticalContentAlignment,RelativeSource={RelativeSource TemplatedParent}}"
 							>
 							<!--<Label.Resources>
 								<Style TargetType="{x:Type Label}">

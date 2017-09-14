@@ -23,7 +23,7 @@
 							Foreground="{Binding ContentColor,RelativeSource={RelativeSource TemplatedParent}}"
 							HorizontalAlignment="Left"
 							Visibility="Visible"
-							VerticalContentAlignment="Center"
+							VerticalContentAlignment="{Binding VerticalContentAlignment,RelativeSource={RelativeSource TemplatedParent}}"
 							Padding="{Binding _LabelPadding,RelativeSource={RelativeSource TemplatedParent}}" 
 							IsHitTestVisible="False"/>
 

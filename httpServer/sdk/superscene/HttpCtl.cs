@@ -91,19 +91,56 @@ namespace com.superscene.util {
 
 			return result;
 		}
+
+		public string httpGet(string url, string data = "", string name = "") {
+			//log.Debug("[Post]<" + url + "><" + data + ">");
+			string result = "";
+
+			try {
+				//HttpContent stringContent = new StringContent(data);
+				using(var client = new HttpClient()) {
+					//using(var formData = new MultipartFormDataContent()) {
+					//	formData.Add(stringContent, name, name);
+					if(_timeout.TotalMilliseconds != 0) {
+						client.Timeout = _timeout;
+					}
+
+					var response = client.GetAsync(url).Result;
+					isResponseOk = response.IsSuccessStatusCode;
+					code = response.StatusCode;
+					if(!isResponseOk) {
+						log += "[error][httpPost][code]" + code;
+						result = "";
+					} else {
+						Stream sResult = response.Content.ReadAsStreamAsync().Result;
+						result = readStream(sResult);
+					}
+					//}
+				}
+			} catch(Exception ex) {
+				log += "[error][httpPost]" + ex.ToString();
+			}
+
+			return result;
+		}
 		
 		public string readStream(Stream stream) {
 			string result = "";
 			int bufSize = 1024;
-			byte[] data = new byte[bufSize];
+			int totaLen = (int)stream.Length;
+			byte[] data = new byte[totaLen + bufSize];
 			int idx = 0;
 			int readCount = 0;
+
 			do {
+
 				readCount = stream.Read(data, idx, bufSize);
 				idx += readCount;
 
-				result += Encoding.UTF8.GetString(data, 0, readCount);
+				//result += Encoding.UTF8.GetString(data, 0, readCount);
 			} while(readCount >= bufSize);
+
+			result = Encoding.UTF8.GetString(data, 0, totaLen);
 
 			return result;
 		}

@@ -74,7 +74,10 @@ namespace com.superscene.ui {
 				btn.MouseLeave += Btn_MouseLeave;
 				btn.MouseLeftButtonDown += Btn_MouseLeftButtonDown;
 				btn.MouseLeftButtonUp += Btn_MouseLeftButtonUp;
+
 				txt.TextChanged += Txt_TextChanged;
+				txt.PreviewDragOver += Txt_PreviewDragOver;
+				txt.PreviewDrop += Txt_PreviewDrop;
 
 			} catch(Exception) { }
 		}
@@ -89,10 +92,6 @@ namespace com.superscene.ui {
 
 		private void Btn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
 			_ButtonHeight = 3;
-		}
-
-		private void Txt_TextChanged(object sender, TextChangedEventArgs e) {
-			e.Handled = true;
 		}
 
 		private void Btn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -112,7 +111,29 @@ namespace com.superscene.ui {
 			//发送事件
 			RoutedEventArgs arg = new RoutedEventArgs(SelectedFileProperty, this);
 			RaiseEvent(arg);
+		}
 
+		private void Txt_TextChanged(object sender, TextChangedEventArgs e) {
+			e.Handled = true;
+		}
+
+		private void Txt_PreviewDragOver(object sender, DragEventArgs e) {
+			//拖拽文件
+			if(ButtonWidth == 0) {
+				return;
+			}
+			e.Effects = DragDropEffects.Copy;
+			e.Handled = true;
+		}
+
+		private void Txt_PreviewDrop(object sender, DragEventArgs e) {
+			//拖拽文件
+			try {
+				string[] docPath = (string[])e.Data.GetData(DataFormats.FileDrop);
+				if(docPath.Length > 0) {
+					txt.Text = docPath[0];
+				}
+			} catch(Exception) { }
 		}
 
 		//选择文件
@@ -120,6 +141,9 @@ namespace com.superscene.ui {
 			//选择文件
 			OpenFileDialog ofd = new OpenFileDialog();
 			ofd.Filter = "所有文件(*.*)|*.*";
+			if(File.Exists(txt.Text)) {
+				ofd.InitialDirectory = System.IO.Path.GetDirectoryName(txt.Text);
+			}
 			ofd.ValidateNames = true;
 			ofd.CheckPathExists = true;
 			ofd.CheckFileExists = true;
@@ -141,23 +165,11 @@ namespace com.superscene.ui {
 			//txt.Text = fbd.SelectedPath;
 
 			var dlg = new System.Windows.Forms.FolderBrowserDialog();
-			//dlg.Title = "My Title";
-			//dlg.IsFolderPicker = true;
+			dlg.Description = "My Title";
 
-			//if(Directory.Exists(txt.Text)) {
-			//	dlg.InitialDirectory = System.IO.Path.GetFullPath(txt.Text + "/../");
-			//	dlg.DefaultDirectory = System.IO.Path.GetFullPath(txt.Text + "/../");
-			//}
-
-			//dlg.AddToMostRecentlyUsedList = false;
-			//dlg.AllowNonFileSystemItems = false;
-			//dlg.EnsureFileExists = true;
-			//dlg.EnsurePathExists = true;
-			//dlg.EnsureReadOnly = false;
-			//dlg.EnsureValidNames = true;
-			//dlg.Multiselect = false;
-			//dlg.ShowPlacesList = true;
-			
+			if(Directory.Exists(txt.Text)) {
+				dlg.SelectedPath = System.IO.Path.GetFullPath(txt.Text + "/../");
+			}
 
 			if(dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 				txt.Text = dlg.SelectedPath;

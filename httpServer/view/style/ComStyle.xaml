@@ -3,13 +3,6 @@
                     xmlns:local="clr-namespace:httpServer"
 					xmlns:supUI="clr-namespace:com.superscene.ui">
 
-	<!--CheckBoxBan-->
-	<Style BasedOn="{StaticResource BaseCheckBoxBan}" TargetType="{x:Type supUI:CheckBoxBan}"  >
-		<Setter Property="Background" Value="#6ceff7"/>
-		<Setter Property="VerticalContentAlignment" Value="Center"/>
-		<Setter Property="Padding" Value="5,0,0,0"/>
-	</Style>
-
 	<!--Label-->
 	<Style TargetType="{x:Type Label}">
 		<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -37,6 +30,7 @@
 	<Style BasedOn="{StaticResource BaseTextBoxTip}" TargetType="{x:Type supUI:TextBoxTip}"  >
 		<Setter Property="BorderThickness" Value="0,0,0,1"/>
 		<Setter Property="BorderBrush" Value="#a1a1a1"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
 	</Style>
 
 	<!--TextBoxFile-->
@@ -44,20 +38,29 @@
 		<Setter Property="BorderThickness" Value="0,0,0,1"/>
 		<Setter Property="BorderBrush" Value="#0bd5e1"/>
 		<Setter Property="ButtonColor" Value="#0bd5e1"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
 	</Style>
 
 	<!--TextBoxCheckbox-->
 	<Style BasedOn="{StaticResource BaseTextBoxCheckbox}" TargetType="{x:Type supUI:TextBoxCheckbox}" >
-		<Setter Property="VerticalContentAlignment" Value="Center"/>
 		<Setter Property="ButtonWidth" Value="0"/>
 		<Setter Property="BorderThickness" Value="0,0,0,1"/>
 		<Setter Property="BorderBrush" Value="#0bd5e1"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
 	</Style>
 
 	<!--TextBoxLabel-->
 	<Style BasedOn="{StaticResource BaseTextBoxLabel}" TargetType="{x:Type supUI:TextBoxLabel}">
 		<Setter Property="BorderThickness" Value="0,0,0,1"/>
 		<Setter Property="BorderBrush" Value="#0bd5e1"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
+	</Style>
+
+	<!--CheckBoxBan-->
+	<Style BasedOn="{StaticResource BaseCheckBoxBan}" TargetType="{x:Type supUI:CheckBoxBan}"  >
+		<Setter Property="Background" Value="#6ceff7"/>
+		<Setter Property="Padding" Value="5,0,0,0"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
 	</Style>
 
 </ResourceDictionary>

@@ -71,7 +71,7 @@ namespace com.superscene.ui {
 		}
 
 		//Left Gap
-		public static readonly DependencyProperty _LabelPaddingProperty = DependencyProperty.Register("_LabelPadding", typeof(Thickness), typeof(TextBoxLabel), new PropertyMetadata(new Thickness(5, 0, 8, 0)));
+		public static readonly DependencyProperty _LabelPaddingProperty = DependencyProperty.Register("_LabelPadding", typeof(Thickness), typeof(TextBoxLabel), new PropertyMetadata(new Thickness(5, 0, 8, 3)));
 		public Thickness _LabelPadding {
 			get { return (Thickness)GetValue(_LabelPaddingProperty); }
 			set { SetValue(_LabelPaddingProperty, value); }

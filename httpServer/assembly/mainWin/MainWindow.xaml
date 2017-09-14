@@ -19,7 +19,16 @@
 			<ColumnDefinition Width="8"/>
 		</Grid.ColumnDefinitions>
 
-		<Grid Grid.Column="1" Grid.Row="1">
+		<!--<Grid Grid.Column="1" Grid.Row="1" VerticalAlignment="Top">
+			<StackPanel Orientation="Horizontal">
+				<supUI:TextBoxCheckbox LeftWidth="80" Height="32" Tip="127.0.0.1:80" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top" Content="端口转发" />
+				<Label Height="32" Margin="8,0,0,0" VerticalContentAlignment="Bottom" Content="空闲地址:" HorizontalAlignment="Left"/>
+				<ComboBox IsEditable="True" BorderThickness="0,0,0,1" Width="150" HorizontalAlignment="Left" Margin="4,0,0,0" Padding="0,5,0,5" Height="32" VerticalContentAlignment="Bottom" BorderBrush="#6ceff7"/>
+				<supUI:TextBoxLabel Margin="8,0,0,0" Width="50" Tip="端口"/>
+			</StackPanel>
+		</Grid>-->
+
+		<Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,0">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="70"/>
 				<RowDefinition Height="8"/>
@@ -32,11 +41,16 @@
 			</Grid.ColumnDefinitions>
 
 			<Grid Grid.Column="3" Grid.RowSpan="3" >
-				<supUI:TextBoxFile LeftWidth="40" Height="32" IsSelectFolder="True"  Content="路径" Tip="" VerticalContentAlignment="Center" VerticalAlignment="Top" x:Name="txtPath" TextChanged="txtPath_TextChanged" />
-				<StackPanel Margin="5,40,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
-					<Label Margin="0,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="http://127.0.0.1:80" Name="lblUrl" MouseLeftButtonUp="lblUrl_MouseLeftButtonUp"/>
-					<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="复制" Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>
+				<StackPanel VerticalAlignment="Top">
+					<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,0,0,0" Tip="127.0.0.1:80" Content="端口转发" x:Name="txtTransmit" Checked="txtTransmit_Checked" Unchecked="txtTransmit_Unchecked" TextChanged="txtTransmit_TextChanged" />
+					<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,4,0,0" Content="反向代理" Tip="" x:Name="txtProxy" TextChanged="txtProxy_TextChanged" Checked="txtProxy_Checked" Unchecked="txtProxy_Unchecked" />
+					<supUI:TextBoxFile LeftWidth="80" Height="32" IsSelectFolder="True" Margin="5,4,0,0" Tip="" VerticalAlignment="Top" Content="路径" x:Name="txtPath" TextChanged="txtPath_TextChanged" />
+					<StackPanel Margin="5,4,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
+						<Label Margin="0,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="http://127.0.0.1:80" Name="lblUrl" MouseLeftButtonUp="lblUrl_MouseLeftButtonUp"/>
+						<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="复制" Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>
+					</StackPanel>
 				</StackPanel>
+				
 			</Grid>
 
 			<!--<Border BorderThickness="0,0,0,1" BorderBrush="#0bd5e1" Grid.ColumnSpan="3" Grid.Row="1"/>-->

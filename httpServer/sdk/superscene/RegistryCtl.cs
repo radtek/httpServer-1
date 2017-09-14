@@ -292,8 +292,8 @@ namespace com.superscene.util {
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public string getValue(string path, string defData = "") {
-			string result = "";
+		public string getValue(string path, string initData = "") {
+			string result = initData;
 
 			RegistryKey root = null;
 			string name = "";
@@ -301,12 +301,11 @@ namespace com.superscene.util {
 			try {
 				getPath(path, false, out root, out name);
 				if(root == null) {
-					return defData;
+					return initData;
 				}
 
-				result = root.GetValue(name).ToString();
+				result = root.GetValue(name, initData).ToString();
 			} catch(Exception) {
-				result = defData;
 				//return "";
 			}
 
