@@ -243,7 +243,8 @@ namespace httpServer {
 				return;
 			}
 
-			string url = httpListenerContext.Request.Url.AbsolutePath;
+			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+			//string url = httpListenerContext.Request.Url.AbsolutePath;
 			bool isIndex = false;
 			if(url != "" && url[url.Length - 1] == '/') {
 				isIndex = true;
@@ -258,7 +259,8 @@ namespace httpServer {
 				if(File.Exists(newPath)) {
 					httpListenerContext.Response.StatusCode = 302;
 					httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-					httpListenerContext.Response.Headers.Add("Location", "http://127.0.0.1:8091/demo/basic/");
+					//httpListenerContext.Response.Headers.Add("Location", "http://127.0.0.1:8091/demo/basic/");
+					httpListenerContext.Response.Headers.Add("Location", url + "/");
 					httpListenerContext.Response.OutputStream.Close();
 					return;
 				}
@@ -302,8 +304,8 @@ namespace httpServer {
 		/// </summary>
 		/// <param name="httpListenerContext"></param>
 		private void resoonseProxy(HttpListenerContext httpListenerContext) {
-			//string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
-			string url = httpListenerContext.Request.Url.AbsolutePath;
+			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+			//string url = httpListenerContext.Request.Url.AbsolutePath;
 			string realUrl = proxyUrl + url;
 
 			//string result = httpCtl.httpGet(realUrl);
