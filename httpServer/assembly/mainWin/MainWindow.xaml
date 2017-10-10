@@ -1,10 +1,12 @@
-﻿<Window x:Class="httpServer.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:httpServer"
 		xmlns:supUI="clr-namespace:com.superscene.ui"
+        xmlns:util="clr-namespace:httpServer.assembly.util"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="httpServer.MainWindow"
         mc:Ignorable="d"
         Title="httpServer" MinHeight="200" MinWidth="400" Height="250" Width="600" Closing="Window_Closing" Closed="Window_Closed">
 	<Grid>
@@ -46,22 +48,24 @@
 					<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,4,0,0" Content="反向代理" Tip="" x:Name="txtProxy" TextChanged="txtProxy_TextChanged" Checked="txtProxy_Checked" Unchecked="txtProxy_Unchecked" />
 					<supUI:TextBoxFile LeftWidth="80" Height="32" IsSelectFolder="True" Margin="5,4,0,0" Tip="" VerticalAlignment="Top" Content="路径" x:Name="txtPath" TextChanged="txtPath_TextChanged" />
 					<StackPanel Margin="5,4,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
-						<Label Margin="0,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="http://127.0.0.1:80" Name="lblUrl" MouseLeftButtonUp="lblUrl_MouseLeftButtonUp"/>
-						<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="复制" Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>
+						<Label Margin="0,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="http://127.0.0.1:80" x:Name="lblUrl" MouseLeftButtonUp="lblUrl_MouseLeftButtonUp"/>
+						<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" Cursor="Hand" Content="复制" x:Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>
 					</StackPanel>
 				</StackPanel>
-				
+
 			</Grid>
 
 			<!--<Border BorderThickness="0,0,0,1" BorderBrush="#0bd5e1" Grid.ColumnSpan="3" Grid.Row="1"/>-->
 
 			<StackPanel Grid.RowSpan="3">
-				<Grid>
+				<!--<Grid>
 					<Label Height="32" VerticalContentAlignment="Bottom" Content="IP:" HorizontalAlignment="Left"/>
-					<ComboBox IsEditable="True" BorderThickness="0,0,0,1" Margin="40,0,0,0" Padding="0,5,0,5" Height="32" VerticalContentAlignment="Bottom" BorderBrush="#6ceff7" Name="cbxIp"/>
-				</Grid>
+					<ComboBox BorderThickness="0,0,0,1" IsEditable="True" IsReadOnly="True" Background="Transparent" Margin="40,0,0,0" Padding="0,5,0,5" Height="32" VerticalContentAlignment="Bottom" BorderBrush="#6ceff7" x:Name="cbxIp1"/>
+				</Grid>-->
+				<supUI:ComboBoxLabel IsEditable="True" LeftWidth="40" Height="32" Content="IP:" x:Name="cbxIp"/>
+				<util:ItemBox Height="32"/>
 				<supUI:TextBoxLabel LeftWidth="40" Height="32" Content="端口" Tip="" VerticalContentAlignment="Center" VerticalAlignment="Top" x:Name="txtPort" />
-				<Label Height="32" Margin="0,8,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="重启" Name="btnRestart" MouseLeftButtonUp="btnRestart_MouseLeftButtonUp"/>
+				<Label Height="32" Margin="0,8,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="重启" x:Name="btnRestart" MouseLeftButtonUp="btnRestart_MouseLeftButtonUp"/>
 			</StackPanel>
 
 			<Border BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" Grid.Column="1" Grid.RowSpan="3"/>

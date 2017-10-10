@@ -55,7 +55,7 @@ namespace com.superscene.ui {
 		}
 
 		public TextBoxFile() {
-			Loaded += TextBoxFile_Loaded; ;
+			Loaded += TextBoxFile_Loaded;
 		}
 
 		private void TextBoxFile_Loaded(object sender, RoutedEventArgs e) {

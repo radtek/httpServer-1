@@ -12,7 +12,7 @@ namespace com.superscene.util {
 		private string filePath = "";
 		private Encoding ecd = null;
 
-		private string data = "";
+		//private string data = "";
 		private List<string> lstData = new List<string>();
 		public Dictionary<string, Func<List<string>, string>> mapParser = new Dictionary<string, Func<List<string>, string>>();
 
@@ -89,7 +89,7 @@ namespace com.superscene.util {
 				return "";
 			}
 
-			string status = "";
+			//string status = "";
 			for(int i = 0; i < data.Count; ++i) {
 
 			}
@@ -102,8 +102,8 @@ namespace com.superscene.util {
 
 			string status = "";
 			string status1 = "";
-			string status2 = "";
-			string status3 = "";
+			//string status2 = "";
+			//string status3 = "";
 			string temp = "";
 			for(int i = 0; i < data.Length; ++i) {
 				if(status == "strStart" && status1 == "\\") {

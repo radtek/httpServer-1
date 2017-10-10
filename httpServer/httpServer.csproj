@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
@@ -64,6 +65,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="assembly\util\ItemBox.xaml.cs">
+      <DependentUpon>ItemBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="sdk\superscene\BindModel.cs" />
     <Compile Include="sdk\superscene\ButtonLabel\ButtonLabel.cs" />
     <Compile Include="sdk\superscene\CheckBoxBan\CheckBoxBan.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="sdk\superscene\ErgFolder.cs" />
     <Compile Include="sdk\superscene\HttpCtl.cs" />
     <Compile Include="sdk\superscene\kernel32.cs" />
+    <Compile Include="sdk\superscene\ComboBoxLabel\ComboBoxLabel.cs" />
     <Compile Include="sdk\superscene\LabelSingle\LabelSingle.cs" />
     <Compile Include="sdk\superscene\ListCtl.cs" />
     <Compile Include="sdk\superscene\MultiAsyn.cs" />
@@ -105,6 +110,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="assembly\util\ItemBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="sdk\superscene\ButtonLabel\ButtonLabel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -112,6 +121,10 @@
     <Page Include="sdk\superscene\CheckBoxBan\CheckBoxBan.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="sdk\superscene\ComboBoxLabel\ComboBoxLabel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="sdk\superscene\LabelSingle\LabelSingle.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -133,9 +146,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\style\ComStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\style\Test.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

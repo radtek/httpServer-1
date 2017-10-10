@@ -63,4 +63,11 @@
 		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
 	</Style>
 
+	<!--ComboBoxLabel-->
+	<Style BasedOn="{StaticResource BaseComboBoxLabel}" TargetType="{x:Type supUI:ComboBoxLabel}"  >
+		<Setter Property="BorderThickness" Value="0,0,0,1"/>
+		<Setter Property="BorderBrush" Value="#0bd5e1"/>
+		<Setter Property="VerticalContentAlignment" Value="Bottom"/>
+	</Style>
+
 </ResourceDictionary>

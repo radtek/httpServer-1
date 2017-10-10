@@ -48,7 +48,7 @@ namespace httpServer {
 		bool isTransmit = false;
 		string transmitUrl = "";
 		ServerStatus lastStatus = ServerStatus.none;
-		string lastTransmit = "";
+		//string lastTransmit = "";
 		string lastServer = "";
 
 		private TimeSpan _timeout = new TimeSpan(0, 0, 0, 0, 0);
@@ -141,8 +141,10 @@ namespace httpServer {
 				}
 
 				cbxIp.Items.Add("127.0.0.1");
+				//cbxIp.ListItems.Add("127.0.0.1");
 				for(int i = 0; i < lstIP.Count; ++i) {
 					cbxIp.Items.Add(lstIP[i]);
+					//cbxIp.ListItems.Add(lstIP[i]);
 				}
 				//for(int i = 0; i < lstIPv6.Count; ++i) {
 				//	cbxIp.Items.Add(lstIPv6[i]);
@@ -469,7 +471,7 @@ namespace httpServer {
 				//Console.WriteLine(data);
 
 				data = exep.StandardError.ReadToEnd();
-			} catch(Exception ex) {
+			} catch(Exception) {
 				//Console.WriteLine(ex.ToString());
 			}
 			exep.Close();

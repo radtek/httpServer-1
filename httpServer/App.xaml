@@ -13,9 +13,11 @@
 				<ResourceDictionary Source="/sdk/superscene/LabelSingle/LabelSingle.xaml" ></ResourceDictionary>
 				<ResourceDictionary Source="/sdk/superscene/TextBoxCheckbox/TextBoxCheckbox.xaml" ></ResourceDictionary>
 				<ResourceDictionary Source="/sdk/superscene/TextBoxFile/TextBoxFile.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/superscene/ComboBoxLabel/ComboBoxLabel.xaml" ></ResourceDictionary>
 				<!--<ResourceDictionary Source="/sdk/superscene/ButtonLabel/ButtonLabel.xaml" ></ResourceDictionary>-->
-
+				
 				<ResourceDictionary Source="view/style/ComStyle.xaml"/>
+				<ResourceDictionary Source="view/style/Test.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 		
