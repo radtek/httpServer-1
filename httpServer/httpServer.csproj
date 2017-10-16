@@ -65,9 +65,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
+    <Compile Include="control\ServerCtl.cs" />
+    <Compile Include="control\ServerDataCtl.cs" />
+    <Compile Include="entity\Entity.cs" />
+    <Compile Include="module\MainModule.cs" />
+    <Compile Include="module\ServerModule.cs" />
     <Compile Include="assembly\util\ItemBox.xaml.cs">
       <DependentUpon>ItemBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="module\LocalRes.cs" />
     <Compile Include="sdk\superscene\BindModel.cs" />
     <Compile Include="sdk\superscene\ButtonLabel\ButtonLabel.cs" />
     <Compile Include="sdk\superscene\CheckBoxBan\CheckBoxBan.cs" />
@@ -98,6 +105,8 @@
     <Compile Include="sdk\superscene\XCmdCtl.cs" />
     <Compile Include="sdk\superscene\XjsCtl.cs" />
     <Compile Include="sdk\superscene\XmlCtl.cs" />
+    <Compile Include="util\CommonUtil.cs" />
+    <Compile Include="util\SysConst.cs" />
     <Page Include="assembly\mainWin\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -111,6 +120,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="assembly\util\ItemBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="assembly\util\ListBoxServer\ListBoxServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -196,6 +209,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="sdk\orther\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resource\status_run.png" />
+    <Resource Include="resource\status_stop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

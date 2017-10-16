@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.superscene.util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,8 @@ namespace httpServer.assembly.util {
 
 		public ItemBox() {
 			InitializeComponent();
+			
+			grdMain.Background = null;
 		}
 
 	}

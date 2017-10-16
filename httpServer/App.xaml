@@ -18,6 +18,8 @@
 				
 				<ResourceDictionary Source="view/style/ComStyle.xaml"/>
 				<ResourceDictionary Source="view/style/Test.xaml"/>
+
+				<ResourceDictionary Source="assembly/util/ListBoxServer/ListBoxServer.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 		

@@ -46,6 +46,18 @@ namespace com.superscene.util {
 			mapRegType["reg_multi_sz"] = RegistryValueKind.MultiString;
 			mapRegType["reg_expand_sz"] = RegistryValueKind.ExpandString;
 		}
+
+		private RegistryKey getPath(string path, bool isCreate) {
+			RegistryKey temp = null;
+			string name = "";
+
+			getPath(path, isCreate, out temp, out name);
+			if(temp == null) {
+				return null;
+			}
+
+			return temp.OpenSubKey(name, true);
+		}
 		
 		private void getPath(string path, bool isCreate, out RegistryKey root, out string name) {
 			root = null;
@@ -287,6 +299,14 @@ namespace com.superscene.util {
 			return result;
 		}
 
+		public bool setValueBool(string path, bool value, string type = "reg_sz") {
+			return setValue(path, value ? "true" : "false", type);
+		}
+
+		public bool setValueBool(string path, bool value, RegistryValueKind type) {
+			return setValue(path, value ? "true" : "false", type);
+		}
+
 		/// <summary>
 		/// 获取键值，不存在这返回空字符串
 		/// </summary>
@@ -309,8 +329,88 @@ namespace com.superscene.util {
 				//return "";
 			}
 
-			root.Close();
+			root?.Close();
 			return result;
+		}
+
+		public bool getValueBool(string path, bool initData = false) {
+			string result = getValue(path);
+			if(result == "") {
+				return initData;
+			}
+			return result == "true";
+		}
+
+		public void each(string path, Action<string> callback) {
+			RegistryKey root = null;
+			string[] names = null;
+
+			try {
+				root = getPath(path, false);
+				if(root == null) {
+					return ;
+				}
+
+				names = root.GetSubKeyNames();
+			} catch(Exception) {
+				//return "";
+			}
+			root?.Close();
+
+			if(names == null) {
+				return;
+			}
+
+			for(int i = 0; i < names.Length; ++i) {
+				callback?.Invoke(names[i]);
+			}
+		}
+
+		public void clearChild(string path) {
+			RegistryKey root = null;
+			string name = "";
+
+			try {
+				getPath(path, false, out root, out name);
+				if(root == null) {
+					return;
+				}
+
+				root.DeleteSubKeyTree(name);
+			} catch(Exception) {
+				//return "";
+			}
+			root?.Close();
+		}
+
+		public void clearChildItem(string path) {
+			RegistryKey root = null;
+			string[] names = null;
+
+			try {
+				root = getPath(path, false);
+				if(root == null) {
+					return;
+				}
+
+				names = root.GetSubKeyNames();
+
+				for(int i = 0; i < names.Length; ++i) {
+					root.DeleteSubKeyTree(names[i]);
+				}
+
+			} catch(Exception) {
+				//return "";
+			}
+			root?.Close();
+
+			//try {
+			//	each(path, (name) => {
+
+			//	});
+			//} catch(Exception) {
+
+			//}
 		}
 
 	}

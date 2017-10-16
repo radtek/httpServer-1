@@ -177,7 +177,7 @@ namespace com.superscene.util {
 
 					//get index
 					int nodeIdx = 0;
-					if(!Int32.TryParse(strOneNode, out nodeIdx)) {
+					if(!Int32.TryParse(strOneNode.Substring(idx + 1, strOneNode.Length - 1), out nodeIdx)) {
 						return this;
 					}
 
@@ -340,7 +340,7 @@ namespace com.superscene.util {
 		public Boolean attrBool(string strNode, bool initData = false) {
 			string data = attr(strNode);
 			if(data == "") {
-				return false;
+				return initData;
 			}
 			return data == "true";
 		}

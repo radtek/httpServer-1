@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace com.superscene.util.service {
+namespace com.superscene.util {
 	public class ComUtil {
 		public static SolidColorBrush createBrush(string color) {
 			return new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
