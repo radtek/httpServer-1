@@ -91,8 +91,8 @@ namespace httpServer {
 			try {
 				x = Int32.Parse(regCtl.getValue(regPath + "x", "100"));
 				y = Int32.Parse(regCtl.getValue(regPath + "y", "100"));
-				w = Int32.Parse(regCtl.getValue(regPath + "width", "600"));
-				h = Int32.Parse(regCtl.getValue(regPath + "height", "250"));
+				w = Int32.Parse(regCtl.getValue(regPath + "width", "680"));
+				h = Int32.Parse(regCtl.getValue(regPath + "height", "270"));
 				//cbxIp.Text = regCtl.getValue(regPath + "ip", "127.0.0.1");
 				//txtProxy.IsChecked = regCtl.getValue(regPath + "isProxy", "false") == "true";
 				//txtProxy.Text = regCtl.getValue(regPath + "proxyUrl", "");
@@ -369,6 +369,7 @@ namespace httpServer {
 						lstServerClt[idx].clear();
 					}
 					if(md.desc == "" || isDescIp(md.desc)) {
+						txtDesc.Text = md.ip + ":" + md.port;
 						updateData("desc", md.ip + ":" + md.port);
 					}
 					break;

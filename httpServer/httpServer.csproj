@@ -66,6 +66,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
+    <Compile Include="control\Cache.cs" />
     <Compile Include="control\ServerCtl.cs" />
     <Compile Include="control\ServerDataCtl.cs" />
     <Compile Include="entity\Entity.cs" />

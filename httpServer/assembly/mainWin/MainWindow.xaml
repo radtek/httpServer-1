@@ -82,7 +82,7 @@
 
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
 						<supUI:ComboBoxLabel IsEditable="True" LeftWidth="50" Width="170" Content="IP：" x:Name="cbxIp"/>
-						<supUI:TextBoxLabel Margin="1,0,0,0" LeftWidth="23"  Width="80" Content="：" Tip="端口号" ToolTip="端口号" x:Name="txtPort" />
+						<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtPort" />
 					</StackPanel>
 
 					<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,0,0,0" Tip="127.0.0.1:80" Content="端口转发" x:Name="txtTransmit" Checked="txtTransmit_Checked" Unchecked="txtTransmit_Unchecked" TextChanged="txtTransmit_TextChanged" />

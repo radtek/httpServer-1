@@ -22,6 +22,7 @@ namespace httpServer.control {
 		}
 
 		static Dictionary<string, string> mapSuffix = new Dictionary<string, string>();
+		static Cache cache = new Cache();
 
 		//public string ip;
 		//public string port;
@@ -115,22 +116,25 @@ namespace httpServer.control {
 			httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
 			httpListener.Prefixes.Add(url);
 			httpListener.Start();
-			//httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), httpListener);
-			thServer = new Thread(serverProc);
-			thServer.Start();
+			httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), this);
+			//thServer = new Thread(serverProc);
+			//thServer.Start();
 		}
 
-		//static void GetContextCallBack(IAsyncResult ar) {
-		//	try {
-		//		HttpListener sSocket = ar.AsyncState as HttpListener;
-		//		HttpListenerContext context = sSocket.EndGetContext(ar);
+		static void GetContextCallBack(IAsyncResult ar) {
+			try {
+				ServerCtl ctl = ar.AsyncState as ServerCtl;
+				//HttpListener sSocket = ar.AsyncState as HttpListener;
+				HttpListener sSocket = ctl.httpListener;
+				HttpListenerContext context = sSocket.EndGetContext(ar);
 
-		//		sSocket.BeginGetContext(new AsyncCallback(GetContextCallBack), sSocket);
+				//sSocket.BeginGetContext(new AsyncCallback(GetContextCallBack), sSocket);
+				sSocket.BeginGetContext(new AsyncCallback(GetContextCallBack), ctl);
 
-		//		MainWindow.ins.responseFile(context);
+				ctl.responseFile(context);
 
-		//	} catch { }
-		//}
+			} catch(Exception) { }
+		}
 
 		private void serverProc() {
 			try {
@@ -157,7 +161,7 @@ namespace httpServer.control {
 				url += "index.html";
 			}
 
-			string path = md.path + "/" + url;
+			string path = Path.GetFullPath(md.path + "/" + url);
 			//Console.WriteLine(path);
 
 			if(!isIndex && !File.Exists(path)) {
@@ -179,16 +183,20 @@ namespace httpServer.control {
 			} else {
 				httpListenerContext.Response.StatusCode = 200;
 
-				string suffix = System.IO.Path.GetExtension(path).ToLower();
+				string suffix = Path.GetExtension(path).ToLower();
 				if(mapSuffix.ContainsKey(suffix)) {
 					httpListenerContext.Response.Headers.Add("Content-Type", mapSuffix[suffix]);
 				}
+
+				//buffer = cache.getFile(path);
 
 				using(FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
 					buffer = new byte[fs.Length];
 					fs.Read(buffer, 0, (int)fs.Length); //将文件读到缓存区
 				};
 			}
+
+			//httpListenerContext.Response.StatusCode = 200;
 
 			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
 			//httpListenerContext.Response.Headers.Add("Content-Type", "text/html;charset=UTF-8");
