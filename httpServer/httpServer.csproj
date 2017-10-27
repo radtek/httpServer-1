@@ -67,6 +67,7 @@
     </ApplicationDefinition>
     <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
     <Compile Include="control\Cache.cs" />
+    <Compile Include="control\RequestCtl.cs" />
     <Compile Include="control\ServerCtl.cs" />
     <Compile Include="control\ServerDataCtl.cs" />
     <Compile Include="entity\Entity.cs" />
@@ -76,6 +77,15 @@
       <DependentUpon>ItemBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="module\LocalRes.cs" />
+    <Compile Include="sdk\HttpMultipartParser\BinaryStreamStack.cs" />
+    <Compile Include="sdk\HttpMultipartParser\FilePart.cs" />
+    <Compile Include="sdk\HttpMultipartParser\MultipartFormDataParser.cs" />
+    <Compile Include="sdk\HttpMultipartParser\MultipartParseException.cs" />
+    <Compile Include="sdk\HttpMultipartParser\MultipartStreamPart.cs" />
+    <Compile Include="sdk\HttpMultipartParser\ParameterPart.cs" />
+    <Compile Include="sdk\HttpMultipartParser\RebufferableBinaryReader.cs" />
+    <Compile Include="sdk\HttpMultipartParser\StreamingMultipartFormDataParser.cs" />
+    <Compile Include="sdk\HttpMultipartParser\SubsequenceFinder.cs" />
     <Compile Include="sdk\superscene\BindModel.cs" />
     <Compile Include="sdk\superscene\ButtonLabel\ButtonLabel.cs" />
     <Compile Include="sdk\superscene\CheckBoxBan\CheckBoxBan.cs" />

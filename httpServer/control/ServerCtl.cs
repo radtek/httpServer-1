@@ -1,4 +1,5 @@
-﻿using httpServer.module;
+﻿using HttpMultipartParser;
+using httpServer.module;
 using httpServer.util;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +48,8 @@ namespace httpServer.control {
 		Thread thServer = null;
 		HttpListener httpListener = null;
 
+		RequestCtl requestCtl = null;
+
 		static ServerCtl(){
 			mapSuffix[".css"] = "text/css";
 			mapSuffix[".js"] = "text/javascript";
@@ -57,6 +61,8 @@ namespace httpServer.control {
 
 		public ServerCtl() {
 			_timeout = TimeSpan.FromMilliseconds(3000);
+
+			requestCtl = new RequestCtl();
 		}
 
 		public void restartServer() {
@@ -179,7 +185,13 @@ namespace httpServer.control {
 			//string result = "";
 			byte[] buffer = new byte[0];
 			if(!File.Exists(path)) {
-				httpListenerContext.Response.StatusCode = 404;
+				//自定义请求
+				bool isDeal = parseCtl(url, httpListenerContext);
+				if(isDeal) {
+					return;
+				} else {
+					httpListenerContext.Response.StatusCode = 404;
+				}
 			} else {
 				httpListenerContext.Response.StatusCode = 200;
 
@@ -211,6 +223,65 @@ namespace httpServer.control {
 			//	writer.WriteLine("</ul>");
 			//	writer.WriteLine("</body></html>");
 			//}
+		}
+
+		private bool parseCtl(string url, HttpListenerContext ctx) {
+			bool isDeal = false;
+
+			if(ctx.Request.HttpMethod == "OPTIONS") {
+				ctx.Response.StatusCode = 200;
+				ctx.Response.Headers.Add("Access-Control-Allow-Credentials", "false");
+				ctx.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+				ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+				ctx.Response.Headers.Add("Access-Control-Allow-Methods", "*");
+				var output = ctx.Response.OutputStream;
+				output.Close();
+				return true;
+			}
+
+			//var parser = new MultipartFormDataParser(ctx.Request.InputStream);
+			//var checkboxResponses = parser.GetParameterValue("path");
+			//Debug.WriteLine(checkboxResponses);
+			//foreach(var parameter in checkboxResponses) {
+			//	Console.WriteLine("Parameter {0} is {1}", parameter.Name, parameter.Data);
+			//}
+
+			try {
+				isDeal = requestCtl.parse(url, ctx);
+
+				var parser = new MultipartFormDataParser(ctx.Request.InputStream);
+				// Loop through all the files
+				//foreach(var file in parser.Files) {
+				//	Stream sr = file.Data;
+
+				//	byte[] data = readStream(sr);
+				//	string strData = Encoding.UTF8.GetString(data, 0, data.Length);
+				//	Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
+				//	// Do stuff with the data.
+				//}
+
+				foreach(var parameter in parser.Parameters) {
+					if(Regex.IsMatch(parameter.Data, "^data:.{0,30}?;base64,")) {
+						//base64
+						int idx = parameter.Data.IndexOf(',') + 1;
+						byte[] data = Convert.FromBase64String(parameter.Data.Substring(idx));
+						string strData = Encoding.UTF8.GetString(data, 0, data.Length);
+						Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
+					} else {
+						//string
+						Debug.WriteLine(parameter.Name + "," + parameter.Data);
+					}
+				}
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
+			}
+
+			//int len = 0;
+			//byte[] data = readStream(ctx.Request.InputStream);
+			//string strData = Encoding.UTF8.GetString(data, 0, data.Length);
+			//Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
+
+			return isDeal;
 		}
 
 		/// <summary>
@@ -322,27 +393,75 @@ namespace httpServer.control {
 		}
 
 		private byte[] readStream(Stream stream, out int len) {
-			//string result = "";
-			int bufSize = 1024;
-			int totaLen = (int)stream.Length;
-			byte[] data = new byte[totaLen + bufSize];
-			int idx = 0;
-			int readCount = 0;
+			try {
+				//string result = "";
+				int bufSize = 1024;
+				int totaLen = (int)stream.Length;
+				byte[] data = new byte[totaLen + bufSize];
+				int idx = 0;
+				int readCount = 0;
 
-			do {
+				do {
 
-				readCount = stream.Read(data, idx, bufSize);
-				idx += readCount;
+					readCount = stream.Read(data, idx, bufSize);
+					idx += readCount;
 
-				//result += Encoding.UTF8.GetString(data, 0, readCount);
-			} while(readCount >= bufSize);
+					//result += Encoding.UTF8.GetString(data, 0, readCount);
+				} while(readCount >= bufSize);
 
-			//result = Encoding.UTF8.GetString(data, 0, totaLen);
+				//result = Encoding.UTF8.GetString(data, 0, totaLen);
 
-			len = totaLen;
-			return data;
+				len = totaLen;
+				return data;
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
+				len = 0;
+				return new byte[0];
+			}
 		}
-		
+
+		private byte[] readStream(Stream stream) {
+			try {
+				List<byte[]> lstData = new List<byte[]>();
+				//string result = "";
+				int bufSize = 10240;
+				byte[] temp = new byte[bufSize];
+
+				int totaLen = 0;
+				int readCount = 0;
+
+				do {
+					readCount = stream.Read(temp, 0, bufSize);
+					totaLen += readCount;
+
+					if(readCount == bufSize) {
+						lstData.Add(temp);
+						temp = new byte[bufSize];
+					} else {
+						byte[] newTemp = new byte[readCount];
+						Array.Copy(temp, newTemp, readCount);
+						lstData.Add(newTemp);
+					}
+					//result += Encoding.UTF8.GetString(data, 0, readCount);
+				} while(readCount >= bufSize);
+
+				//result = Encoding.UTF8.GetString(data, 0, totaLen);
+
+				byte[] result = new byte[totaLen];
+				int dstIdx = 0;
+				for(int i = 0; i < lstData.Count; ++i) {
+					int srcLen = lstData[i].Length;
+					Array.Copy(lstData[i], 0, result, dstIdx, srcLen);
+					dstIdx += srcLen;
+				}
+
+				return result;
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
+				return new byte[0];
+			}
+		}
+
 		public void clear() {
 			stopServer = true;
 			httpListener?.Abort();
