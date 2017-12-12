@@ -202,7 +202,7 @@ namespace httpServer.control {
 
 				//buffer = cache.getFile(path);
 
-				using(FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+				using(FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 					buffer = new byte[fs.Length];
 					fs.Read(buffer, 0, (int)fs.Length); //将文件读到缓存区
 				};
