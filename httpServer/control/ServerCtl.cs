@@ -212,9 +212,10 @@ namespace httpServer.control {
 
 			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
 			//httpListenerContext.Response.Headers.Add("Content-Type", "text/html;charset=UTF-8");
-			var output = httpListenerContext.Response.OutputStream;
-			output.Write(buffer, 0, buffer.Length);
-			output.Close();
+			//var output = httpListenerContext.Response.OutputStream;
+			//output.Write(buffer, 0, buffer.Length);
+			//output.Close();
+			httpListenerContext.Response.Close(buffer, true);
 
 			//using(StreamWriter writer = new StreamWriter(httpListenerContext.Response.OutputStream)) {
 			//	writer.WriteLine("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>测试服务器</title></head><body>");
