@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 
 namespace httpServer.control {
 	class RequestCtl {
-
-
 		private Dictionary<string, Action<string, HttpListenerContext>> mapUrl = new Dictionary<string, Action<string, HttpListenerContext>>();
 		public RequestCtl() {
 			mapUrl["savString"] = saveString;

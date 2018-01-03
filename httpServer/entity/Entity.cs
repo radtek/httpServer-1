@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace httpServer.entity {
-	public class Entity {
+	class Entity {
 		public static Entity instance = null;
 		public static Entity getInstance() {
 			if(instance == null) {
@@ -17,6 +17,7 @@ namespace httpServer.entity {
 		}
 
 		public MainModule mainModule = null;
+		public MainWindow mainWin = null;
 
 	}
 }

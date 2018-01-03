@@ -24,19 +24,21 @@ namespace httpServer.control {
 
 					string subPath = regPath + i + "\\";
 
-					regCtl.setValue(subPath + "desc", md.desc);
-					regCtl.setValueBool(subPath + "isRun", md.isRun);
+					md.save(regCtl, subPath);
 
-					regCtl.setValue(subPath + "ip", md.ip);
-					regCtl.setValue(subPath + "port", md.port);
+					//regCtl.setValue(subPath + "desc", md.desc);
+					//regCtl.setValueBool(subPath + "isRun", md.isRun);
 
-					regCtl.setValue(subPath + "path", md.path);
+					//regCtl.setValue(subPath + "ip", md.ip);
+					//regCtl.setValue(subPath + "port", md.port);
 
-					regCtl.setValueBool(subPath + "isProxy", md.isProxy);
-					regCtl.setValue(subPath + "proxyUrl", md.proxyUrl);
+					//regCtl.setValue(subPath + "path", md.path);
 
-					regCtl.setValueBool(subPath + "isTransmit", md.isTransmit);
-					regCtl.setValue(subPath + "transmitUrl", md.transmitUrl);
+					//regCtl.setValueBool(subPath + "isProxy", md.isProxy);
+					//regCtl.setValue(subPath + "proxyUrl", md.proxyUrl);
+
+					//regCtl.setValueBool(subPath + "isTransmit", md.isTransmit);
+					//regCtl.setValue(subPath + "transmitUrl", md.transmitUrl);
 				}
 			} catch(Exception) {
 
@@ -50,27 +52,38 @@ namespace httpServer.control {
 			lstServer.Clear();
 
 			try {
+				var map = Entity.getInstance().mainModule.mapServer;
+				
 				regCtl.each(regPath, (name) => {
 					string subPath = regPath + name + "\\";
 
-					ServerModule md = new ServerModule();
+					string type = regCtl.getValue(subPath + "type", "httpServer");
+					if(!map.ContainsKey(type)) {
+						return;
+					}
 
-					md.desc = regCtl.getValue(subPath + "desc");
-					md.isRun = regCtl.getValueBool(subPath + "isRun");
+					ServerModule md = map[type].createModel();
 
-					md.ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
-					md.port = regCtl.getValue(subPath + "port", "8091");
+					md.load(regCtl, subPath);
 
-					md.path = regCtl.getValue(subPath + "path", rootPath);
+					//ServerModule md = new ServerModule();
 
-					md.isProxy = regCtl.getValueBool(subPath + "isProxy");
-					md.proxyUrl = regCtl.getValue(subPath + "proxyUrl", "");
+					//md.desc = regCtl.getValue(subPath + "desc");
+					//md.isRun = regCtl.getValueBool(subPath + "isRun");
 
-					md.isTransmit = regCtl.getValueBool(subPath + "isTransmit");
-					md.transmitUrl = regCtl.getValue(subPath + "transmitUrl", "");
+					//md.ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
+					//md.port = regCtl.getValue(subPath + "port", "8091");
 
-					md.isProxy = false;
-					md.isTransmit = false;
+					//md.path = regCtl.getValue(subPath + "path", rootPath);
+
+					//md.isProxy = regCtl.getValueBool(subPath + "isProxy");
+					//md.proxyUrl = regCtl.getValue(subPath + "proxyUrl", "");
+
+					//md.isTransmit = regCtl.getValueBool(subPath + "isTransmit");
+					//md.transmitUrl = regCtl.getValue(subPath + "transmitUrl", "");
+
+					//md.isProxy = false;
+					//md.isTransmit = false;
 
 					lstServer.Add(md);
 				});

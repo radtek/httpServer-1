@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:httpServer"
 		xmlns:supUI="clr-namespace:com.superscene.ui"
         xmlns:util="clr-namespace:httpServer.assembly.util"
-        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="httpServer.MainWindow"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+	xmlns:page="clr-namespace:httpServer.assembly.page" x:Class="httpServer.MainWindow"
         mc:Ignorable="d"
         Title="httpServer" MinHeight="200" MinWidth="400" Height="250" Width="600" Closing="Window_Closing" Closed="Window_Closed">
 	<Grid>
@@ -71,12 +72,8 @@
 				</Grid>
 			</StackPanel>
 
-			<Grid Grid.Column="3" Grid.RowSpan="3" >
-				<!--<util:ItemBox/>-->
-
-
-				<!--<Border BorderThickness="0,0,0,1" BorderBrush="#0bd5e1" Grid.ColumnSpan="3" Grid.Row="1"/>-->
-
+			<!--<page:HttpServerWin Grid.Column="3" Grid.RowSpan="3"/>-->
+			<!--<Grid Grid.Column="3" Grid.RowSpan="3" >
 				<StackPanel VerticalAlignment="Top">
 					<supUI:TextBoxLabel LeftWidth="50" Height="32" Margin="5,0,0,0" Content="描述：" x:Name="txtDesc" TextChanged="txtDesc_TextChanged"/>
 
@@ -93,8 +90,7 @@
 						<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" VerticalContentAlignment="Bottom" Cursor="Hand" Content="复制" x:Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>
 					</StackPanel>
 				</StackPanel>
-
-			</Grid>
+			</Grid>-->
 
 			<Border BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" Grid.Column="1" Grid.RowSpan="3" IsHitTestVisible="False"/>
 			<GridSplitter Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
