@@ -9,7 +9,9 @@ namespace httpServer.assembly.page {
 	interface IPage {
 		void init();
 		void initData(ServerModule md);
+
 		ServerModule createModel();
+		ServerModule createNewModel();
 
 		void updateData(ServerModule md);
 

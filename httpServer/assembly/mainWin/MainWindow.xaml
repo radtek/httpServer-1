@@ -72,7 +72,9 @@
 				</Grid>
 			</StackPanel>
 
-			<!--<page:HttpServerWin Grid.Column="3" Grid.RowSpan="3"/>-->
+			<Grid Grid.Column="3" Grid.RowSpan="3" Name="grdPage">
+				<!--<page:HttpServerWin/>-->
+			</Grid>
 			<!--<Grid Grid.Column="3" Grid.RowSpan="3" >
 				<StackPanel VerticalAlignment="Top">
 					<supUI:TextBoxLabel LeftWidth="50" Height="32" Margin="5,0,0,0" Content="描述：" x:Name="txtDesc" TextChanged="txtDesc_TextChanged"/>

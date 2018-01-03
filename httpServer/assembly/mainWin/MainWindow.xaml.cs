@@ -67,7 +67,7 @@ namespace httpServer {
 		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
 		//HttpCtl httpCtl = new HttpCtl();
 
-		private int nowIdx = -1;
+		//private int nowIdx = -1;
 
 		public MainWindow() {
 			InitializeComponent();
@@ -99,6 +99,12 @@ namespace httpServer {
 			this.Top = y;
 			this.Width = w;
 			this.Height = h;
+
+			foreach (var key in ent.mainModule.mapServer.Keys) {
+				IPage page = ent.mainModule.mapServer[key];
+				page.init();
+				grdPage.Children.Add(page as UserControl);
+			}
 
 			//
 			initServerItem(ent.mainModule.lstServer);
@@ -160,15 +166,13 @@ namespace httpServer {
 		}
 
 		private void btnRestart_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-			updateData("isRun", true);
+			int idx = lstItem.SelectedIndex;
+			ServerModule md = ent.mainModule.lstServer[idx];
+			ent.mainModule.mapServer[md.type].start();
 		}
 
 		public string getServerStatusImgPath(bool isRun) {
 			return isRun ? LocalRes.statusRun() : LocalRes.statusStop();
-		}
-
-		private bool isDescIp(string desc) {
-			return Regex.IsMatch(desc, "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
 		}
 		
 		private void lstItem_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -192,6 +196,8 @@ namespace httpServer {
 			//txtDesc.Text = md.desc;
 			serverItem[idx].Source = getServerStatusImgPath(md.isRun);
 
+			ent.mainModule.mapServer[md.type].updateData(md);
+
 			//cbxIp.Text = md.ip;
 			//txtPort.Text = md.port;
 
@@ -210,23 +216,34 @@ namespace httpServer {
 		}
 
 		private void btnStop_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-			updateData("isRun", false);
+			int idx = lstItem.SelectedIndex;
+			ServerModule md = ent.mainModule.lstServer[idx];
+			ent.mainModule.mapServer[md.type].stop();
 		}
 
 		private void btnNew_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			List<ServerModule> lstServer = ent.mainModule.lstServer;
 
-			ServerModule md = new ServerModule();
-			md.port = SystemCtl.getFreePort(8091).ToString();
-			md.desc = md.ip + ":" + md.port;
-			md.path = SysConst.rootPath();
+			ServerModule md = ent.mainModule.mapServer["httpServer"].createNewModel();
+			md.type = "httpServer";
+
+			ServerItem item = new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
+			md.serverItem = item;
+
+			ent.mainModule.mapServer[md.type].initData(md);
+			serverItem.Add(item);
+
+			//ServerModule md = new ServerModule();
+			//md.port = SystemCtl.getFreePort(8091).ToString();
+			//md.desc = md.ip + ":" + md.port;
+			//md.path = SysConst.rootPath();
 			lstServer.Add(md);
 
-			serverItem.Add(new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() });
+			//serverItem.Add(new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() });
 
-			ServerCtl ctl = new ServerCtl();
-			ctl.md = md;
-			lstServerClt.Add(ctl);
+			//ServerCtl ctl = new ServerCtl();
+			//ctl.md = md;
+			//lstServerClt.Add(ctl);
 
 			lstItem.SelectedIndex = serverItem.Count - 1;
 
@@ -240,11 +257,13 @@ namespace httpServer {
 			}
 
 			List<ServerModule> lstServer = ent.mainModule.lstServer;
-			lstServerClt[idx].clear();
+			ServerModule md = lstServer[idx];
+			ent.mainModule.mapServer[md.type].clear(md);
+			//lstServerClt[idx].clear();
 
 			lstServer.RemoveAt(idx);
 			serverItem.RemoveAt(idx);
-			lstServerClt.RemoveAt(idx);
+			//lstServerClt.RemoveAt(idx);
 
 			if(serverItem.Count <= 0) {
 				return;

@@ -1,4 +1,5 @@
 ﻿using HttpMultipartParser;
+using httpServer.assembly.page;
 using httpServer.module;
 using httpServer.util;
 using System;
@@ -14,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace httpServer.control {
-	public class ServerCtl {
+	class ServerCtl {
 		public class IpAddr {
 			public string ip = "";
 			public string port = "";
@@ -37,7 +38,7 @@ namespace httpServer.control {
 		//public bool isTransmit = false;
 		//public string transmitUrl = "";
 
-		public ServerModule md = null;
+		public HttpModel md = null;
 
 		string lastServer = "";
 		string serverUrl = "";

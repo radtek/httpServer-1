@@ -1,4 +1,5 @@
 ﻿using com.superscene.util;
+using com.superscene.util.action;
 using httpServer.control;
 using httpServer.entity;
 using httpServer.module;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +22,8 @@ using System.Windows.Shapes;
 
 namespace httpServer.assembly.page {
 	class HttpModel : ServerModule {
+		public ServerCtl ctl = null;
+
 		public string ip = "127.0.0.1";     //
 		public string port = "";
 
@@ -60,7 +64,7 @@ namespace httpServer.assembly.page {
 		//int dataIndex = 0;
 		//ServerItem serverItem = null;
 		private HttpModel nowData = null;
-		private List<ServerCtl> lstServerClt = new List<ServerCtl>();
+		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
 
 		public HttpServerWin() {
 			InitializeComponent();
@@ -80,28 +84,62 @@ namespace httpServer.assembly.page {
 			}
 		}
 
-		public void initData(ServerModule md) {
+		public void initData(ServerModule _md) {
+			HttpModel md = (HttpModel)_md;
 
+			ServerCtl ctl = new ServerCtl();
+			ctl.md = md;
+			md.ctl = ctl;
+			//lstServerClt.Add(ctl);
+			if (md.isRun) {
+				ctl.restartServer();
+			}
 		}
 
 		public void start() {
-
+			updateData("isRun", true);
 		}
 
 		public void stop() {
-
+			updateData("isRun", false);
 		}
 
-		public void clear() {
-
+		public void clear(ServerModule _md) {
+			HttpModel md = (HttpModel)_md;
+			md.ctl.clear();
 		}
 
-		public void updateData(ServerModule md) {
-			nowData = md as HttpModel;
+		public void updateData(ServerModule _md) {
+			HttpModel md = (HttpModel)_md;
+			nowData = md;
+
+			txtDesc.Text = md.desc;
+
+			cbxIp.Text = md.ip;
+			txtPort.Text = md.port;
+
+			txtPath.Text = md.path;
+
+			txtProxy.IsChecked = md.isProxy;
+			txtProxy.Text = md.proxyUrl;
+
+			txtTransmit.IsChecked = md.isTransmit;
+			txtTransmit.Text = md.transmitUrl;
+
+			lblUrl.Content = "http://" + md.ip + ":" + md.port;
 		}
 
 		public ServerModule createModel() {
 			return new HttpModel();
+			//return data;
+		}
+
+		public ServerModule createNewModel() {
+			HttpModel md = new HttpModel();
+			md.port = SystemCtl.getFreePort(8091).ToString();
+			md.desc = md.ip + ":" + md.port;
+			md.path = SysConst.rootPath();
+			return md;
 			//return data;
 		}
 
@@ -152,17 +190,20 @@ namespace httpServer.assembly.page {
 		}
 
 		private void updateData(string name, string value) {
-			int idx = dataIndex;
-			if(idx < 0 || serverItem == null) {
+			//int idx = dataIndex;
+			//if(idx < 0 || serverItem == null) {
+			//	return;
+			//}
+			if (nowData == null) {
 				return;
 			}
 
-			HttpModel md = ent.mainModule.lstServer[idx] as HttpModel;
+			HttpModel md = nowData;
 
 			switch(name) {
 			case "desc": {
 					md.desc = value;
-					serverItem.Content = value;
+					md.serverItem.Content = value;
 					break;
 				}
 			case "transmitUrl": md.transmitUrl = value; break;
@@ -172,26 +213,31 @@ namespace httpServer.assembly.page {
 		}
 
 		private void updateData(string name, bool value) {
-			int idx = dataIndex;
-			if(idx < 0 || serverItem == null) {
+			//int idx = dataIndex;
+			//if(idx < 0 || serverItem == null) {
+			//	return;
+			//}
+			if (nowData == null) {
 				return;
 			}
 
-			HttpModel md = ent.mainModule.lstServer[idx] as HttpModel;
+			HttpModel md = nowData;
 
-			switch(name) {
+			switch (name) {
 			case "isTransmit": md.isTransmit = value; break;
 			case "isProxy": md.isProxy = value; break;
 			case "isRun": {
 					md.isRun = value;
-					serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
+					md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
 					if(value == true) {
 						md.ip = cbxIp.Text;
 						md.port = txtPort.Text;
 						lblUrl.Content = "http://" + md.ip + ":" + md.port;
-						lstServerClt[idx].restartServer();
+						//lstServerClt[idx].restartServer();
+						md.ctl.restartServer();
 					} else {
-						lstServerClt[idx].clear();
+						//lstServerClt[idx].clear();
+						md.ctl.clear();
 					}
 					if(md.desc == "" || isDescIp(md.desc)) {
 						txtDesc.Text = md.ip + ":" + md.port;
@@ -200,6 +246,10 @@ namespace httpServer.assembly.page {
 					break;
 				}
 			}
+		}
+
+		private bool isDescIp(string desc) {
+			return Regex.IsMatch(desc, "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
 		}
 
 	}
