@@ -56,6 +56,7 @@ namespace httpServer.assembly.page {
 
 	/// <summary>
 	/// HttpServerWin.xaml 的交互逻辑
+	/// http服务器
 	/// </summary>
 	public partial class HttpServerWin : UserControl, IPage {
 		//HttpModel data = new HttpModel();
@@ -228,7 +229,7 @@ namespace httpServer.assembly.page {
 			case "isProxy": md.isProxy = value; break;
 			case "isRun": {
 					md.isRun = value;
-					md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
+					//md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
 					if(value == true) {
 						md.ip = cbxIp.Text;
 						md.port = txtPort.Text;

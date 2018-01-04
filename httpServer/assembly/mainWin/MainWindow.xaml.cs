@@ -167,8 +167,12 @@ namespace httpServer {
 
 		private void btnRestart_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			int idx = lstItem.SelectedIndex;
+
 			ServerModule md = ent.mainModule.lstServer[idx];
+
 			ent.mainModule.mapServer[md.type].start();
+			btnRestart.Content = md.isRun ? "重启" : "启动";
+			md.serverItem.Source = getServerStatusImgPath(md.isRun);
 		}
 
 		public string getServerStatusImgPath(bool isRun) {
@@ -215,10 +219,19 @@ namespace httpServer {
 			//lblUrl.Content = "http://" + md.ip + ":" + md.port;
 		}
 
+		private void switchPage(string type) {
+
+		}
+
 		private void btnStop_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			int idx = lstItem.SelectedIndex;
+
+
 			ServerModule md = ent.mainModule.lstServer[idx];
+
 			ent.mainModule.mapServer[md.type].stop();
+			btnRestart.Content = md.isRun ? "重启" : "启动";
+			md.serverItem.Source = getServerStatusImgPath(md.isRun);
 		}
 
 		private void btnNew_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
