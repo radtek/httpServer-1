@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 
 namespace httpServer.assembly.page {
 	/// <summary>
-	/// RevProxy.xaml 的交互逻辑
-	/// 反向代理
+	/// HttpRevProxy.xaml 的交互逻辑
+	/// Http反向代理
 	/// </summary>
-	public partial class RevProxy : UserControl {
-		public RevProxy() {
+	public partial class HttpRevProxy : UserControl {
+		public HttpRevProxy() {
 			InitializeComponent();
 		}
 	}

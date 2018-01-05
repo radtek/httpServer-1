@@ -69,8 +69,8 @@
       <DependentUpon>HttpServerWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="assembly\page\IPage.cs" />
-    <Compile Include="assembly\page\RevProxy.xaml.cs">
-      <DependentUpon>RevProxy.xaml</DependentUpon>
+    <Compile Include="assembly\page\HttpRevProxy.xaml.cs">
+      <DependentUpon>HttpRevProxy.xaml</DependentUpon>
     </Compile>
     <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
     <Compile Include="control\Cache.cs" />
@@ -141,7 +141,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="assembly\page\RevProxy.xaml">
+    <Page Include="assembly\page\HttpRevProxy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
