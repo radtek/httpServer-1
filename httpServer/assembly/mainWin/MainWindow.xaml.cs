@@ -68,6 +68,9 @@ namespace httpServer {
 		//HttpCtl httpCtl = new HttpCtl();
 
 		//private int nowIdx = -1;
+		private string nowType = "";
+
+		Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
 
 		public MainWindow() {
 			InitializeComponent();
@@ -79,6 +82,7 @@ namespace httpServer {
 			ent.mainWin = this;
 
 			ent.mainModule.mapServer["httpServer"] = new HttpServerWin();
+			ent.mainModule.mapServer["httpRevProxy"] = new HttpRevProxy();
 
 			serverDataCtl = new ServerDataCtl();
 			serverDataCtl.load();
@@ -104,7 +108,20 @@ namespace httpServer {
 				IPage page = ent.mainModule.mapServer[key];
 				page.init();
 				grdPage.Children.Add(page as UserControl);
+				(page as UserControl).Visibility = Visibility.Collapsed;
 			}
+
+			string[] lstType = {
+				"httpServer", "http服务器",
+				"httpRevProxy", "http反向代理"
+			};
+
+			for (int i = 0; i < lstType.Length ; i += 2) {
+				cbxType.Items.Add(lstType[i + 1]);
+				mapIdxToType[i / 2] = lstType[i];
+			}
+
+			cbxType.SelectedIndex = 0;
 
 			//
 			initServerItem(ent.mainModule.lstServer);
@@ -196,7 +213,27 @@ namespace httpServer {
 				return;
 			}
 
+			var map = ent.mainModule.mapServer;
+
 			ServerModule md = ent.mainModule.lstServer[idx];
+
+			if(!map.ContainsKey(md.type)){
+				return;
+			}
+
+			//update page
+			if (nowType != md.type) {
+				if (map.ContainsKey(nowType)) {
+					IPage oldPage = ent.mainModule.mapServer[nowType];
+					(oldPage as UserControl).Visibility = Visibility.Collapsed;
+				}
+				
+				IPage newPage = ent.mainModule.mapServer[md.type];
+				(newPage as UserControl).Visibility = Visibility.Visible;
+			}
+
+			nowType = md.type;
+
 			//txtDesc.Text = md.desc;
 			serverItem[idx].Source = getServerStatusImgPath(md.isRun);
 
@@ -237,8 +274,10 @@ namespace httpServer {
 		private void btnNew_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			List<ServerModule> lstServer = ent.mainModule.lstServer;
 
-			ServerModule md = ent.mainModule.mapServer["httpServer"].createNewModel();
-			md.type = "httpServer";
+			string type = mapIdxToType[cbxType.SelectedIndex];
+
+			ServerModule md = ent.mainModule.mapServer[type].createNewModel();
+			md.type = type;
 
 			ServerItem item = new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 			md.serverItem = item;

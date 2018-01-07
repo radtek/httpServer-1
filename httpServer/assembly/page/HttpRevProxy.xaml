@@ -22,29 +22,30 @@
 					</Grid.ColumnDefinitions>
 
 					<StackPanel>
-						<Label HorizontalContentAlignment="Center" Content="服务器"/>
-						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top"/>
+						<Label HorizontalContentAlignment="Center" Content="局域网" Name="lblLocal" MouseEnter="lblLocal_MouseEnter" MouseLeave="lblLocal_MouseLeave" MouseLeftButtonUp="lblLocal_MouseLeftButtonUp"/>
+						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top" Name="borLocal"/>
 
-						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
-							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="隧道地址：" x:Name="txtCtlIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtCtlPort" />
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" HorizontalAlignment="Center" Height="32">
+							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="隧道地址：" x:Name="txtServerIp"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtServerPort"/>
 						</StackPanel>
-						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
-							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="http服务：" x:Name="txtIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtPort" />
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" HorizontalAlignment="Center" Height="32">
+							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="http服务：" x:Name="txtLocalIp"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtLocalPort"/>
 						</StackPanel>
 					</StackPanel>
 
 					<StackPanel Grid.Column="2">
-						<Label HorizontalContentAlignment="Center" Content="局域网"/>
-						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top"/>
-						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
-							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="隧道地址：" x:Name="txtServerIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtServerPort" />
+						<Label HorizontalContentAlignment="Center" Content="服务器" Name="lblServer" MouseEnter="lblServer_MouseEnter" MouseLeave="lblServer_MouseLeave" MouseLeftButtonUp="lblServer_MouseLeftButtonUp"/>
+						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top" Visibility="Hidden" Name="borServer"/>
+
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" HorizontalAlignment="Center" Height="32">
+							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="隧道地址：" x:Name="cbxCtlIp"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtCtlPort" />
 						</StackPanel>
-						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
-							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="http服务：" x:Name="txtLocalIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtLocalPort" />
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" HorizontalAlignment="Center" Height="32">
+							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="http服务：" x:Name="cbxHttpIp"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtHttpPort" />
 						</StackPanel>
 					</StackPanel>
 				</Grid>

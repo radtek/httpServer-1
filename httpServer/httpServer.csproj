@@ -73,6 +73,7 @@
       <DependentUpon>HttpRevProxy.xaml</DependentUpon>
     </Compile>
     <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
+    <Compile Include="assembly\util\UiService.cs" />
     <Compile Include="control\Cache.cs" />
     <Compile Include="control\RequestCtl.cs" />
     <Compile Include="control\ServerCtl.cs" />

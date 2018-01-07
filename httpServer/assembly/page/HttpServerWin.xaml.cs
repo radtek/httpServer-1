@@ -1,5 +1,6 @@
 ﻿using com.superscene.util;
 using com.superscene.util.action;
+using httpServer.assembly.util;
 using httpServer.control;
 using httpServer.entity;
 using httpServer.module;
@@ -78,7 +79,7 @@ namespace httpServer.assembly.page {
 			txtTransmit.Visibility = Visibility.Collapsed;
 
 			//find ip
-			List<string> lstIP = CommonUtil.findAllIp();
+			List<string> lstIP = UiService.ins().getAllIp();
 			cbxIp.Items.Add("127.0.0.1");
 			for(int i = 0; i < lstIP.Count; ++i) {
 				cbxIp.Items.Add(lstIP[i]);

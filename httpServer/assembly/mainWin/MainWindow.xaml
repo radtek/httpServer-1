@@ -54,21 +54,25 @@
 					</Grid>-->
 				<!--<supUI:ComboBoxLabel IsEditable="True" LeftWidth="40" Height="32" Content="IP:" x:Name="cbxIp"/>
 					<supUI:TextBoxLabel LeftWidth="40" Height="32" Content="端口" Tip="" VerticalContentAlignment="Center" VerticalAlignment="Top" x:Name="txtPort" />-->
+
 				<Grid Margin="0,4,0,0" Height="25">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="50*"/>
-						<ColumnDefinition Width="50*"/>
-					</Grid.ColumnDefinitions>
-					<Label Margin="0,0,2,0" Padding="0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Content="新建" x:Name="btnNew" MouseLeftButtonUp="btnNew_MouseLeftButtonUp"/>
-					<Label Margin="2,0,0,0" Padding="0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Content="删除" x:Name="btnDel" MouseLeftButtonUp="btnDel_MouseLeftButtonUp"/>
-				</Grid>
-				<Grid Margin="0,4,0,0" Height="25">
-					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="50*"/>
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
 					<Label Margin="0,0,2,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Content="重启" x:Name="btnRestart" MouseLeftButtonUp="btnRestart_MouseLeftButtonUp"/>
 					<Label Margin="2,0,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Content="停止" x:Name="btnStop" MouseLeftButtonUp="btnStop_MouseLeftButtonUp"/>
+					<Label Margin="2,0,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" Content="删除" x:Name="btnDel" MouseLeftButtonUp="btnDel_MouseLeftButtonUp"/>
+				</Grid>
+				<Grid Margin="0,4,0,0" Height="25">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="50*"/>
+					</Grid.ColumnDefinitions>
+					<supUI:ComboBoxLabel Grid.ColumnSpan="2" LeftWidth="0" Content="" x:Name="cbxType"/>
+					<Label Margin="0,0,2,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" Content="新建" x:Name="btnNew" MouseLeftButtonUp="btnNew_MouseLeftButtonUp"/>
 				</Grid>
 			</StackPanel>
 
