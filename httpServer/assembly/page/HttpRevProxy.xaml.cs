@@ -1,6 +1,8 @@
 ﻿using com.superscene.util;
 using com.superscene.util.action;
 using httpServer.assembly.util;
+using httpServer.control;
+using httpServer.control.httpRevProxy;
 using httpServer.entity;
 using httpServer.module;
 using httpServer.util;
@@ -21,12 +23,13 @@ using System.Windows.Shapes;
 
 namespace httpServer.assembly.page {
 	class HttpRevModel : ServerModule {
+		public IServerCtl serverCtl = null;
 		public string revType = "local";
 
-		public string serverIp = "";
-		public string serverPort = "";
-		public string localIp = "";
-		public string localPort = "";
+		public string serverIp = "127.0.0.1";
+		public string serverPort = "8091";
+		public string localIp = "127.0.0.1";
+		public string localPort = "8091";
 
 		public string ctlIp = "127.0.0.1";
 		public string ctlPort = "";
@@ -40,10 +43,10 @@ namespace httpServer.assembly.page {
 
 			revType = regCtl.getValue(subPath + "revType", "local");
 
-			serverIp = regCtl.getValue(subPath + "serverIp", "");
-			serverPort = regCtl.getValue(subPath + "serverPort", "");
-			localIp = regCtl.getValue(subPath + "localIp", "");
-			localPort = regCtl.getValue(subPath + "localPort", "");
+			serverIp = regCtl.getValue(subPath + "serverIp", "127.0.0.1");
+			serverPort = regCtl.getValue(subPath + "serverPort", "8091");
+			localIp = regCtl.getValue(subPath + "localIp", "127.0.0.1");
+			localPort = regCtl.getValue(subPath + "localPort", "8091");
 
 			ctlIp = regCtl.getValue(subPath + "ctlIp", "127.0.0.1");
 			ctlPort = regCtl.getValue(subPath + "ctlPort", "8091");
@@ -75,6 +78,8 @@ namespace httpServer.assembly.page {
 	public partial class HttpRevProxy : UserControl, IPage {
 		Entity ent = null;
 		private HttpRevModel nowData = null;
+		//private HttpRevServer server = new HttpRevServer();
+		//private HttpRevClient client = new HttpRevClient();
 
 		public HttpRevProxy() {
 			InitializeComponent();
@@ -92,8 +97,18 @@ namespace httpServer.assembly.page {
 			}
 		}
 
-		public void initData(ServerModule md) {
+		public void initData(ServerModule _md) {
+			HttpRevModel md = (HttpRevModel)_md;
 
+			if(md.revType == "local") {
+				md.serverCtl = new HttpRevClient();
+			} else {
+				md.serverCtl = new HttpRevServer();
+			}
+
+			if(md.isRun) {
+				md.serverCtl.restartServer();
+			}
 		}
 
 		public ServerModule createModel() {
@@ -124,15 +139,48 @@ namespace httpServer.assembly.page {
 			cbxHttpIp.Text = md.httpIp;
 			txtHttpPort.Text = md.httpPort;
 
+			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort;
 			updateRevType(md.revType);
 		}
 
 		public void start() {
-
+			startServer(true);
 		}
 
 		public void stop() {
+			startServer(false);
+		}
 
+		private void startServer(bool isStart) {
+			HttpRevModel md = nowData;
+			md.isRun = isStart;
+
+			md.serverIp = txtServerIp.Text;
+			md.serverPort = txtServerPort.Text;
+			md.localIp = txtLocalIp.Text;
+			md.localPort = txtLocalPort.Text;
+
+			md.ctlIp = cbxCtlIp.Text;
+			md.ctlPort = txtCtlPort.Text;
+			md.httpIp = cbxHttpIp.Text;
+			md.httpPort = txtHttpPort.Text;
+
+			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort;
+			if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
+				if(md.revType == "local") {
+					md.desc = md.localIp + ":" + md.localPort;
+				} else {
+					md.desc = md.httpIp + ":" + md.httpPort;
+				}
+				txtDesc.Text = md.desc;
+				md.serverItem.Content = md.desc;
+			}
+
+			if(isStart) {
+				md.serverCtl.restartServer();
+			} else {
+				md.serverCtl.clear();
+			}
 		}
 
 		public void clear(ServerModule md) {
@@ -183,9 +231,16 @@ namespace httpServer.assembly.page {
 			if (type == "local") {
 				borLocal.Visibility = Visibility.Visible;
 				borServer.Visibility = Visibility.Hidden;
+
+				lblUrl.Visibility = Visibility.Hidden;
+				lblCopyUrl.Visibility = Visibility.Hidden;
 			} else {
 				borLocal.Visibility = Visibility.Hidden;
 				borServer.Visibility = Visibility.Visible;
+
+				lblUrl.Visibility = Visibility.Visible;
+				lblCopyUrl.Visibility = Visibility.Visible;
+
 			}
 		}
 

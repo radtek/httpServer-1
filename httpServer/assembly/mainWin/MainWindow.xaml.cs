@@ -125,7 +125,7 @@ namespace httpServer {
 
 			//
 			initServerItem(ent.mainModule.lstServer);
-			lstItem.SelectedIndex = 0;
+			lstItem.SelectedIndex = Int32.Parse(regCtl.getValue(regPath + "selectItem", "0"));
 		}
 
 		private void initServerItem(List<ServerModule> lstServer) {
@@ -167,6 +167,7 @@ namespace httpServer {
 			regCtl.setValue(regPath + "y", this.Top.ToString());
 			regCtl.setValue(regPath + "width", this.Width.ToString());
 			regCtl.setValue(regPath + "height", this.Height.ToString());
+			regCtl.setValue(regPath + "selectItem", lstItem.SelectedIndex.ToString());
 
 			serverDataCtl.save();
 		}
