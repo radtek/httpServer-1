@@ -31,7 +31,7 @@
 			</StackPanel>
 		</Grid>-->
 
-		<Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,0">
+		<Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,0" Name="grdMainBox">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="70"/>
 				<RowDefinition Height="8"/>
@@ -41,6 +41,8 @@
 				<ColumnDefinition Width="160" MinWidth="150" MaxWidth="350"/>
 				<ColumnDefinition Width="8"/>
 				<ColumnDefinition Width="50*"/>
+				<ColumnDefinition Width="8"/>
+				<ColumnDefinition Width="150"/>
 			</Grid.ColumnDefinitions>
 
 			<!--<ListBox Grid.RowSpan="3" Margin="0,0,0,90" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" Name="lstItem" ItemTemplate="{DynamicResource BaseListBoxServerItem}"/>-->
@@ -76,9 +78,12 @@
 				</Grid>
 			</StackPanel>
 
-			<Grid Grid.Column="3" Grid.RowSpan="3" Name="grdPage">
+			<Grid Grid.Column="2" Grid.RowSpan="3" Name="grdPage">
 				<!--<page:HttpServerWin/>-->
 			</Grid>
+
+			<Label Grid.Column="4" Grid.RowSpan="3" Content="日志："/>
+			<TextBox Grid.Column="4" Grid.RowSpan="3" Margin="0,27,0,0" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="txtLog" />
 			<!--<Grid Grid.Column="3" Grid.RowSpan="3" >
 				<StackPanel VerticalAlignment="Top">
 					<supUI:TextBoxLabel LeftWidth="50" Height="32" Margin="5,0,0,0" Content="描述：" x:Name="txtDesc" TextChanged="txtDesc_TextChanged"/>

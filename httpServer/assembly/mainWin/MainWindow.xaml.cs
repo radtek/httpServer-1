@@ -72,6 +72,9 @@ namespace httpServer {
 
 		Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
 
+		bool isDebug = true;
+		string strLog = "";
+
 		public MainWindow() {
 			InitializeComponent();
 			ins = this;
@@ -122,6 +125,12 @@ namespace httpServer {
 			}
 
 			cbxType.SelectedIndex = 0;
+
+			//隐藏日志
+			if (!isDebug) {
+				grdMainBox.ColumnDefinitions[3].Width = new GridLength(0);
+				grdMainBox.ColumnDefinitions[4].Width = new GridLength(0);
+			}
 
 			//
 			initServerItem(ent.mainModule.lstServer);
@@ -327,6 +336,17 @@ namespace httpServer {
 				newIdx = idx - 1;
 			}
 			lstItem.SelectedIndex = newIdx;
+		}
+
+		public void log(string info) {
+			if (!isDebug) {
+				return;
+			}
+
+			strLog += info + "\r\n";
+			Dispatcher.Invoke(() => {
+				txtLog.Text = strLog;
+			});
 		}
 
 	}

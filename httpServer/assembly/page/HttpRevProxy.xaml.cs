@@ -23,18 +23,31 @@ using System.Windows.Shapes;
 
 namespace httpServer.assembly.page {
 	class HttpRevModel : ServerModule {
-		public IServerCtl serverCtl = null;
+		//public IServerCtl localCtl = new HttpRevClient();
+		//public IServerCtl serverCtl = new HttpRevServer();
 		public string revType = "local";
+		public Dictionary<string, IServerCtl> mapCtl = new Dictionary<string, IServerCtl>();
 
-		public string serverIp = "127.0.0.1";
-		public string serverPort = "8091";
-		public string localIp = "127.0.0.1";
-		public string localPort = "8091";
+		public string serverCtlIp = "127.0.0.1";
+		public string serverCtlPort = "8091";
+		public string localHttpIp = "127.0.0.1";
+		public string localHttpPort = "8091";
 
 		public string ctlIp = "127.0.0.1";
 		public string ctlPort = "";
 		public string httpIp = "127.0.0.1";
 		public string httpPort = "";
+
+		public HttpRevModel() {
+			mapCtl["local"] = new HttpRevClient(this);
+			mapCtl["server"] = new HttpRevServer(this);
+		}
+
+		public void clearCtl() {
+			foreach (string key in mapCtl.Keys) {
+				mapCtl[key].clear();
+			}
+		}
 
 		public override void load(RegistryCtl regCtl, string subPath) {
 			base.load(regCtl, subPath);
@@ -43,10 +56,10 @@ namespace httpServer.assembly.page {
 
 			revType = regCtl.getValue(subPath + "revType", "local");
 
-			serverIp = regCtl.getValue(subPath + "serverIp", "127.0.0.1");
-			serverPort = regCtl.getValue(subPath + "serverPort", "8091");
-			localIp = regCtl.getValue(subPath + "localIp", "127.0.0.1");
-			localPort = regCtl.getValue(subPath + "localPort", "8091");
+			serverCtlIp = regCtl.getValue(subPath + "serverCtlIp", "127.0.0.1");
+			serverCtlPort = regCtl.getValue(subPath + "serverCtlPort", "8091");
+			localHttpIp = regCtl.getValue(subPath + "localHttpIp", "127.0.0.1");
+			localHttpPort = regCtl.getValue(subPath + "localHttpPort", "8091");
 
 			ctlIp = regCtl.getValue(subPath + "ctlIp", "127.0.0.1");
 			ctlPort = regCtl.getValue(subPath + "ctlPort", "8091");
@@ -59,10 +72,10 @@ namespace httpServer.assembly.page {
 
 			regCtl.setValue(subPath + "revType", revType);
 
-			regCtl.setValue(subPath + "serverIp", serverIp);
-			regCtl.setValue(subPath + "serverPort", serverPort);
-			regCtl.setValue(subPath + "localIp", localIp);
-			regCtl.setValue(subPath + "localPort", localPort);
+			regCtl.setValue(subPath + "serverCtlIp", serverCtlIp);
+			regCtl.setValue(subPath + "serverCtlPort", serverCtlPort);
+			regCtl.setValue(subPath + "localHttpIp", localHttpIp);
+			regCtl.setValue(subPath + "localHttpPort", localHttpPort);
 
 			regCtl.setValue(subPath + "ctlIp", ctlIp);
 			regCtl.setValue(subPath + "ctlPort", ctlPort);
@@ -100,14 +113,17 @@ namespace httpServer.assembly.page {
 		public void initData(ServerModule _md) {
 			HttpRevModel md = (HttpRevModel)_md;
 
-			if(md.revType == "local") {
-				md.serverCtl = new HttpRevClient();
-			} else {
-				md.serverCtl = new HttpRevServer();
-			}
+			//if(md.revType == "local") {
+			//	md.serverCtl = new HttpRevClient();
+			//} else {
+			//	md.serverCtl = new HttpRevServer();
+			//}
 
 			if(md.isRun) {
-				md.serverCtl.restartServer();
+				//md.clearCtl();
+				if (md.mapCtl.ContainsKey(md.revType)){
+					md.mapCtl[md.revType].restartServer();
+				}
 			}
 		}
 
@@ -129,10 +145,10 @@ namespace httpServer.assembly.page {
 
 			txtDesc.Text = md.desc;
 
-			txtServerIp.Text = md.serverIp;
-			txtServerPort.Text = md.serverPort;
-			txtLocalIp.Text = md.localIp;
-			txtLocalPort.Text = md.localPort;
+			txtServerCtlIp.Text = md.serverCtlIp;
+			txtServerCtlPort.Text = md.serverCtlPort;
+			txtLocalHttpIp.Text = md.localHttpIp;
+			txtLocalHttpPort.Text = md.localHttpPort;
 
 			cbxCtlIp.Text = md.ctlIp;
 			txtCtlPort.Text = md.ctlPort;
@@ -155,10 +171,11 @@ namespace httpServer.assembly.page {
 			HttpRevModel md = nowData;
 			md.isRun = isStart;
 
-			md.serverIp = txtServerIp.Text;
-			md.serverPort = txtServerPort.Text;
-			md.localIp = txtLocalIp.Text;
-			md.localPort = txtLocalPort.Text;
+			md.revType = borLocal.Visibility == Visibility.Visible ? "local" : "server";
+			md.serverCtlIp = txtServerCtlIp.Text;
+			md.serverCtlPort = txtServerCtlPort.Text;
+			md.localHttpIp = txtLocalHttpIp.Text;
+			md.localHttpPort = txtLocalHttpPort.Text;
 
 			md.ctlIp = cbxCtlIp.Text;
 			md.ctlPort = txtCtlPort.Text;
@@ -166,25 +183,42 @@ namespace httpServer.assembly.page {
 			md.httpPort = txtHttpPort.Text;
 
 			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort;
-			if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
-				if(md.revType == "local") {
-					md.desc = md.localIp + ":" + md.localPort;
+			//if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
+			//	if(md.revType == "local") {
+			//		md.desc = md.localIp + ":" + md.localPort;
+			//	} else {
+			//		md.desc = md.httpIp + ":" + md.httpPort;
+			//	}
+			//	txtDesc.Text = md.desc;
+			//	md.serverItem.Content = md.desc;
+			//}
+			updateDesc();
+
+			md.clearCtl();
+			if (isStart) {
+				if (md.mapCtl.ContainsKey(md.revType)) {
+					md.mapCtl[md.revType].restartServer();
+				}
+			}
+		}
+
+		public void clear(ServerModule _md) {
+			HttpRevModel md = (HttpRevModel)_md;
+			md.clearCtl();
+		}
+
+		private void updateDesc() {
+			HttpRevModel md = nowData;
+
+			if (md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
+				if (md.revType == "local") {
+					md.desc = md.localHttpIp + ":" + md.localHttpPort;
 				} else {
 					md.desc = md.httpIp + ":" + md.httpPort;
 				}
 				txtDesc.Text = md.desc;
 				md.serverItem.Content = md.desc;
 			}
-
-			if(isStart) {
-				md.serverCtl.restartServer();
-			} else {
-				md.serverCtl.clear();
-			}
-		}
-
-		public void clear(ServerModule md) {
-
 		}
 
 		private void txtDesc_TextChanged(object sender, TextChangedEventArgs e) {
@@ -219,16 +253,18 @@ namespace httpServer.assembly.page {
 			if (nowData == null) { return; }
 			updateRevType("local");
 			nowData.revType = "local";
+			updateDesc();
 		}
 
 		private void lblServer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			if (nowData == null) { return; }
 			updateRevType("server");
 			nowData.revType = "server";
+			updateDesc();
 		}
 
-		private void updateRevType(string type) {
-			if (type == "local") {
+		private void updateRevType(string revType) {
+			if (revType == "local") {
 				borLocal.Visibility = Visibility.Visible;
 				borServer.Visibility = Visibility.Hidden;
 
@@ -244,5 +280,12 @@ namespace httpServer.assembly.page {
 			}
 		}
 
+		private void lblUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			CommonUtil.runExe("explorer.exe", lblUrl.Content.ToString());
+		}
+
+		private void lblCopyUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			Clipboard.SetDataObject(lblUrl.Content);
+		}
 	}
 }

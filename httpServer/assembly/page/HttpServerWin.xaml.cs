@@ -241,7 +241,7 @@ namespace httpServer.assembly.page {
 						//lstServerClt[idx].clear();
 						md.ctl.clear();
 					}
-					if(md.desc == "" || isDescIp(md.desc)) {
+					if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
 						txtDesc.Text = md.ip + ":" + md.port;
 						updateData("desc", md.ip + ":" + md.port);
 					}
@@ -250,9 +250,9 @@ namespace httpServer.assembly.page {
 			}
 		}
 
-		private bool isDescIp(string desc) {
-			return Regex.IsMatch(desc, "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
-		}
+		//private bool isDescIp(string desc) {
+		//	return Regex.IsMatch(desc, "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
+		//}
 
 	}
 }
