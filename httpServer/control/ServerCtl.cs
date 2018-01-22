@@ -165,6 +165,7 @@ namespace httpServer.control {
 			}
 
 			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+			//Debug.WriteLine(url);
 			//string url = httpListenerContext.Request.Url.AbsolutePath;
 			bool isIndex = false;
 			if(url != "" && url[url.Length - 1] == '/') {
@@ -173,7 +174,6 @@ namespace httpServer.control {
 			}
 
 			string path = Path.GetFullPath(md.path + "/" + url);
-			//Console.WriteLine(path);
 
 			if(!isIndex && !File.Exists(path)) {
 				string newPath = md.path + "/" + url + "/index.html";
@@ -227,32 +227,12 @@ namespace httpServer.control {
 						Kernel32.CloseHandle(hFile);
 					}
 				} catch(Exception ex) {
-					Console.WriteLine(ex.ToString());
+					Debug.WriteLine(ex.ToString());
 				}
-
-				//读文件
-				//using(FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-				//	buffer = new byte[fs.Length];
-				//	fs.Read(buffer, 0, (int)fs.Length);
-				//};
 			}
 
-			//httpListenerContext.Response.StatusCode = 200;
-
 			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-			//httpListenerContext.Response.Headers.Add("Content-Type", "text/html;charset=UTF-8");
-			//var output = httpListenerContext.Response.OutputStream;
-			//output.Write(buffer, 0, buffer.Length);
-			//output.Close();
 			httpListenerContext.Response.Close(buffer, true);
-
-			//using(StreamWriter writer = new StreamWriter(httpListenerContext.Response.OutputStream)) {
-			//	writer.WriteLine("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>测试服务器</title></head><body>");
-			//	writer.WriteLine("<div style=\"height:20px;color:blue;text-align:center;\"><p> hello</p></div>");
-			//	writer.WriteLine("<ul>");
-			//	writer.WriteLine("</ul>");
-			//	writer.WriteLine("</body></html>");
-			//}
 		}
 
 		private bool parseCtl(string url, HttpListenerContext ctx) {
@@ -269,26 +249,10 @@ namespace httpServer.control {
 				return true;
 			}
 
-			//var parser = new MultipartFormDataParser(ctx.Request.InputStream);
-			//var checkboxResponses = parser.GetParameterValue("path");
-			//Debug.WriteLine(checkboxResponses);
-			//foreach(var parameter in checkboxResponses) {
-			//	Console.WriteLine("Parameter {0} is {1}", parameter.Name, parameter.Data);
-			//}
-
 			try {
 				isDeal = requestCtl.parse(url, ctx);
 
 				var parser = new MultipartFormDataParser(ctx.Request.InputStream);
-				// Loop through all the files
-				//foreach(var file in parser.Files) {
-				//	Stream sr = file.Data;
-
-				//	byte[] data = readStream(sr);
-				//	string strData = Encoding.UTF8.GetString(data, 0, data.Length);
-				//	Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
-				//	// Do stuff with the data.
-				//}
 
 				foreach(var parameter in parser.Parameters) {
 					if(Regex.IsMatch(parameter.Data, "^data:.{0,30}?;base64,")) {
@@ -296,20 +260,15 @@ namespace httpServer.control {
 						int idx = parameter.Data.IndexOf(',') + 1;
 						byte[] data = Convert.FromBase64String(parameter.Data.Substring(idx));
 						string strData = Encoding.UTF8.GetString(data, 0, data.Length);
-						Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
+						//Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
 					} else {
 						//string
-						Debug.WriteLine(parameter.Name + "," + parameter.Data);
+						//Debug.WriteLine(parameter.Name + "," + parameter.Data);
 					}
 				}
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
-
-			//int len = 0;
-			//byte[] data = readStream(ctx.Request.InputStream);
-			//string strData = Encoding.UTF8.GetString(data, 0, data.Length);
-			//Debug.WriteLine(url + "," + data.Length + "\r\n" + strData + "");
 
 			return isDeal;
 		}
@@ -323,11 +282,6 @@ namespace httpServer.control {
 			//string url = httpListenerContext.Request.Url.AbsolutePath;
 			string realUrl = md.proxyUrl + url;
 
-			//string result = httpCtl.httpGet(realUrl);
-			//byte[] buffer = Encoding.UTF8.GetBytes(result);
-			//string method = httpListenerContext.Request.HttpMethod;
-			//Debug.WriteLine(realUrl + "," + method);
-
 			byte[] result = new byte[0];
 			int dataLen = 0;
 			try {
@@ -337,48 +291,9 @@ namespace httpServer.control {
 				};
 
 				using(var client = new HttpClient(handler)) {
-					//using(var formData = new MultipartFormDataContent()) {
-					//	formData.Add(stringContent, name, name);
 					if(_timeout.TotalMilliseconds != 0) {
 						client.Timeout = _timeout;
 					}
-
-					//client.BaseAddress = new Uri("http://" + httpListenerContext.Request.UserHostAddress);
-					//Debug.WriteLine(httpListenerContext.Request.UserHostAddress);
-					//client.BaseAddress
-					//if(method != "GET") {
-					//	var que = httpListenerContext.Request.QueryString;
-					//	que = new System.Collections.Specialized.NameValueCollection
-					//	//for(int i = 0; i < que.Count; ++i) {
-					//	HttpContent stringContent = new StringContent(httpListenerContext.Request.QueryString);
-					//}
-					//var getAsync = client.GetAsync(realUrl);
-					//try {
-					//	var responsea = client.GetAsync(realUrl).Result;
-					//} catch(System.AggregateException ex) {
-					//	Debug.WriteLine(ex.ToString());
-					//	Debug.WriteLine(ex.ToString());
-					//}
-					//Debug.WriteLine( client.DefaultRequestHeaders.UserAgent);
-					//client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36");
-					//client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-					//client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
-					//client.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.8");
-					////client.DefaultRequestHeaders.Add("Connection", "keep-alive");
-					//client.DefaultRequestHeaders.Add("Host", "127.0.0.1:32767");
-					//client.DefaultRequestHeaders.Add("Referer", "http://127.0.0.1:32767/14.58.58/index.html");
-					//client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
-					//client.DefaultRequestHeaders.Host = "127.0.0.1:32767";
-					//Debug.WriteLine(client.DefaultRequestHeaders.Host);
-
-					//Uri ur = new Uri(realUrl);
-					//Debug.WriteLine(ur.Host);
-					//var requestMessage = new HttpRequestMessage {
-					//	Version = HttpVersion.Version11,
-					//	RequestUri = new Uri(realUrl),
-					//	Method = new HttpMethod("GET"),
-					//};
-					//requestMessage.Headers.Host = "127.0.0.1";
 
 					//var response = client.SendAsync(requestMessage).Result;
 					var response = client.GetAsync(realUrl).Result;
@@ -403,13 +318,7 @@ namespace httpServer.control {
 
 					//response.Headers.Location;
 					int statusCode = (int)code;
-					//int.TryParse(code.ToString(), out statusCode);
-					//Debug.WriteLine(realUrl + "," + statusCode);
-					//if(statusCode == 0) {
-					//	statusCode = 200;
-					//}
 					httpListenerContext.Response.StatusCode = statusCode;
-					//}
 				}
 			} catch(Exception ex) {
 				//httpListenerContext.Response.StatusCode = 302;

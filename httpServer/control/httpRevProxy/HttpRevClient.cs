@@ -1,10 +1,14 @@
-﻿using httpServer.assembly.page;
+﻿using com.superscene.util;
+using httpServer.assembly.page;
 using httpServer.entity;
 using httpServer.module;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -18,11 +22,20 @@ namespace httpServer.control.httpRevProxy {
 		HttpRevModel md = null;
 
 		Thread thCtl = null;
+		Thread thDeal = null;
 		TcpListener server = null;
 		TcpClient client = null;
+		HttpCtl httpCtl = new HttpCtl();
+		List<byte[]> lstData = new List<byte[]>();
+		object syncData = new object();
+		NetworkStream dataStream = null;
 
-		public HttpRevClient() { }
-		public HttpRevClient(ServerModule _md) { setModel(_md); }
+		public HttpRevClient() {
+			httpCtl.timeout = 5000;
+		}
+		public HttpRevClient(ServerModule _md):this() {
+			setModel(_md);
+		}
 
 		public void setModel(ServerModule _md) {
 			md = (HttpRevModel)_md;
@@ -32,11 +45,14 @@ namespace httpServer.control.httpRevProxy {
 			try {
 				clear();
 
+				thDeal = new Thread(dealProc);
+				thDeal.Start();
+
 				thCtl = new Thread(cltProc);
 				thCtl.Start();
-				
-			} catch (Exception) {
 
+			} catch (Exception ex) {
+				Debug.WriteLine(ex.ToString());
 			}
 		}
 
@@ -47,26 +63,220 @@ namespace httpServer.control.httpRevProxy {
 
 				client = new TcpClient();
 				client.Connect(ip, port);
-				NetworkStream dataStream = client.GetStream();
+				client.ReceiveBufferSize = 10 * 1024 * 1024;
+				client.SendBufferSize = 10 * 1024 * 1024;
+
+				dataStream = client.GetStream();
 
 				do {
 					byte[] data = ComServerCtl.readStream(dataStream);
+
 					if (data.Length == 0) {
-						Thread.Sleep(100);
+						Thread.Sleep(50);
 						continue;
 					}
+					lock (syncData) {
+						lstData.Add(data);
+					}
+					continue;
 
-					string strData = Encoding.Default.GetString(data);
-					Entity.getInstance().mainWin.log(strData);
+					//HttpPackModel httpModel = new HttpPackModel();
+					//httpModel.unPack(data);
+					////Debug.WriteLine("bbbb:" + httpModel.url);
+
+					////string strUrl = Encoding.UTF8.GetString(data);
+					//string strUrl = httpModel.url;
+					//strUrl = "http://" + md.localHttpIp + ":" + md.localHttpPort + strUrl;
+					////int len = 0;
+					////byte[] rst = httpCtl.httpGetByte(strUrl, out len);
+					////dataStream.Write(rst, 0, len);
+					////continue;
+
+					//try {
+					//	//HttpContent stringContent = new StringContent(data);
+					//	using (var httpClient = new HttpClient()) {
+					//		//using(var formData = new MultipartFormDataContent()) {
+					//		//	formData.Add(stringContent, name, name);
+					//		httpClient.Timeout = TimeSpan.FromMilliseconds(5000);
+
+					//		HttpResponseMessage response = httpClient.GetAsync(strUrl).Result;
+					//		bool isResponseOk = response.IsSuccessStatusCode;
+					//		HttpStatusCode code = response.StatusCode;
+					//		int len = 0;
+					//		byte[] result = new byte[0];
+					//		if (!isResponseOk) {
+					//		} else {
+					//			Stream sResult = response.Content.ReadAsStreamAsync().Result;
+					//			result = readStreamByte(sResult, out len);
+					//		}
+
+					//		HttpPackModel httpModelRst = new HttpPackModel();
+					//		httpModelRst.httpIdx = httpModel.httpIdx;
+					//		httpModelRst.url = httpModel.url;
+					//		//httpModelRst.mapHead["type"] = response.typ;
+					//		var arr = response.Headers.ToList();
+					//		//Debug.WriteLine("bbb:" + arr.Count);
+					//		for (int i = 0; i < arr.Count; ++i) {
+					//			string key = arr[i].Key;
+					//			string val = "";
+					//			if (arr[i].Value.Count() > 0) {
+					//				//val = ((List<string>)arr[i].Value)[0];
+					//				val = arr[i].Value.FirstOrDefault();
+					//			}
+					//			httpModelRst.mapHead[key] = val;
+					//		}
+					//		httpModelRst.mapHead["Status"] = ((int)code).ToString();
+					//		if (response.Content.Headers.ContentType != null) {
+					//			httpModelRst.mapHead["Content-Type"] = response.Content.Headers.ContentType.ToString();
+					//		} else {
+					//			httpModelRst.mapHead["Content-Type"] = "";
+					//		}
+
+					//		httpModelRst.data = new byte[len];
+					//		Array.Copy(result, 0, httpModelRst.data, 0, len);
+
+					//		byte[] rst = httpModelRst.pack();
+					//		rst = httpModelRst.pack();
+					//		//var httpIdx = BitConverter.ToInt64(rst, 0);
+					//		//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length + "," + httpIdx);
+					//		//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length);
+					//		dataStream.Write(rst, 0, rst.Length);
+					//		//dataStream.Close();
+
+					//		//}
+					//	}
+					//} catch (Exception ex) {
+					//	Debug.WriteLine(ex.ToString());
+					//}
+
+					//string aaa = Encoding.UTF8.GetString(rst);
+					//Entity.getInstance().mainWin.log(aaa);
 				} while (true);
 
 				//NetworkStream dataStream = client.GetStream();
 				//string msg = "服务端亲启！";
 				//byte[] buffer = Encoding.Default.GetBytes(msg);
 				//dataStream.Write(buffer, 0, buffer.Length);
-			} catch (Exception) {
-
+			} catch (Exception ex) {
+				Debug.WriteLine(ex.ToString());
 			}
+		}
+
+		public void dealProc() {
+			try {
+				do {
+					List<byte[]> lstDataTmp = null;
+
+					lock (syncData) {
+						lstDataTmp = lstData;
+						if (lstData.Count > 0) {
+							lstData = new List<byte[]>();
+						}
+					}
+
+					if (lstDataTmp.Count <= 0 || dataStream == null) {
+						Thread.Sleep(100);
+						continue;
+					}
+
+					for (int i = 0; i < lstDataTmp.Count; ++i) {
+						byte[] data = lstDataTmp[i];
+
+						HttpPackModel httpModel = new HttpPackModel();
+						httpModel.unPack(data);
+						//Debug.WriteLine("bbbb:" + httpModel.url);
+
+						//string strUrl = Encoding.UTF8.GetString(data);
+						string strUrl = httpModel.url;
+						strUrl = "http://" + md.localHttpIp + ":" + md.localHttpPort + strUrl;
+						//int len = 0;
+						//byte[] rst = httpCtl.httpGetByte(strUrl, out len);
+						//dataStream.Write(rst, 0, len);
+						//continue;
+
+						try {
+							//HttpContent stringContent = new StringContent(data);
+							using (var httpClient = new HttpClient()) {
+								//using(var formData = new MultipartFormDataContent()) {
+								//	formData.Add(stringContent, name, name);
+								httpClient.Timeout = TimeSpan.FromMilliseconds(5000);
+
+								HttpResponseMessage response = httpClient.GetAsync(strUrl).Result;
+								bool isResponseOk = response.IsSuccessStatusCode;
+								HttpStatusCode code = response.StatusCode;
+								int len = 0;
+								byte[] result = new byte[0];
+								if (!isResponseOk) {
+								} else {
+									Stream sResult = response.Content.ReadAsStreamAsync().Result;
+									result = readStreamByte(sResult, out len);
+								}
+
+								HttpPackModel httpModelRst = new HttpPackModel();
+								httpModelRst.httpIdx = httpModel.httpIdx;
+								httpModelRst.url = httpModel.url;
+								//httpModelRst.mapHead["type"] = response.typ;
+								var arr = response.Headers.ToList();
+								//Debug.WriteLine("bbb:" + arr.Count);
+								for (int j = 0; j < arr.Count; ++j) {
+									string key = arr[j].Key;
+									string val = "";
+									if (arr[j].Value.Count() > 0) {
+										//val = ((List<string>)arr[i].Value)[0];
+										val = arr[j].Value.FirstOrDefault();
+									}
+									httpModelRst.mapHead[key] = val;
+								}
+								httpModelRst.mapHead["Status"] = ((int)code).ToString();
+								if (response.Content.Headers.ContentType != null) {
+									httpModelRst.mapHead["Content-Type"] = response.Content.Headers.ContentType.ToString();
+								} else {
+									httpModelRst.mapHead["Content-Type"] = "";
+								}
+
+								httpModelRst.data = new byte[len];
+								Array.Copy(result, 0, httpModelRst.data, 0, len);
+
+								byte[] rst = httpModelRst.pack();
+								rst = httpModelRst.pack();
+								//var httpIdx = BitConverter.ToInt64(rst, 0);
+								//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length + "," + httpIdx);
+								//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length);
+								dataStream.Write(rst, 0, rst.Length);
+								//dataStream.Close();
+
+								//}
+							}
+						} catch (Exception ex) {
+							Debug.WriteLine(ex.ToString());
+						}
+					}
+				} while (true);
+			} catch (Exception ex) {
+				Debug.WriteLine(ex.ToString());
+			}
+		}
+
+		public byte[] readStreamByte(Stream stream, out int len) {
+			//byte[] result = new byte[0];
+			int bufSize = 1024;
+			int totaLen = (int)stream.Length;
+			byte[] data = new byte[totaLen + bufSize];
+			int idx = 0;
+			int readCount = 0;
+
+			do {
+
+				readCount = stream.Read(data, idx, bufSize);
+				idx += readCount;
+
+				//result += Encoding.UTF8.GetString(data, 0, readCount);
+			} while (readCount >= bufSize);
+
+			//result = Encoding.UTF8.GetString(data, 0, totaLen);
+
+			len = totaLen;
+			return data;
 		}
 
 		public void clear() {
@@ -76,8 +286,14 @@ namespace httpServer.control.httpRevProxy {
 				server?.Stop();
 				server = null;
 
+				thDeal?.Abort();
+				thDeal = null;
+
 				thCtl?.Abort();
 				thCtl = null;
+
+				lstData = new List<byte[]>();
+				dataStream = null;
 			} catch (Exception) {
 
 			}

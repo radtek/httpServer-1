@@ -78,6 +78,7 @@
     <Compile Include="control\ComServerCtl.cs" />
     <Compile Include="control\httpRevProxy\HttpRevClient.cs" />
     <Compile Include="control\httpRevProxy\HttpRevServer.cs" />
+    <Compile Include="control\httpRevProxy\HttpPackModel.cs" />
     <Compile Include="control\IServerCtl.cs" />
     <Compile Include="control\RequestCtl.cs" />
     <Compile Include="control\ServerCtl.cs" />

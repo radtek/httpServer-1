@@ -32,6 +32,7 @@ namespace httpServer.assembly.page {
 		public string serverCtlPort = "8091";
 		public string localHttpIp = "127.0.0.1";
 		public string localHttpPort = "8091";
+		public string urlParam = "";
 
 		public string ctlIp = "127.0.0.1";
 		public string ctlPort = "";
@@ -60,6 +61,7 @@ namespace httpServer.assembly.page {
 			serverCtlPort = regCtl.getValue(subPath + "serverCtlPort", "8091");
 			localHttpIp = regCtl.getValue(subPath + "localHttpIp", "127.0.0.1");
 			localHttpPort = regCtl.getValue(subPath + "localHttpPort", "8091");
+			urlParam = regCtl.getValue(subPath + "urlParam", "");
 
 			ctlIp = regCtl.getValue(subPath + "ctlIp", "127.0.0.1");
 			ctlPort = regCtl.getValue(subPath + "ctlPort", "8091");
@@ -76,6 +78,7 @@ namespace httpServer.assembly.page {
 			regCtl.setValue(subPath + "serverCtlPort", serverCtlPort);
 			regCtl.setValue(subPath + "localHttpIp", localHttpIp);
 			regCtl.setValue(subPath + "localHttpPort", localHttpPort);
+			regCtl.setValue(subPath + "urlParam", urlParam);
 
 			regCtl.setValue(subPath + "ctlIp", ctlIp);
 			regCtl.setValue(subPath + "ctlPort", ctlPort);
@@ -149,13 +152,14 @@ namespace httpServer.assembly.page {
 			txtServerCtlPort.Text = md.serverCtlPort;
 			txtLocalHttpIp.Text = md.localHttpIp;
 			txtLocalHttpPort.Text = md.localHttpPort;
+			txtUrlParam.Text = md.urlParam;
 
 			cbxCtlIp.Text = md.ctlIp;
 			txtCtlPort.Text = md.ctlPort;
 			cbxHttpIp.Text = md.httpIp;
 			txtHttpPort.Text = md.httpPort;
 
-			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort;
+			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort + "/" + md.urlParam;
 			updateRevType(md.revType);
 		}
 
@@ -176,13 +180,14 @@ namespace httpServer.assembly.page {
 			md.serverCtlPort = txtServerCtlPort.Text;
 			md.localHttpIp = txtLocalHttpIp.Text;
 			md.localHttpPort = txtLocalHttpPort.Text;
+			md.urlParam = txtUrlParam.Text;
 
 			md.ctlIp = cbxCtlIp.Text;
 			md.ctlPort = txtCtlPort.Text;
 			md.httpIp = cbxHttpIp.Text;
 			md.httpPort = txtHttpPort.Text;
 
-			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort;
+			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort + "/" + md.urlParam;
 			//if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
 			//	if(md.revType == "local") {
 			//		md.desc = md.localIp + ":" + md.localPort;
@@ -270,12 +275,14 @@ namespace httpServer.assembly.page {
 
 				lblUrl.Visibility = Visibility.Hidden;
 				lblCopyUrl.Visibility = Visibility.Hidden;
+				txtUrlParam.Visibility = Visibility.Collapsed;
 			} else {
 				borLocal.Visibility = Visibility.Hidden;
 				borServer.Visibility = Visibility.Visible;
 
 				lblUrl.Visibility = Visibility.Visible;
 				lblCopyUrl.Visibility = Visibility.Visible;
+				txtUrlParam.Visibility = Visibility.Visible;
 
 			}
 		}
@@ -286,6 +293,12 @@ namespace httpServer.assembly.page {
 
 		private void lblCopyUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			Clipboard.SetDataObject(lblUrl.Content);
+		}
+
+		private void txtUrlParam_TextChanged(object sender, TextChangedEventArgs e) {
+			if (nowData == null) { return; }
+			nowData.urlParam = txtUrlParam.Text;
+			lblUrl.Content = "http://" + nowData.httpIp + ":" + nowData.httpPort + "/" + nowData.urlParam;
 		}
 	}
 }

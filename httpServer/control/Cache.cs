@@ -37,7 +37,7 @@ namespace httpServer.control {
 					Kernel32.CloseHandle(hFile);
 				}
 			} catch(Exception ex) {
-				Console.WriteLine(ex.ToString());
+				//Debug.WriteLine(ex.ToString());
 			}
 
 			//read file

@@ -27,6 +27,7 @@ namespace httpServer.assembly.page {
 
 		public string ip = "127.0.0.1";     //
 		public string port = "";
+		public string urlParam = "";
 
 		public string path = "";    //路径
 
@@ -44,6 +45,7 @@ namespace httpServer.assembly.page {
 			ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
 			port = regCtl.getValue(subPath + "port", "8091");
 			path = regCtl.getValue(subPath + "path", rootPath);
+			urlParam = regCtl.getValue(subPath + "urlParam", "");
 		}
 
 		public override void save(RegistryCtl regCtl, string subPath) {
@@ -52,6 +54,7 @@ namespace httpServer.assembly.page {
 			regCtl.setValue(subPath + "ip", ip);
 			regCtl.setValue(subPath + "port", port);
 			regCtl.setValue(subPath + "path", path);
+			regCtl.setValue(subPath + "urlParam", urlParam);
 		}
 	};
 
@@ -121,6 +124,7 @@ namespace httpServer.assembly.page {
 			txtPort.Text = md.port;
 
 			txtPath.Text = md.path;
+			txtUrlParam.Text = md.urlParam;
 
 			txtProxy.IsChecked = md.isProxy;
 			txtProxy.Text = md.proxyUrl;
@@ -128,7 +132,7 @@ namespace httpServer.assembly.page {
 			txtTransmit.IsChecked = md.isTransmit;
 			txtTransmit.Text = md.transmitUrl;
 
-			lblUrl.Content = "http://" + md.ip + ":" + md.port;
+			lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
 		}
 
 		public ServerModule createModel() {
@@ -191,6 +195,10 @@ namespace httpServer.assembly.page {
 			updateData("desc", txtDesc.Text);
 		}
 
+		private void txtUrlParam_TextChanged(object sender, TextChangedEventArgs e) {
+			updateData("urlParam", txtUrlParam.Text);
+		}
+
 		private void updateData(string name, string value) {
 			//int idx = dataIndex;
 			//if(idx < 0 || serverItem == null) {
@@ -211,6 +219,11 @@ namespace httpServer.assembly.page {
 			case "transmitUrl": md.transmitUrl = value; break;
 			case "proxyUrl": md.proxyUrl = value; break;
 			case "path": md.path = value; break;
+			case "urlParam": {
+					md.urlParam = value;
+					lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+					break;
+				}
 			}
 		}
 
@@ -234,7 +247,7 @@ namespace httpServer.assembly.page {
 					if(value == true) {
 						md.ip = cbxIp.Text;
 						md.port = txtPort.Text;
-						lblUrl.Content = "http://" + md.ip + ":" + md.port;
+						lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
 						//lstServerClt[idx].restartServer();
 						md.ctl.restartServer();
 					} else {

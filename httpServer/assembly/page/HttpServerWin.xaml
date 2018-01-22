@@ -22,6 +22,7 @@
 				<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,0,0,0" Tip="127.0.0.1:80" Content="端口转发" x:Name="txtTransmit" Checked="txtTransmit_Checked" Unchecked="txtTransmit_Unchecked" TextChanged="txtTransmit_TextChanged" />
 				<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,4,0,0" Content="反向代理" Tip="" x:Name="txtProxy" TextChanged="txtProxy_TextChanged" Checked="txtProxy_Checked" Unchecked="txtProxy_Unchecked" />
 				<supUI:TextBoxFile LeftWidth="50" Height="32" IsSelectFolder="True" Margin="5,4,0,0" Tip="" VerticalAlignment="Top" Content="路径：" x:Name="txtPath" TextChanged="txtPath_TextChanged" />
+				<supUI:TextBoxLabel LeftWidth="60" Height="32" Margin="5,8,0,0" Content="url参数：" Tip="" x:Name="txtUrlParam" TextChanged="txtUrlParam_TextChanged" />
 				<StackPanel Margin="5,4,0,0" VerticalAlignment="Top" Orientation="Horizontal" Height="28">
 					<Label Margin="5,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" VerticalContentAlignment="Bottom" Cursor="Hand" Content="http://127.0.0.1:80" x:Name="lblUrl" MouseLeftButtonUp="lblUrl_MouseLeftButtonUp"/>
 					<Label Margin="10,0,0,0" BorderThickness="0,0,0,1" Padding="0" BorderBrush="#0000ff" Foreground="#0000ff" VerticalContentAlignment="Bottom" Cursor="Hand" Content="复制" x:Name="lblCopyUrl" MouseLeftButtonUp="lblCopyUrl_MouseLeftButtonUp"/>

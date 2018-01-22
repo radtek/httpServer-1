@@ -19,7 +19,7 @@ namespace httpServer.control {
 
 			int idx = url.IndexOf("/", 1);
 
-			Debug.WriteLine(url);
+			//Debug.WriteLine(url);
 
 			return isDeal;
 		}
