@@ -22,7 +22,9 @@ namespace httpServer.control {
 				for(int i = 0; i < lstServer.Count; ++i) {
 					ServerModule md = lstServer[i];
 
-					string subPath = regPath + i + "\\";
+					var strIdx = "000" + i;
+					strIdx = strIdx.Substring(strIdx.Length - 3);
+					string subPath = regPath + strIdx + "\\";
 
 					md.save(regCtl, subPath);
 

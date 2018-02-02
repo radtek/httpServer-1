@@ -208,27 +208,33 @@ namespace httpServer.control {
 				//缓存
 				//buffer = cache.getFile(path);
 
-				//内存映射文件
-				try {
-					FileInfo fileInfo = new FileInfo(path);
+				//直接读文件
+				using(FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+					buffer = new byte[fs.Length];
+					fs.Read(buffer, 0, (int)fs.Length);
+				};
 
-					IntPtr hFile = Kernel32.CreateFile(path, Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_READ, IntPtr.Zero, Kernel32.OPEN_EXISTING, Kernel32.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-					if((int)hFile != Kernel32.INVALID_HANDLE_VALUE) {
-						var hFileMap = Kernel32.CreateFileMapping(hFile, IntPtr.Zero, (uint)Kernel32.PAGE_READONLY, 0, (uint)fileInfo.Length, null);
-						if(hFileMap != IntPtr.Zero) {
-							IntPtr diskBuf = Kernel32.MapViewOfFile(hFileMap, Kernel32.FILE_MAP_READ, 0, 0, (uint)fileInfo.Length);
-							if(diskBuf != IntPtr.Zero) {
-								buffer = new byte[fileInfo.Length];
-								Marshal.Copy(diskBuf, buffer, 0, (int)fileInfo.Length);
-								Kernel32.UnmapViewOfFile(diskBuf);
-							}
-							Kernel32.CloseHandle(hFileMap);
-						}
-						Kernel32.CloseHandle(hFile);
-					}
-				} catch(Exception ex) {
-					Debug.WriteLine(ex.ToString());
-				}
+				//内存映射文件
+				//try {
+				//	FileInfo fileInfo = new FileInfo(path);
+
+				//	IntPtr hFile = Kernel32.CreateFile(path, Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_READ, IntPtr.Zero, Kernel32.OPEN_EXISTING, Kernel32.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+				//	if((int)hFile != Kernel32.INVALID_HANDLE_VALUE) {
+				//		var hFileMap = Kernel32.CreateFileMapping(hFile, IntPtr.Zero, (uint)Kernel32.PAGE_READONLY, 0, (uint)fileInfo.Length, null);
+				//		if(hFileMap != IntPtr.Zero) {
+				//			IntPtr diskBuf = Kernel32.MapViewOfFile(hFileMap, Kernel32.FILE_MAP_READ, 0, 0, (uint)fileInfo.Length);
+				//			if(diskBuf != IntPtr.Zero) {
+				//				buffer = new byte[fileInfo.Length];
+				//				Marshal.Copy(diskBuf, buffer, 0, (int)fileInfo.Length);
+				//				Kernel32.UnmapViewOfFile(diskBuf);
+				//			}
+				//			Kernel32.CloseHandle(hFileMap);
+				//		}
+				//		Kernel32.CloseHandle(hFile);
+				//	}
+				//} catch(Exception ex) {
+				//	Debug.WriteLine(ex.ToString());
+				//}
 			}
 
 			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");

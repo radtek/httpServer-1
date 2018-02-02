@@ -1,4 +1,5 @@
-﻿using httpServer.assembly.page;
+﻿using com.superscene.util;
+using httpServer.assembly.page;
 using httpServer.entity;
 using httpServer.module;
 using System;
@@ -19,9 +20,11 @@ namespace httpServer.control.httpRevProxy {
 		HttpRevModel md = null;
 
 		Thread thCtl = null;
-		TcpListener server = null;
-		TcpClient client = null;
-		NetworkStream dataStream = null;
+		Thread thListen = null;
+		//TcpListener server = null;
+		//TcpClient client = null;
+		TcpCtl tcpServer = null;
+		//NetworkStream dataStream = null;
 
 		Thread thTcpSend = null;
 		List<HttpPackModel> lstTcpData = new List<HttpPackModel>();
@@ -133,8 +136,11 @@ namespace httpServer.control.httpRevProxy {
 				//	//Thread.Sleep(50);
 				//	dataStream?.Write(buffer, 0, buffer.Length);
 				//}
-				if (dataStream != null) {
-					dataStream.Write(buffer, 0, buffer.Length);
+				//if (dataStream != null) {
+				//	dataStream.Write(buffer, 0, buffer.Length);
+				//}
+				lock(syncHttp) {
+					tcpServer?.send(buffer);
 				}
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.ToString());
@@ -199,84 +205,110 @@ namespace httpServer.control.httpRevProxy {
 		//	return rst;
 		//}
 
-		public void cltProc() {
+		public void listenProc() {
 			try {
-				IPAddress ip = IPAddress.Parse(md.ctlIp);
-				int port = Int32.Parse(md.ctlPort);
-				server = new TcpListener(ip, port);
-				server.Start();                             //服务端启动侦听
-				client = server.AcceptTcpClient();
-				client.ReceiveBufferSize = 10 * 1024 * 1024;
-				client.SendBufferSize = 10 * 1024 * 1024;
 				do {
 					try {
-						//if (client == null || !client.Connected) {
-						dataStream = client.GetStream();
-						//}
-
-						byte[] data = ComServerCtl.readStream(dataStream);
-						//Debug.WriteLine("aaaa:" + data.Length);
-						//string strData = Encoding.Default.GetString(data);
-						//Entity.getInstance().mainWin.log(strData);
-
-						//var httpIdx = BitConverter.ToInt64(data, 0);
-						//Debug.WriteLine("aaa:" + httpIdx);
-
-						lock (syncData) {
-							lstData.Add(data);
-						}
-						continue;
-
-						//try {
-						//	HttpPackModel httpModel = new HttpPackModel();
-						//	httpModel.unPack(data);
-						//	//Debug.WriteLine("aa:" + httpModel.url + "," + httpModel.httpIdx);
-						//	//foreach (string key in httpModel.mapHead.Keys) {
-						//	//	Debug.WriteLine(key + "," + httpModel.mapHead[key]);
-						//	//}
-
-						//	HttpListenerContext httpCnt = null;
-						//	lock (syncHttp) {
-						//		if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
-						//			httpCnt = mapHttpCtx[httpModel.httpIdx];
-						//			mapHttpCtx.Remove(httpModel.httpIdx);
-						//		}
-						//	}
-
-						//	if (httpCnt == null) {
-						//		continue;
-						//	}
-
-						//	//if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
-						//	//	var httpCnt = mapHttpCtx[httpModel.httpIdx];
-						//	//	//lstHttpCxt.RemoveAt(0);
-						//	//	mapHttpCtx.Remove(httpModel.httpIdx);
-
-						//	var accName = "Access-Control-Allow-Origin";
-						//	if (httpModel.mapHead.ContainsKey(accName)) {
-						//		httpCnt.Response.Headers.Add(accName, httpModel.mapHead[accName]);
-						//	}
-						//	if (httpModel.mapHead.ContainsKey("Content-Type")) {
-						//		httpCnt.Response.Headers.Add("Content-Type", httpModel.mapHead["Content-Type"]);
-						//	}
-						//	httpCnt.Response.StatusCode = Int32.Parse(httpModel.mapHead["Status"]);
-
-						//	httpCnt.Response.Close(httpModel.data, true);
-						//	//}
-
-						//} catch (Exception ex) {
-						//	Debug.WriteLine(ex.ToString());
-						//}
-
-						//string msg = "to client";
-						//byte[] buffer = Encoding.Default.GetBytes(msg);
-						//dataStream.Write(buffer, 0, buffer.Length);
-						//Thread.Sleep(1000);
-						//dataStream.Write(buffer, 0, buffer.Length);
-					} catch (Exception ex) {
-						Debug.WriteLine(ex.ToString());
+						tcpServer.wait();
+					} catch(Exception) {
+						Thread.Sleep(20);
 					}
-				} while (true);
+				} while(true);
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
+			}
+		}
+
+		public void cltProc() {
+			try {
+				//IPAddress ip = IPAddress.Parse(md.ctlIp);
+				//int port = Int32.Parse(md.ctlPort);
+				//server = new TcpListener(ip, port);
+				//server.Start();                             //服务端启动侦听
+				//client = server.AcceptTcpClient();
+				//client.ReceiveBufferSize = 10 * 1024 * 1024;
+				//client.SendBufferSize = 10 * 1024 * 1024;
+				tcpServer = new TcpCtl(md.ctlIp, md.ctlPort);
+				tcpServer.listen();
+
+				thListen = new Thread(listenProc);
+				thListen.Start();
+
+				tcpServer.listenData((data) => {
+					lock(syncData) {
+						lstData.Add(data);
+					}
+				});
+
+				//do {
+				//	try {
+				//		//if (client == null || !client.Connected) {
+				//		dataStream = client.GetStream();
+				//		//}
+
+				//		byte[] data = ComServerCtl.readStream(dataStream);
+				//		//Debug.WriteLine("aaaa:" + data.Length);
+				//		//string strData = Encoding.Default.GetString(data);
+				//		//Entity.getInstance().mainWin.log(strData);
+
+				//		//var httpIdx = BitConverter.ToInt64(data, 0);
+				//		//Debug.WriteLine("aaa:" + httpIdx);
+
+				//		lock(syncData) {
+				//			lstData.Add(data);
+				//		}
+				//		continue;
+
+				//		//try {
+				//		//	HttpPackModel httpModel = new HttpPackModel();
+				//		//	httpModel.unPack(data);
+				//		//	//Debug.WriteLine("aa:" + httpModel.url + "," + httpModel.httpIdx);
+				//		//	//foreach (string key in httpModel.mapHead.Keys) {
+				//		//	//	Debug.WriteLine(key + "," + httpModel.mapHead[key]);
+				//		//	//}
+
+				//		//	HttpListenerContext httpCnt = null;
+				//		//	lock (syncHttp) {
+				//		//		if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
+				//		//			httpCnt = mapHttpCtx[httpModel.httpIdx];
+				//		//			mapHttpCtx.Remove(httpModel.httpIdx);
+				//		//		}
+				//		//	}
+
+				//		//	if (httpCnt == null) {
+				//		//		continue;
+				//		//	}
+
+				//		//	//if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
+				//		//	//	var httpCnt = mapHttpCtx[httpModel.httpIdx];
+				//		//	//	//lstHttpCxt.RemoveAt(0);
+				//		//	//	mapHttpCtx.Remove(httpModel.httpIdx);
+
+				//		//	var accName = "Access-Control-Allow-Origin";
+				//		//	if (httpModel.mapHead.ContainsKey(accName)) {
+				//		//		httpCnt.Response.Headers.Add(accName, httpModel.mapHead[accName]);
+				//		//	}
+				//		//	if (httpModel.mapHead.ContainsKey("Content-Type")) {
+				//		//		httpCnt.Response.Headers.Add("Content-Type", httpModel.mapHead["Content-Type"]);
+				//		//	}
+				//		//	httpCnt.Response.StatusCode = Int32.Parse(httpModel.mapHead["Status"]);
+
+				//		//	httpCnt.Response.Close(httpModel.data, true);
+				//		//	//}
+
+				//		//} catch (Exception ex) {
+				//		//	Debug.WriteLine(ex.ToString());
+				//		//}
+
+				//		//string msg = "to client";
+				//		//byte[] buffer = Encoding.Default.GetBytes(msg);
+				//		//dataStream.Write(buffer, 0, buffer.Length);
+				//		//Thread.Sleep(1000);
+				//		//dataStream.Write(buffer, 0, buffer.Length);
+				//	} catch (Exception ex) {
+				//		Debug.WriteLine(ex.ToString());
+				//	}
+				//} while (true);
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
@@ -294,7 +326,7 @@ namespace httpServer.control.httpRevProxy {
 						}
 					}
 
-					if (lstDataTmp.Count <= 0 || dataStream == null) {
+					if (lstDataTmp.Count <= 0 || tcpServer == null) {
 						Thread.Sleep(100);
 						continue;
 					}
@@ -352,11 +384,16 @@ namespace httpServer.control.httpRevProxy {
 
 		public void clear() {
 			try {
-				client?.Close();
-				client = null;
-				server?.Stop();
-				server = null;
-				dataStream = null;
+				tcpServer?.clear();
+				tcpServer = null;
+				//client?.Close();
+				//client = null;
+				//server?.Stop();
+				//server = null;
+				//dataStream = null;
+
+				thListen?.Abort();
+				thListen = null;
 
 				thTcpSend?.Abort();
 				thTcpSend = null;

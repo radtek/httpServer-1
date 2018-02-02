@@ -121,6 +121,7 @@
     <Compile Include="sdk\superscene\SystemCtl.cs" />
     <Compile Include="sdk\superscene\TableCtl.cs" />
     <Compile Include="sdk\superscene\TaskCtl.cs" />
+    <Compile Include="sdk\superscene\TcpCtl.cs" />
     <Compile Include="sdk\superscene\TextBoxCheckbox\TextBoxCheckbox.cs" />
     <Compile Include="sdk\superscene\TextBoxFile\TextBoxFile.cs" />
     <Compile Include="sdk\superscene\TextBoxLabel\TextBoxLabel.cs" />
