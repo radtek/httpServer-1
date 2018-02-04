@@ -44,6 +44,8 @@ namespace httpServer.control.httpRevProxy {
 
 		public object DebughttpCnt { get; private set; }
 
+		//TimeTest tm = new TimeTest();
+
 		public HttpRevServer() { }
 		public HttpRevServer(ServerModule _md) { setModel(_md); }
 
@@ -59,12 +61,12 @@ namespace httpServer.control.httpRevProxy {
 				//thTcpSend = new Thread(tcpSendProc);
 				//thTcpSend.Start();
 
+				//thHttpDeal = new Thread(httpProc);
+				//thHttpDeal.Start();
+
 				//tcp ctl
 				thCtl = new Thread(cltProc);
 				thCtl.Start();
-
-				thHttpDeal = new Thread(httpProc);
-				thHttpDeal.Start();
 
 				//http server
 				initHttpServer();
@@ -139,9 +141,17 @@ namespace httpServer.control.httpRevProxy {
 				//if (dataStream != null) {
 				//	dataStream.Write(buffer, 0, buffer.Length);
 				//}
-				lock(syncHttp) {
-					tcpServer?.send(buffer);
-				}
+
+				//lock (syncHttp) {
+				//	//tcpServer?.send(buffer);
+				//	tcpServer?.sendAsync(buffer);
+				//}
+				//if (url == "/lib/bootstrap/css/bootstrap-theme.min.css") {
+				//	tm.start();
+				//}
+				Task.Run(() => {
+					tcpServer?.sendAsync(buffer);
+				});
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
@@ -235,9 +245,12 @@ namespace httpServer.control.httpRevProxy {
 				thListen.Start();
 
 				tcpServer.listenData((data) => {
-					lock(syncData) {
-						lstData.Add(data);
-					}
+					//lock(syncData) {
+					//	lstData.Add(data);
+					//}
+					Task.Run(() => {
+						httpDealOne(data);
+					});
 				});
 
 				//do {
@@ -314,6 +327,44 @@ namespace httpServer.control.httpRevProxy {
 			}
 		}
 
+		private void httpDealOne(byte[] data) {
+			HttpPackModel httpModel = new HttpPackModel();
+			httpModel.unPack(data);
+			//Debug.WriteLine("aa:" + httpModel.url + "," + data.Length);
+			//foreach (string key in httpModel.mapHead.Keys) {
+			//	Debug.WriteLine(key + "," + httpModel.mapHead[key]);
+			//}
+
+			HttpListenerContext httpCnt = null;
+			lock (syncHttp) {
+				if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
+					httpCnt = mapHttpCtx[httpModel.httpIdx];
+					mapHttpCtx.Remove(httpModel.httpIdx);
+				}
+			}
+
+			if (httpCnt == null) {
+				return;
+			}
+
+			//Debug.WriteLine("aa:" + httpModel.url + "," + httpModel.httpIdx + "," + data.Length);
+			//if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
+			//	var httpCnt = mapHttpCtx[httpModel.httpIdx];
+			//	//lstHttpCxt.RemoveAt(0);
+			//	mapHttpCtx.Remove(httpModel.httpIdx);
+
+			var accName = "Access-Control-Allow-Origin";
+			if (httpModel.mapHead.ContainsKey(accName)) {
+				httpCnt.Response.Headers.Add(accName, httpModel.mapHead[accName]);
+			}
+			if (httpModel.mapHead.ContainsKey("Content-Type")) {
+				httpCnt.Response.Headers.Add("Content-Type", httpModel.mapHead["Content-Type"]);
+			}
+			httpCnt.Response.StatusCode = Int32.Parse(httpModel.mapHead["Status"]);
+
+			httpCnt.Response.Close(httpModel.data, true);
+		}
+
 		private void httpProc() {
 			try {
 				do {
@@ -371,6 +422,9 @@ namespace httpServer.control.httpRevProxy {
 							httpCnt.Response.StatusCode = Int32.Parse(httpModel.mapHead["Status"]);
 
 							httpCnt.Response.Close(httpModel.data, true);
+							//if (httpModel.url == "/lib/bootstrap/css/bootstrap-theme.min.css") {
+							//	Debug.WriteLine(tm.end());
+							//}
 							//}
 						}
 					} catch (Exception ex) {

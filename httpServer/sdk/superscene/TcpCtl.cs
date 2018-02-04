@@ -32,6 +32,8 @@ namespace com.superscene.util {
 		int rstLen = 0;
 		int rstPos = 0;
 
+		object asyncSend = new object();
+
 		public TcpCtl() {
 			
 		}
@@ -158,8 +160,25 @@ namespace com.superscene.util {
 		public void send(byte[] data) {
 			byte[] bufLen = BitConverter.GetBytes((Int32)data.Length);
 
+			//dataStream?.WriteAsync(bufLen, 0, bufLen.Length);
+			//dataStream?.WriteAsync(data, 0, data.Length);
 			dataStream?.Write(bufLen, 0, bufLen.Length);
 			dataStream?.Write(data, 0, data.Length);
+		}
+
+		public void sendAsync(byte[] data) {
+			byte[] bufLen = BitConverter.GetBytes((Int32)data.Length);
+			byte[] bufRst = new byte[bufLen.Length + data.Length];
+			Array.Copy(bufLen, bufRst, bufLen.Length);
+			Array.Copy(data, 0, bufRst, bufLen.Length, data.Length);
+
+			dataStream?.WriteAsync(bufRst, 0, bufRst.Length);
+			//lock (asyncSend) {
+			//	dataStream?.WriteAsync(bufLen, 0, bufLen.Length);
+			//	dataStream?.WriteAsync(data, 0, data.Length);
+			//}
+			//dataStream?.Write(bufLen, 0, bufLen.Length);
+			//dataStream?.Write(data, 0, data.Length);
 		}
 
 		public void send(string data, Encoding encoding = null) {

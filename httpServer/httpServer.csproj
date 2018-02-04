@@ -126,6 +126,7 @@
     <Compile Include="sdk\superscene\TextBoxFile\TextBoxFile.cs" />
     <Compile Include="sdk\superscene\TextBoxLabel\TextBoxLabel.cs" />
     <Compile Include="sdk\superscene\TextBoxTip\TextBoxTip.cs" />
+    <Compile Include="sdk\superscene\TimeTest.cs" />
     <Compile Include="sdk\superscene\User32.cs" />
     <Compile Include="sdk\superscene\XCmdCtl.cs" />
     <Compile Include="sdk\superscene\XjsCtl.cs" />

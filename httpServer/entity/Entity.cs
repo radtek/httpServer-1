@@ -1,4 +1,5 @@
-﻿using httpServer.module;
+﻿using com.superscene.util;
+using httpServer.module;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace httpServer.entity {
 
 		public MainModule mainModule = null;
 		public MainWindow mainWin = null;
-
+		
+		public TimeTest tmTest = new TimeTest();
 	}
 }
