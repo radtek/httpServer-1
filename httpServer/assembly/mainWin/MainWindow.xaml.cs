@@ -1,6 +1,7 @@
 ﻿using com.superscene.util;
 using com.superscene.util.action;
 using httpServer.assembly.page;
+using httpServer.assembly.util;
 using httpServer.control;
 using httpServer.entity;
 using httpServer.module;
@@ -30,6 +31,12 @@ using System.Windows.Shapes;
 
 namespace httpServer {
 	public class ServerItem : INotifyPropertyChanged {
+		int _Tag;
+		public int Tag {
+			get { return _Tag; }
+			set { _Tag = value; FirePropertyChanged("Tag"); }
+		}
+
 		string _Content;
 		public string Content {
 			get { return _Content; }
@@ -63,7 +70,7 @@ namespace httpServer {
 		RegistryCtl regCtl = new RegistryCtl();
 		//string lastTransmit = "";
 
-		private ObservableCollection<ServerItem> serverItem = new ObservableCollection<ServerItem>();
+		private List<ServerItem> serverItem = new List<ServerItem>();
 		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
 		//HttpCtl httpCtl = new HttpCtl();
 
@@ -72,8 +79,9 @@ namespace httpServer {
 
 		Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
 
-		bool isDebug = true;
+		bool isDebug = false;
 		string strLog = "";
+		private int itemTag = 0;
 
 		public MainWindow() {
 			InitializeComponent();
@@ -145,7 +153,7 @@ namespace httpServer {
 				//	continue;
 				//}
 
-				ServerItem item = new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
+				ServerItem item = new ServerItem() { Tag = ++itemTag, Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 				md.serverItem = item;
 
 				ent.mainModule.mapServer[md.type].initData(md);
@@ -289,7 +297,7 @@ namespace httpServer {
 			ServerModule md = ent.mainModule.mapServer[type].createNewModel();
 			md.type = type;
 
-			ServerItem item = new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
+			ServerItem item = new ServerItem() { Tag = ++itemTag, Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 			md.serverItem = item;
 
 			ent.mainModule.mapServer[md.type].initData(md);
@@ -349,5 +357,52 @@ namespace httpServer {
 			});
 		}
 
+		private void lstItem_UpClick(object sender, UpDownEvent e) {
+			int idx = findItemIdx((int)e.tag);
+			if(idx <= 0) {
+				return;
+			}
+
+			//Debug.WriteLine(idx);
+			switchItem(idx - 1, idx);
+		}
+
+		private void lstItem_DownClick(object sender, UpDownEvent e) {
+			int idx = findItemIdx((int)e.tag);
+			if(idx < 0 || idx >= serverItem.Count - 1) {
+				return;
+			}
+			switchItem(idx, idx + 1);
+		}
+
+		private int findItemIdx(int tag) {
+			for(int i = 0; i < serverItem.Count; ++i) {
+				if(serverItem[i].Tag == tag) {
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		private void switchItem(int idx, int nextIex) {
+			int sltIdx = lstItem.SelectedIndex;
+			if(sltIdx == idx) {
+				sltIdx = nextIex;
+			} else if(sltIdx == nextIex) {
+				sltIdx = idx;
+			}
+
+			List<ServerModule> lstServer = ent.mainModule.lstServer;
+			ServerModule md = lstServer[idx];
+			lstServer[idx] = lstServer[nextIex];
+			lstServer[nextIex] = md;
+
+			ServerItem item = serverItem[idx];
+			serverItem[idx] = serverItem[nextIex];
+			serverItem[nextIex] = item;
+			lstItem.ItemsSource = null;
+			lstItem.ItemsSource = serverItem;
+			lstItem.SelectedIndex = sltIdx;
+		}
 	}
 }

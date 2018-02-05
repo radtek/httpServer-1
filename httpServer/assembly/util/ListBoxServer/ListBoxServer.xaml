@@ -4,14 +4,41 @@
 
 	<SolidColorBrush x:Key="ListBorder" Color="#828790"/>
 	<DataTemplate x:Key="BaseListBoxServerItem">
-		<Grid Name="main" Height="25">
+		<Grid Name="main" Height="25" Background="Transparent">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="15" />
+				<ColumnDefinition Width="15" Name="co1" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
-			<Image Grid.Column="0" Source="{Binding Source}" />
+			<Image Grid.Column="0" Source="{Binding Source}" Name="imgStatus" />
+			<Image Grid.Column="0" Visibility="Collapsed" Width="9" Height="18" HorizontalAlignment="Left" Source="/httpServer;component/resource/up.png" Name="imgUp">
+				<Image.InputBindings>
+					<MouseBinding Command="{Binding CmdUpClick, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBox}}}" CommandParameter="{Binding Tag}" MouseAction="LeftClick" />
+				</Image.InputBindings>
+			</Image>
+			<!--<Button Grid.Column="0" Name="btn"/>-->
+			<Image Grid.Column="0" Visibility="Collapsed" Width="9" Height="18" HorizontalAlignment="Right" Source="/httpServer;component/resource/down.png" Name="imgDown">
+				<Image.InputBindings>
+					<MouseBinding Command="{Binding CmdDownClick, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBox}}}" CommandParameter="{Binding Tag}" MouseAction="LeftClick" />
+				</Image.InputBindings>
+			</Image>
 			<Label Grid.Column="1" Content="{Binding Content}"/>
+			<!--<Image Grid.Column="2" Source="/httpServer;component/resource/up.png" />-->
 		</Grid>
+		
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True">
+				<Setter TargetName="co1" Property="Width" Value="18"/>
+				<Setter TargetName="imgStatus" Property="Visibility" Value="Collapsed"/>
+				<Setter TargetName="imgUp" Property="Visibility" Value="Visible"/>
+				<Setter TargetName="imgDown" Property="Visibility" Value="Visible"/>
+			</DataTrigger>
+			<DataTrigger Binding="{Binding ElementName=imgUp, Path=IsMouseOver}" Value="True">
+				<Setter TargetName="imgDown" Property="Visibility" Value="Collapsed"/>
+			</DataTrigger>
+			<DataTrigger Binding="{Binding ElementName=imgDown, Path=IsMouseOver}" Value="True">
+				<Setter TargetName="imgUp" Property="Visibility" Value="Collapsed"/>
+			</DataTrigger>
+		</DataTemplate.Triggers>
 	</DataTemplate>
 
 	<Style x:Key="BaseListBoxServerItemStyle" TargetType="ListBoxItem">

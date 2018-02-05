@@ -46,7 +46,7 @@
 			</Grid.ColumnDefinitions>
 
 			<!--<ListBox Grid.RowSpan="3" Margin="0,0,0,90" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" Name="lstItem" ItemTemplate="{DynamicResource BaseListBoxServerItem}"/>-->
-			<util:ListBoxServer Grid.RowSpan="3" Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" SelectionChanged="lstItem_SelectionChanged"/>
+			<util:ListBoxServer Grid.RowSpan="3" Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" SelectionChanged="lstItem_SelectionChanged" UpClick="lstItem_UpClick" DownClick="lstItem_DownClick"/>
 
 			<StackPanel Grid.RowSpan="3" VerticalAlignment="Bottom" >
 				<!--<Image Source="/httpServer;component/resource/status_run.png"/>-->

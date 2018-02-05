@@ -248,5 +248,9 @@
     <Resource Include="resource\status_run.png" />
     <Resource Include="resource\status_stop.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resource\down.png" />
+    <Resource Include="resource\up.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

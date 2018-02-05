@@ -254,13 +254,13 @@ namespace httpServer.control.httpRevProxy {
 				//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length + "," + httpIdx);
 				//Debug.WriteLine("bb:" + httpModel.url + "," + rst.Length);
 				//dataStream.Write(rst, 0, rst.Length);
-				lock (syncSend) {
-					//tcpClient.send(rst);
-					Task.Run(() => {
-						tcpClient.sendAsync(rst);
-						//Debug.WriteLine(httpModel.url + "," + tm.end());
-					});
-				}
+				//lock (syncSend) {
+				//tcpClient.send(rst);
+				Task.Run(() => {
+					tcpClient.sendAsync(rst);
+					//Debug.WriteLine(httpModel.url + "," + tm.end());
+				});
+				//}
 				//dataStream.Close();
 
 				//Debug.WriteLine(httpModel.url + "," + tm.tag());
