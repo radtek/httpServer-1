@@ -19,7 +19,5 @@ namespace httpServer.entity {
 
 		public MainModule mainModule = null;
 		public MainWindow mainWin = null;
-		
-		public TimeTest tmTest = new TimeTest();
 	}
 }
