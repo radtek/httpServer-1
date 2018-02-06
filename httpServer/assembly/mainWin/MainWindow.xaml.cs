@@ -5,6 +5,7 @@ using httpServer.assembly.util;
 using httpServer.control;
 using httpServer.entity;
 using httpServer.module;
+using httpServer.services;
 using httpServer.util;
 using System;
 using System.Collections.Generic;
@@ -59,22 +60,18 @@ namespace httpServer {
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class MainWindow : Window {
+		private static MainWindow ins = null;
 
-		static MainWindow ins = null;
-		//string rootPath = "";
+		private Entity ent = null;
+		private ServerDataCtl serverDataCtl = null;
 
-		Entity ent = null;
-		ServerDataCtl serverDataCtl = null;
-
-		string regPath = "HKCU\\Software\\superHttpServer\\";
-		RegistryCtl regCtl = new RegistryCtl();
-		//string lastTransmit = "";
+		private string title = "";
+		private bool isWaitSave = false;
+		private string regPath = "HKCU\\Software\\superHttpServer\\";
+		private RegistryCtl regCtl = new RegistryCtl();
 
 		private List<ServerItem> serverItem = new List<ServerItem>();
-		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
-		//HttpCtl httpCtl = new HttpCtl();
-
-		//private int nowIdx = -1;
+		
 		private string nowType = "";
 
 		Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
@@ -141,17 +138,38 @@ namespace httpServer {
 			}
 
 			//
+			title = Title;
+			CmdServ.cfgWaitSave.listen(()=> {
+				cfgWaitSaved();
+			});
+			CmdServ.cfgSaved.listen(() => {
+				cfgSaved();
+			});
+
+			//
 			initServerItem(ent.mainModule.lstServer);
 			lstItem.SelectedIndex = Int32.Parse(regCtl.getValue(regPath + "selectItem", "0"));
+		}
+
+		private void cfgWaitSaved() {
+			if(isWaitSave) {
+				return;
+			}
+			isWaitSave = true;
+			Title = title + "*";
+		}
+
+		private void cfgSaved() {
+			if(!isWaitSave) {
+				return;
+			}
+			isWaitSave = false;
+			Title = title;
 		}
 
 		private void initServerItem(List<ServerModule> lstServer) {
 			for(int i = 0; i < lstServer.Count; ++i) {
 				ServerModule md = lstServer[i];
-
-				//if(!ent.mainModule.mapServer.ContainsKey(md.type)) {
-				//	continue;
-				//}
 
 				ServerItem item = new ServerItem() { Tag = ++itemTag, Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 				md.serverItem = item;
@@ -160,17 +178,9 @@ namespace httpServer {
 
 				//lstItem.Items.Add(md.desc);
 				serverItem.Add(item);
-
-				//ServerCtl ctl = new ServerCtl();
-				//ctl.md = md;
-				//lstServerClt.Add(ctl);
-				//if(md.isRun) {
-				//	ctl.restartServer();
-				//}
 			}
 
 			lstItem.ItemsSource = serverItem;
-			//lstItem.SelectedIndex = 0;
 		}
 		
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -194,10 +204,6 @@ namespace httpServer {
 			for(int i = 0; i < server.Count; ++i) {
 				ent.mainModule.mapServer[server[i].type].clear(server[i]);
 			}
-
-			//for(int i = 0; i < lstServerClt.Count; ++i) {
-			//	lstServerClt[i].clear();
-			//}
 		}
 
 		private void btnRestart_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -208,6 +214,8 @@ namespace httpServer {
 			ent.mainModule.mapServer[md.type].start();
 			btnRestart.Content = md.isRun ? "重启" : "启动";
 			md.serverItem.Source = getServerStatusImgPath(md.isRun);
+
+			cfgSaved();
 		}
 
 		public string getServerStatusImgPath(bool isRun) {
@@ -217,17 +225,7 @@ namespace httpServer {
 		private void lstItem_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 			int idx = lstItem.SelectedIndex;
 			if(idx < 0 || idx >= ent.mainModule.lstServer.Count) {
-				//txtDesc.Text = "";
-				//cbxIp.Text = "";
-				//txtPort.Text = "";
-				//txtPath.Text = SysConst.rootPath();
-
-				//txtProxy.IsChecked = false;
-				//txtProxy.Text = "";
-				//txtTransmit.IsChecked = false;
-				//txtTransmit.Text = "";
 				btnRestart.Content = "启动";
-				//lblUrl.Content = "127.0.0.1:8091";
 				return;
 			}
 
@@ -251,31 +249,14 @@ namespace httpServer {
 			}
 
 			nowType = md.type;
-
-			//txtDesc.Text = md.desc;
+			
 			serverItem[idx].Source = getServerStatusImgPath(md.isRun);
 
 			ent.mainModule.mapServer[md.type].updateData(md);
 
-			//cbxIp.Text = md.ip;
-			//txtPort.Text = md.port;
-
-			//txtPath.Text = md.path;
-
-			//txtProxy.IsChecked = md.isProxy;
-			//txtProxy.Text = md.proxyUrl;
-
-			//txtTransmit.IsChecked = md.isTransmit;
-			//txtTransmit.Text = md.transmitUrl;
-
 			btnRestart.Content = md.isRun ? "重启" : "启动";
 
-			//serverPath = md.path + "/";
-			//lblUrl.Content = "http://" + md.ip + ":" + md.port;
-		}
-
-		private void switchPage(string type) {
-
+			cfgSaved();
 		}
 
 		private void btnStop_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -287,6 +268,8 @@ namespace httpServer {
 			ent.mainModule.mapServer[md.type].stop();
 			btnRestart.Content = md.isRun ? "重启" : "启动";
 			md.serverItem.Source = getServerStatusImgPath(md.isRun);
+
+			cfgSaved();
 		}
 
 		private void btnNew_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -303,20 +286,12 @@ namespace httpServer {
 			ent.mainModule.mapServer[md.type].initData(md);
 			serverItem.Add(item);
 
-			//ServerModule md = new ServerModule();
-			//md.port = SystemCtl.getFreePort(8091).ToString();
-			//md.desc = md.ip + ":" + md.port;
-			//md.path = SysConst.rootPath();
 			lstServer.Add(md);
 
-			//serverItem.Add(new ServerItem() { Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() });
-
-			//ServerCtl ctl = new ServerCtl();
-			//ctl.md = md;
-			//lstServerClt.Add(ctl);
+			lstItem.ItemsSource = null;
+			lstItem.ItemsSource = serverItem;
 
 			lstItem.SelectedIndex = serverItem.Count - 1;
-
 			lstItem.ScrollIntoView(lstItem.Items[serverItem.Count - 1]);
 		}
 
@@ -343,6 +318,9 @@ namespace httpServer {
 			if(newIdx >= serverItem.Count) {
 				newIdx = idx - 1;
 			}
+
+			lstItem.ItemsSource = null;
+			lstItem.ItemsSource = serverItem;
 			lstItem.SelectedIndex = newIdx;
 		}
 

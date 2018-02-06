@@ -102,6 +102,7 @@
     <Compile Include="sdk\superscene\BindModel.cs" />
     <Compile Include="sdk\superscene\ButtonLabel\ButtonLabel.cs" />
     <Compile Include="sdk\superscene\CheckBoxBan\CheckBoxBan.cs" />
+    <Compile Include="sdk\superscene\Cmd.cs" />
     <Compile Include="sdk\superscene\ComExtension.cs" />
     <Compile Include="sdk\superscene\CommandService.cs" />
     <Compile Include="sdk\superscene\ComUtil.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="sdk\superscene\XCmdCtl.cs" />
     <Compile Include="sdk\superscene\XjsCtl.cs" />
     <Compile Include="sdk\superscene\XmlCtl.cs" />
+    <Compile Include="services\CmdServ.cs" />
     <Compile Include="util\CommonUtil.cs" />
     <Compile Include="util\SysConst.cs" />
     <Page Include="assembly\mainWin\MainWindow.xaml">

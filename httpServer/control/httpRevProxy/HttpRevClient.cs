@@ -52,7 +52,7 @@ namespace httpServer.control.httpRevProxy {
 
 		public void cltProc() {
 			try {
-				tcpClient = new TcpCtl(md.serverCtlIp, md.serverCtlPort);
+				tcpClient = new TcpCtl(md.localCtlIp, md.localCtlPort);
 				tcpClient.connect();
 				tcpClient.listenData((data)=> {
 					if(data.Length == 0) {

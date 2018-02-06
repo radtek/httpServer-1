@@ -5,6 +5,7 @@ using httpServer.control;
 using httpServer.control.httpRevProxy;
 using httpServer.entity;
 using httpServer.module;
+using httpServer.services;
 using httpServer.util;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,8 @@ namespace httpServer.assembly.page {
 		public string revType = "local";
 		public Dictionary<string, IServerCtl> mapCtl = new Dictionary<string, IServerCtl>();
 
-		public string serverCtlIp = "127.0.0.1";
-		public string serverCtlPort = "8091";
+		public string localCtlIp = "127.0.0.1";
+		public string localCtlPort = "8091";
 		public string localHttpIp = "127.0.0.1";
 		public string localHttpPort = "8091";
 		public string urlParam = "";
@@ -57,8 +58,8 @@ namespace httpServer.assembly.page {
 
 			revType = regCtl.getValue(subPath + "revType", "local");
 
-			serverCtlIp = regCtl.getValue(subPath + "serverCtlIp", "127.0.0.1");
-			serverCtlPort = regCtl.getValue(subPath + "serverCtlPort", "8091");
+			localCtlIp = regCtl.getValue(subPath + "localCtlIp", "127.0.0.1");
+			localCtlPort = regCtl.getValue(subPath + "localCtlPort", "8091");
 			localHttpIp = regCtl.getValue(subPath + "localHttpIp", "127.0.0.1");
 			localHttpPort = regCtl.getValue(subPath + "localHttpPort", "8091");
 			urlParam = regCtl.getValue(subPath + "urlParam", "");
@@ -74,8 +75,8 @@ namespace httpServer.assembly.page {
 
 			regCtl.setValue(subPath + "revType", revType);
 
-			regCtl.setValue(subPath + "serverCtlIp", serverCtlIp);
-			regCtl.setValue(subPath + "serverCtlPort", serverCtlPort);
+			regCtl.setValue(subPath + "localCtlIp", localCtlIp);
+			regCtl.setValue(subPath + "localCtlPort", localCtlPort);
 			regCtl.setValue(subPath + "localHttpIp", localHttpIp);
 			regCtl.setValue(subPath + "localHttpPort", localHttpPort);
 			regCtl.setValue(subPath + "urlParam", urlParam);
@@ -138,7 +139,7 @@ namespace httpServer.assembly.page {
 			HttpRevModel md = new HttpRevModel();
 			md.ctlPort = SystemCtl.getFreePort(8091).ToString();
 			md.httpPort = SystemCtl.getFreePort(8091).ToString();
-			md.desc = md.httpIp + ":" + md.httpPort;
+			md.desc = md.ctlIp + ":" + md.ctlPort;
 			return md;
 		}
 
@@ -148,8 +149,8 @@ namespace httpServer.assembly.page {
 
 			txtDesc.Text = md.desc;
 
-			txtServerCtlIp.Text = md.serverCtlIp;
-			txtServerCtlPort.Text = md.serverCtlPort;
+			txtLocalCtlIp.Text = md.localCtlIp;
+			txtLocalCtlPort.Text = md.localCtlPort;
 			txtLocalHttpIp.Text = md.localHttpIp;
 			txtLocalHttpPort.Text = md.localHttpPort;
 			txtUrlParam.Text = md.urlParam;
@@ -176,8 +177,8 @@ namespace httpServer.assembly.page {
 			md.isRun = isStart;
 
 			md.revType = borLocal.Visibility == Visibility.Visible ? "local" : "server";
-			md.serverCtlIp = txtServerCtlIp.Text;
-			md.serverCtlPort = txtServerCtlPort.Text;
+			md.localCtlIp = txtLocalCtlIp.Text;
+			md.localCtlPort = txtLocalCtlPort.Text;
 			md.localHttpIp = txtLocalHttpIp.Text;
 			md.localHttpPort = txtLocalHttpPort.Text;
 			md.urlParam = txtUrlParam.Text;
@@ -188,15 +189,6 @@ namespace httpServer.assembly.page {
 			md.httpPort = txtHttpPort.Text;
 
 			lblUrl.Content = "http://" + md.httpIp + ":" + md.httpPort + "/" + md.urlParam;
-			//if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
-			//	if(md.revType == "local") {
-			//		md.desc = md.localIp + ":" + md.localPort;
-			//	} else {
-			//		md.desc = md.httpIp + ":" + md.httpPort;
-			//	}
-			//	txtDesc.Text = md.desc;
-			//	md.serverItem.Content = md.desc;
-			//}
 			updateDesc();
 
 			md.clearCtl();
@@ -217,7 +209,7 @@ namespace httpServer.assembly.page {
 
 			if (md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
 				if (md.revType == "local") {
-					md.desc = md.localHttpIp + ":" + md.localHttpPort;
+					md.desc = md.localCtlIp + ":" + md.localCtlPort;
 				} else {
 					md.desc = md.httpIp + ":" + md.httpPort;
 				}
@@ -299,6 +291,46 @@ namespace httpServer.assembly.page {
 			if (nowData == null) { return; }
 			nowData.urlParam = txtUrlParam.Text;
 			lblUrl.Content = "http://" + nowData.httpIp + ":" + nowData.httpPort + "/" + nowData.urlParam;
+		}
+
+		private void txtLocalCtlIp_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtLocalCtlIp.Text == nowData.localCtlIp) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtLocalCtlPort_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtLocalCtlPort.Text == nowData.localCtlPort) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtLocalHttpIp_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtLocalHttpIp.Text == nowData.localHttpIp) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtLocalHttpPort_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtLocalHttpPort.Text == nowData.localHttpPort) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void cbxCtlIp_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || cbxCtlIp.Text == nowData.ctlIp) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtCtlPort_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtCtlPort.Text == nowData.ctlPort) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void cbxHttpIp_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || cbxHttpIp.Text == nowData.httpIp) { return; }
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtHttpPort_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtHttpPort.Text == nowData.httpPort) { return; }
+			CmdServ.cfgWaitSave.send();
 		}
 	}
 }

@@ -26,12 +26,12 @@
 						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top" Name="borLocal"/>
 
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" Height="32">
-							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="隧道地址：" x:Name="txtServerCtlIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtServerCtlPort"/>
+							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="隧道地址：" x:Name="txtLocalCtlIp" TextChanged="txtLocalCtlIp_TextChanged"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtLocalCtlPort" TextChanged="txtLocalCtlPort_TextChanged"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" Height="32">
-							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="http服务：" x:Name="txtLocalHttpIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtLocalHttpPort"/>
+							<supUI:TextBoxLabel LeftWidth="80" Width="200" Content="http服务：" x:Name="txtLocalHttpIp" TextChanged="txtLocalHttpIp_TextChanged"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtLocalHttpPort" TextChanged="txtLocalHttpPort_TextChanged"/>
 						</StackPanel>
 					</StackPanel>
 
@@ -40,12 +40,12 @@
 						<Border BorderThickness="1" BorderBrush="#f00" Height="1" Width="80" VerticalAlignment="Top" Visibility="Hidden" Name="borServer"/>
 
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" Height="32">
-							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="隧道地址：" x:Name="cbxCtlIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtCtlPort" />
+							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="隧道地址：" x:Name="cbxCtlIp" TextBoxBase.TextChanged="cbxCtlIp_TextChanged"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtCtlPort" TextChanged="txtCtlPort_TextChanged" />
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,0" HorizontalAlignment="Center" Height="32">
-							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="http服务：" x:Name="cbxHttpIp"/>
-							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtHttpPort" />
+							<supUI:ComboBoxLabel IsEditable="True" LeftWidth="80" Width="200" Content="http服务：" x:Name="cbxHttpIp" TextBoxBase.TextChanged="cbxHttpIp_TextChanged"/>
+							<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtHttpPort" TextChanged="txtHttpPort_TextChanged" />
 						</StackPanel>
 					</StackPanel>
 				</Grid>

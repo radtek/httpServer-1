@@ -4,15 +4,18 @@ using httpServer.assembly.util;
 using httpServer.control;
 using httpServer.entity;
 using httpServer.module;
+using httpServer.services;
 using httpServer.util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -78,8 +81,8 @@ namespace httpServer.assembly.page {
 		public void init() {
 			ent = Entity.getInstance();
 
-			txtProxy.Visibility = Visibility.Collapsed;
-			txtTransmit.Visibility = Visibility.Collapsed;
+			//txtProxy.Visibility = Visibility.Collapsed;
+			//txtTransmit.Visibility = Visibility.Collapsed;
 
 			//find ip
 			List<string> lstIP = UiService.ins().getAllIp();
@@ -118,6 +121,9 @@ namespace httpServer.assembly.page {
 			HttpModel md = (HttpModel)_md;
 			nowData = md;
 
+			//isEditByCode = true;
+			//Debug.WriteLine("aa");
+
 			txtDesc.Text = md.desc;
 
 			cbxIp.Text = md.ip;
@@ -126,13 +132,16 @@ namespace httpServer.assembly.page {
 			txtPath.Text = md.path;
 			txtUrlParam.Text = md.urlParam;
 
-			txtProxy.IsChecked = md.isProxy;
-			txtProxy.Text = md.proxyUrl;
+			//txtProxy.IsChecked = md.isProxy;
+			//txtProxy.Text = md.proxyUrl;
 
-			txtTransmit.IsChecked = md.isTransmit;
-			txtTransmit.Text = md.transmitUrl;
+			//txtTransmit.IsChecked = md.isTransmit;
+			//txtTransmit.Text = md.transmitUrl;
 
 			lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+
+			//Debug.WriteLine("bb");
+			//isEditByCode = false;
 		}
 
 		public ServerModule createModel() {
@@ -162,34 +171,34 @@ namespace httpServer.assembly.page {
 			updateData("path", txtPath.Text);
 		}
 
-		private void txtProxy_TextChanged(object sender, TextChangedEventArgs e) {
-			//proxyUrl = txtProxy.Text;
-			updateData("proxyUrl", txtProxy.Text);
-		}
+		//private void txtProxy_TextChanged(object sender, TextChangedEventArgs e) {
+		//	//proxyUrl = txtProxy.Text;
+		//	updateData("proxyUrl", txtProxy.Text);
+		//}
 
-		private void txtProxy_Checked(object sender, RoutedEventArgs e) {
-			//isProxy = true;
-			updateData("isProxy", true);
-		}
+		//private void txtProxy_Checked(object sender, RoutedEventArgs e) {
+		//	//isProxy = true;
+		//	updateData("isProxy", true);
+		//}
 
-		private void txtProxy_Unchecked(object sender, RoutedEventArgs e) {
-			//isProxy = false;
-			updateData("isProxy", false);
-		}
+		//private void txtProxy_Unchecked(object sender, RoutedEventArgs e) {
+		//	//isProxy = false;
+		//	updateData("isProxy", false);
+		//}
 
-		private void txtTransmit_Checked(object sender, RoutedEventArgs e) {
-			//isTransmit = true;
-			updateData("isTransmit", true);
-		}
+		//private void txtTransmit_Checked(object sender, RoutedEventArgs e) {
+		//	//isTransmit = true;
+		//	updateData("isTransmit", true);
+		//}
 
-		private void txtTransmit_Unchecked(object sender, RoutedEventArgs e) {
-			//isTransmit = false;
-			updateData("isTransmit", false);
-		}
+		//private void txtTransmit_Unchecked(object sender, RoutedEventArgs e) {
+		//	//isTransmit = false;
+		//	updateData("isTransmit", false);
+		//}
 
-		private void txtTransmit_TextChanged(object sender, TextChangedEventArgs e) {
-			updateData("transmitUrl", txtTransmit.Text);
-		}
+		//private void txtTransmit_TextChanged(object sender, TextChangedEventArgs e) {
+		//	updateData("transmitUrl", txtTransmit.Text);
+		//}
 
 		private void txtDesc_TextChanged(object sender, TextChangedEventArgs e) {
 			updateData("desc", txtDesc.Text);
@@ -244,23 +253,45 @@ namespace httpServer.assembly.page {
 			case "isRun": {
 					md.isRun = value;
 					//md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
+					var lastIp = md.ip;
+					var lastPort = md.port;
+					md.ip = cbxIp.Text;
+					md.port = txtPort.Text;
+					lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+
+					md.desc = md.desc.Replace(lastIp, md.ip);
+					md.desc = md.desc.Replace(lastPort, md.port);
+					txtDesc.Text = md.desc;
+					md.serverItem.Content = md.desc;
+
 					if(value == true) {
-						md.ip = cbxIp.Text;
-						md.port = txtPort.Text;
-						lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
 						//lstServerClt[idx].restartServer();
 						md.ctl.restartServer();
 					} else {
 						//lstServerClt[idx].clear();
 						md.ctl.clear();
 					}
-					if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
-						txtDesc.Text = md.ip + ":" + md.port;
-						updateData("desc", md.ip + ":" + md.port);
-					}
+					//if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
+					//	txtDesc.Text = md.ip + ":" + md.port;
+					//	updateData("desc", md.ip + ":" + md.port);
+					//}
 					break;
 				}
 			}
+		}
+
+		private void cbxIp_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || cbxIp.Text == nowData.ip) {
+				return;
+			}
+			CmdServ.cfgWaitSave.send();
+		}
+
+		private void txtPort_TextChanged(object sender, TextChangedEventArgs e) {
+			if(nowData == null || txtPort.Text == nowData.port) {
+				return;
+			}
+			CmdServ.cfgWaitSave.send();
 		}
 
 		//private bool isDescIp(string desc) {

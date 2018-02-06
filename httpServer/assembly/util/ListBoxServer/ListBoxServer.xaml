@@ -4,7 +4,7 @@
 
 	<SolidColorBrush x:Key="ListBorder" Color="#828790"/>
 	<DataTemplate x:Key="BaseListBoxServerItem">
-		<Grid Name="main" Height="25" Background="Transparent">
+		<Grid Name="main" Height="28" Background="Transparent">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="15" Name="co1" />
 				<ColumnDefinition Width="*" />

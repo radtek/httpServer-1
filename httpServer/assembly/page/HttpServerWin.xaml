@@ -15,12 +15,12 @@
 				<supUI:TextBoxLabel LeftWidth="50" Height="32" Margin="5,0,0,0" Content="描述：" x:Name="txtDesc" TextChanged="txtDesc_TextChanged"/>
 
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="5,0,0,0" Height="32">
-					<supUI:ComboBoxLabel IsEditable="True" LeftWidth="50" Width="170" Content="IP：" x:Name="cbxIp"/>
-					<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtPort" />
+					<supUI:ComboBoxLabel IsEditable="True" LeftWidth="50" Width="170" Content="IP：" x:Name="cbxIp" TextBoxBase.TextChanged="cbxIp_TextChanged"/>
+					<supUI:TextBoxLabel Margin="8,0,0,0" LeftWidth="0"  Width="60" Content="" Tip="端口号" ToolTip="端口号" x:Name="txtPort" TextChanged="txtPort_TextChanged" />
 				</StackPanel>
 
-				<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,0,0,0" Tip="127.0.0.1:80" Content="端口转发" x:Name="txtTransmit" Checked="txtTransmit_Checked" Unchecked="txtTransmit_Unchecked" TextChanged="txtTransmit_TextChanged" />
-				<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,4,0,0" Content="反向代理" Tip="" x:Name="txtProxy" TextChanged="txtProxy_TextChanged" Checked="txtProxy_Checked" Unchecked="txtProxy_Unchecked" />
+				<!--<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,0,0,0" Tip="127.0.0.1:80" Content="端口转发" x:Name="txtTransmit" Checked="txtTransmit_Checked" Unchecked="txtTransmit_Unchecked" TextChanged="txtTransmit_TextChanged" />-->
+				<!--<supUI:TextBoxCheckbox LeftWidth="80" Height="32" VerticalAlignment="Top" Margin="5,4,0,0" Content="反向代理" Tip="" x:Name="txtProxy" TextChanged="txtProxy_TextChanged" Checked="txtProxy_Checked" Unchecked="txtProxy_Unchecked" />-->
 				<supUI:TextBoxFile LeftWidth="50" Height="32" IsSelectFolder="True" Margin="5,4,0,0" Tip="" VerticalAlignment="Top" Content="路径：" x:Name="txtPath" TextChanged="txtPath_TextChanged" />
 				<supUI:TextBoxLabel LeftWidth="60" Height="32" Margin="5,8,0,0" Content="url参数：" Tip="" x:Name="txtUrlParam" TextChanged="txtUrlParam_TextChanged" />
 				<StackPanel Margin="5,4,0,0" VerticalAlignment="Top" Orientation="Horizontal" Height="28">
