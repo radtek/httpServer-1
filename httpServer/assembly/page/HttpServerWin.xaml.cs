@@ -86,6 +86,7 @@ namespace httpServer.assembly.page {
 
 			//find ip
 			List<string> lstIP = UiService.ins().getAllIp();
+			cbxIp.Items.Add("localhost");
 			cbxIp.Items.Add("127.0.0.1");
 			for(int i = 0; i < lstIP.Count; ++i) {
 				cbxIp.Items.Add(lstIP[i]);

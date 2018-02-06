@@ -106,7 +106,9 @@ namespace httpServer.assembly.page {
 			ent = Entity.getInstance();
 
 			List<string> lstIP = UiService.ins().getAllIp();
+			cbxCtlIp.Items.Add("localhost");
 			cbxCtlIp.Items.Add("127.0.0.1");
+			cbxHttpIp.Items.Add("localhost");
 			cbxHttpIp.Items.Add("127.0.0.1");
 			for (int i = 0; i < lstIP.Count; ++i) {
 				cbxCtlIp.Items.Add(lstIP[i]);
