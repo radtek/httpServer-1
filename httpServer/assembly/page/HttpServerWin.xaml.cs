@@ -59,6 +59,14 @@ namespace httpServer.assembly.page {
 			regCtl.setValue(subPath + "path", path);
 			regCtl.setValue(subPath + "urlParam", urlParam);
 		}
+
+		public override int getMaxPort() {
+			try {
+				return Int32.Parse(port);
+			} catch(Exception) {
+				return base.getMaxPort();
+			}
+		}
 	};
 
 	/// <summary>
@@ -93,8 +101,20 @@ namespace httpServer.assembly.page {
 			}
 		}
 
+		public ServerModule createNewModel() {
+			HttpModel md = new HttpModel();
+			md.port = SystemCtl.getFreePort(ent.mainModule.maxStartPort()).ToString();
+			//ent.mainModule.updateStartPort(md.port);
+
+			md.desc = md.ip + ":" + md.port;
+			md.path = SysConst.rootPath();
+			return md;
+			//return data;
+		}
+
 		public void initData(ServerModule _md) {
 			HttpModel md = (HttpModel)_md;
+			//ent.mainModule.updateStartPort(md.port);
 
 			ServerCtl ctl = new ServerCtl();
 			ctl.md = md;
@@ -147,15 +167,6 @@ namespace httpServer.assembly.page {
 
 		public ServerModule createModel() {
 			return new HttpModel();
-			//return data;
-		}
-
-		public ServerModule createNewModel() {
-			HttpModel md = new HttpModel();
-			md.port = SystemCtl.getFreePort(8091).ToString();
-			md.desc = md.ip + ":" + md.port;
-			md.path = SysConst.rootPath();
-			return md;
 			//return data;
 		}
 

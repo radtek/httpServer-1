@@ -86,6 +86,26 @@ namespace httpServer.assembly.page {
 			regCtl.setValue(subPath + "httpIp", httpIp);
 			regCtl.setValue(subPath + "httpPort", httpPort);
 		}
+
+		public override int getMaxPort() {
+			try {
+				if(revType == "local") {
+					return base.getMaxPort();
+				}
+				int iCtlPort = Int32.Parse(ctlPort);
+				int iHttpPort = Int32.Parse(httpPort);
+				int maxPort = Entity.getInstance().mainModule.maxPort;
+
+				int port = Math.Max(iCtlPort, iHttpPort);
+				if(port > maxPort) {
+					return Math.Min(iCtlPort, iHttpPort);
+				} else {
+					return port;
+				}
+			} catch(Exception) {
+				return base.getMaxPort();
+			}
+		}
 	};
 
 	/// <summary>
@@ -116,8 +136,23 @@ namespace httpServer.assembly.page {
 			}
 		}
 
+		public ServerModule createNewModel() {
+			HttpRevModel md = new HttpRevModel();
+			int port = ent.mainModule.maxStartPort();
+			md.ctlPort = SystemCtl.getFreePort(port).ToString();
+			md.httpPort = SystemCtl.getFreePort(port + 1).ToString();
+
+			//ent.mainModule.updateStartPort(md.ctlPort);
+			//ent.mainModule.updateStartPort(md.httpPort);
+
+			md.desc = md.ctlIp + ":" + md.ctlPort;
+			return md;
+		}
+
 		public void initData(ServerModule _md) {
 			HttpRevModel md = (HttpRevModel)_md;
+			//ent.mainModule.updateStartPort(md.ctlPort);
+			//ent.mainModule.updateStartPort(md.httpPort);
 
 			//if(md.revType == "local") {
 			//	md.serverCtl = new HttpRevClient();
@@ -135,14 +170,6 @@ namespace httpServer.assembly.page {
 
 		public ServerModule createModel() {
 			return new HttpRevModel();
-		}
-
-		public ServerModule createNewModel() {
-			HttpRevModel md = new HttpRevModel();
-			md.ctlPort = SystemCtl.getFreePort(8091).ToString();
-			md.httpPort = SystemCtl.getFreePort(8091).ToString();
-			md.desc = md.ctlIp + ":" + md.ctlPort;
-			return md;
 		}
 
 		public void updateData(ServerModule _md) {

@@ -1,4 +1,5 @@
 ﻿using com.superscene.util;
+using httpServer.entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,10 @@ namespace httpServer.module {
 			regCtl.setValue(subPath + "type", type);
 			regCtl.setValue(subPath + "desc", desc);
 			regCtl.setValueBool(subPath + "isRun", isRun);
+		}
+
+		public virtual int getMaxPort() {
+			return Entity.getInstance().mainModule.startPort;
 		}
 	}
 }
