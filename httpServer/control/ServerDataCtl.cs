@@ -56,7 +56,7 @@ namespace httpServer.control {
 			try {
 				var map = Entity.getInstance().mainModule.mapServer;
 				
-				regCtl.each(regPath, (name) => {
+				regCtl.eachItem(regPath, (name) => {
 					string subPath = regPath + name + "\\";
 
 					string type = regCtl.getValue(subPath + "type", "httpServer");

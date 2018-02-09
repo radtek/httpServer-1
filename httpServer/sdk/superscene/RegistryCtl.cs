@@ -58,7 +58,7 @@ namespace com.superscene.util {
 
 			return temp.OpenSubKey(name, true);
 		}
-		
+
 		private void getPath(string path, bool isCreate, out RegistryKey root, out string name) {
 			root = null;
 			name = "";
@@ -70,7 +70,7 @@ namespace com.superscene.util {
 				idx = path.IndexOf('/');
 			}
 			if(idx < 0) {
-				return ;
+				return;
 			}
 
 			//get value idx
@@ -79,10 +79,10 @@ namespace com.superscene.util {
 				valueIdx = path.LastIndexOf('/');
 			}
 			if(valueIdx < 0) {
-				return ;
+				return;
 			}
 			if(idx > valueIdx) {
-				return ;
+				return;
 			}
 
 			//get root
@@ -341,17 +341,21 @@ namespace com.superscene.util {
 			return result == "true";
 		}
 
-		public void each(string path, Action<string> callback) {
+		public void each(string path, Action<string> callback, bool isItem) {
 			RegistryKey root = null;
 			string[] names = null;
 
 			try {
 				root = getPath(path, false);
 				if(root == null) {
-					return ;
+					return;
 				}
 
-				names = root.GetSubKeyNames();
+				if(isItem) {
+					names = root.GetSubKeyNames();
+				} else {
+					names = root.GetValueNames();
+				}
 			} catch(Exception) {
 				//return "";
 			}
@@ -364,6 +368,14 @@ namespace com.superscene.util {
 			for(int i = 0; i < names.Length; ++i) {
 				callback?.Invoke(names[i]);
 			}
+		}
+
+		public void eachItem(string path, Action<string> callback) {
+			each(path, callback, true);
+		}
+
+		public void eachName(string path, Action<string> callback) {
+			each(path, callback, false);
 		}
 
 		public void clearChild(string path) {
