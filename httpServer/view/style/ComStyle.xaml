@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:httpServer"
                     xmlns:util="clr-namespace:httpServer.assembly.util"
-					xmlns:supUI="clr-namespace:com.superscene.ui">
+					xmlns:supUI="clr-namespace:csharpHelp.ui">
 
 	<!--Label-->
 	<Style TargetType="{x:Type Label}">

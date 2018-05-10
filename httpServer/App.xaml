@@ -7,14 +7,14 @@
 
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="/sdk/superscene/TextBoxTip/TextBoxTip.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/TextBoxLabel/TextBoxLabel.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/CheckBoxBan/CheckBoxBan.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/LabelSingle/LabelSingle.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/TextBoxCheckbox/TextBoxCheckbox.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/TextBoxFile/TextBoxFile.xaml" ></ResourceDictionary>
-				<ResourceDictionary Source="/sdk/superscene/ComboBoxLabel/ComboBoxLabel.xaml" ></ResourceDictionary>
-				<!--<ResourceDictionary Source="/sdk/superscene/ButtonLabel/ButtonLabel.xaml" ></ResourceDictionary>-->
+				<ResourceDictionary Source="/sdk/csharpHelp/TextBoxTip/TextBoxTip.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/TextBoxLabel/TextBoxLabel.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/CheckBoxBan/CheckBoxBan.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/LabelSingle/LabelSingle.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/TextBoxCheckbox/TextBoxCheckbox.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/TextBoxFile/TextBoxFile.xaml" ></ResourceDictionary>
+				<ResourceDictionary Source="/sdk/csharpHelp/ComboBoxLabel/ComboBoxLabel.xaml" ></ResourceDictionary>
+				<!--<ResourceDictionary Source="/sdk/csharpHelp/ButtonLabel/ButtonLabel.xaml" ></ResourceDictionary>-->
 				
 				<ResourceDictionary Source="view/style/ComStyle.xaml"/>
 				<ResourceDictionary Source="view/style/Test.xaml"/>

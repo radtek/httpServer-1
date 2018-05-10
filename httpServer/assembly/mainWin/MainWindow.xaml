@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:httpServer"
-		xmlns:supUI="clr-namespace:com.superscene.ui"
+		xmlns:supUI="clr-namespace:csharpHelp.ui"
         xmlns:util="clr-namespace:httpServer.assembly.util"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
 	xmlns:page="clr-namespace:httpServer.assembly.page" x:Class="httpServer.MainWindow"
