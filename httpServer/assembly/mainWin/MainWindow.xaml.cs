@@ -98,11 +98,13 @@ namespace httpServer {
 			int y = 100;
 			int w = 400;
 			int h = 200;
+			double colServerWidth = 0;
 			try {
 				x = Int32.Parse(regCtl.getValue(regPath + "x", "100"));
 				y = Int32.Parse(regCtl.getValue(regPath + "y", "100"));
 				w = Int32.Parse(regCtl.getValue(regPath + "width", "680"));
 				h = Int32.Parse(regCtl.getValue(regPath + "height", "270"));
+				colServerWidth = Int32.Parse(regCtl.getValue(regPath + "colServer", "160"));
 			} catch(Exception) {
 
 			}
@@ -111,6 +113,7 @@ namespace httpServer {
 			this.Top = y;
 			this.Width = w;
 			this.Height = h;
+			colServer.Width = new GridLength(colServerWidth);
 
 			foreach (var key in ent.mainModule.mapServer.Keys) {
 				IPage page = ent.mainModule.mapServer[key];
@@ -195,6 +198,7 @@ namespace httpServer {
 			regCtl.setValue(regPath + "width", this.Width.ToString());
 			regCtl.setValue(regPath + "height", this.Height.ToString());
 			regCtl.setValue(regPath + "selectItem", lstItem.SelectedIndex.ToString());
+			regCtl.setValue(regPath + "colServer", ((int)colServer.Width.Value).ToString());
 
 			serverDataCtl.save();
 		}
@@ -284,15 +288,19 @@ namespace httpServer {
 			md.serverItem = item;
 
 			ent.mainModule.mapServer[md.type].initData(md);
-			serverItem.Add(item);
+			//serverItem.Add(item);
+			serverItem.Insert(0, item);
 
-			lstServer.Add(md);
+			//lstServer.Add(md);
+			lstServer.Insert(0, md);
 
 			lstItem.ItemsSource = null;
 			lstItem.ItemsSource = serverItem;
 
-			lstItem.SelectedIndex = serverItem.Count - 1;
-			lstItem.ScrollIntoView(lstItem.Items[serverItem.Count - 1]);
+			//lstItem.SelectedIndex = serverItem.Count - 1;
+			//lstItem.ScrollIntoView(lstItem.Items[serverItem.Count - 1]);
+			lstItem.SelectedIndex = 0;
+			lstItem.ScrollIntoView(lstItem.Items[0]);
 		}
 
 		private void btnDel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
