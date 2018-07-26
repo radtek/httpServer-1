@@ -39,6 +39,32 @@ namespace httpServer.assembly.page {
 
 		public bool isTransmit = false; //端口转发
 		public string transmitUrl = "";
+		string _rewrite = "";
+		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
+
+		public string rewrite {
+			get { return _rewrite; }
+			set {
+				_rewrite = value;
+				updateRewrite();
+			}
+		}
+
+		private void updateRewrite() {
+			string[] arr = _rewrite.Split(new string[] { "\r\n", ";" }, StringSplitOptions.RemoveEmptyEntries);
+			mapRewrite = new Dictionary<string, string>();
+
+			for(int i = 0; i < arr.Length; ++i) {
+				Regex reg = new Regex("^(?:(?:'|\"|‘|“)?)(.*?)(?:(?:'|\"|‘|“)?)(?:\\s?=\\s?)(?:(?:'|\"|‘|“)?)(.*?)(?:(?:'|\"|‘|“)?)$");
+
+				Match match = reg.Match(arr[i].Trim());
+				if(match.Groups.Count < 3) {
+					continue;
+				}
+
+				mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
+			}
+		}
 
 		public override void load(RegistryCtl regCtl, string subPath) {
 			base.load(regCtl, subPath);
@@ -49,6 +75,7 @@ namespace httpServer.assembly.page {
 			port = regCtl.getValue(subPath + "port", "8091");
 			path = regCtl.getValue(subPath + "path", rootPath);
 			urlParam = regCtl.getValue(subPath + "urlParam", "");
+			_rewrite = regCtl.getValue(subPath + "rewrite", "");
 		}
 
 		public override void save(RegistryCtl regCtl, string subPath) {
@@ -58,6 +85,7 @@ namespace httpServer.assembly.page {
 			regCtl.setValue(subPath + "port", port);
 			regCtl.setValue(subPath + "path", path);
 			regCtl.setValue(subPath + "urlParam", urlParam);
+			regCtl.setValue(subPath + "rewrite", _rewrite);
 		}
 
 		public override int getMaxPort() {
@@ -152,6 +180,7 @@ namespace httpServer.assembly.page {
 
 			txtPath.Text = md.path;
 			txtUrlParam.Text = md.urlParam;
+			txtRewrite.Text = md.rewrite;
 
 			//txtProxy.IsChecked = md.isProxy;
 			//txtProxy.Text = md.proxyUrl;
@@ -220,6 +249,10 @@ namespace httpServer.assembly.page {
 			updateData("urlParam", txtUrlParam.Text);
 		}
 
+		private void txtRewrite_TextChanged(object sender, TextChangedEventArgs e) {
+			updateData("rewrite", txtRewrite.Text);
+		}
+
 		private void updateData(string name, string value) {
 			//int idx = dataIndex;
 			//if(idx < 0 || serverItem == null) {
@@ -245,6 +278,7 @@ namespace httpServer.assembly.page {
 					lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
 					break;
 				}
+			case "rewrite": md.rewrite = value; break;
 			}
 		}
 

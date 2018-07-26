@@ -165,6 +165,24 @@ namespace httpServer.control {
 			}
 
 			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+			foreach(string key in md.mapRewrite.Keys) {
+				if(url.IndexOf(key) >= 0) {
+					var arr = md.mapRewrite[key].Split(',');
+					if(arr.Length < 2) {
+						continue;
+					}
+					string rewriteUrl = arr[0].Trim();
+					string rewriteParam = arr[1].Trim();
+					string newUrl = rewriteUrl + url.Replace(key, rewriteParam);
+
+					//foreach(string aaa in httpListenerContext.Request.Headers.Keys) {
+					//	Debug.WriteLine(httpListenerContext.Request.Headers[aaa]);
+					//}
+					rewrite(newUrl, httpListenerContext);
+					return;
+				}
+			}
+
 			//Debug.WriteLine(url);
 			//string url = httpListenerContext.Request.Url.AbsolutePath;
 			bool isIndex = false;
@@ -239,6 +257,116 @@ namespace httpServer.control {
 
 			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
 			httpListenerContext.Response.Close(buffer, true);
+		}
+
+		/// <summary>重定向</summary>
+		private void rewrite(string newUrl, HttpListenerContext httpListenerContext) {
+			try {
+				byte[] result = new byte[0];
+				int dataLen = 0;
+
+				var handler = new HttpClientHandler() {
+					AllowAutoRedirect = false,
+					UseCookies = false
+				};
+
+				using(var client = new HttpClient(handler)) {
+					if(_timeout.TotalMilliseconds != 0) {
+						client.Timeout = _timeout;
+					}
+
+					int inputLen = 0;
+					byte[] intputData = readStream(httpListenerContext.Request.InputStream, out inputLen);
+					//using(var reader = new BinaryReader(httpListenerContext.Request.InputStream, httpListenerContext.Request.ContentEncoding)) {
+					//	Debug.WriteLine("aa:" + reader.ReadToEnd());
+					//}
+
+					foreach(string key in httpListenerContext.Request.Headers.Keys) {
+						try {
+							string val = httpListenerContext.Request.Headers[key];
+
+							if(key.ToLower() == "host") {
+								val = (new Regex("(?:.*?://)(.*?)(?:/)")).Match(newUrl).Groups[1].Value;
+							} else if(key.ToLower() == "origin") {
+								val = (new Regex("(.*?://.*?)(?:/)")).Match(newUrl).Groups[1].Value;
+							} else if(key.ToLower() == "referer") {
+								//var host = (new Regex(".*?://.*?/")).Match(newUrl).Value;
+								val = newUrl;
+							}
+							//Debug.WriteLine($"request: {key},{val}");
+							client.DefaultRequestHeaders.Add(key, val);
+						} catch(Exception) { }
+					}
+
+					//var response = client.SendAsync(requestMessage).Result;
+					HttpResponseMessage response = null;
+					if(httpListenerContext.Request.HttpMethod.ToLower() == "post") {
+						//Debug.WriteLine($"input:{Encoding.UTF8.GetString(intputData, 0, inputLen)},bb");
+						var postData = new ByteArrayContent(intputData, 0, inputLen);
+						response = client.PostAsync(newUrl, postData).Result;
+					} else {
+						response = client.GetAsync(newUrl).Result;
+					}
+					bool isResponseOk = response.IsSuccessStatusCode;
+					HttpStatusCode code = response.StatusCode;
+					if(!isResponseOk) {
+						//result = "";
+					} else {
+						Stream sResult = response.Content.ReadAsStreamAsync().Result;
+						result = readStream(sResult, out dataLen);
+						//Debug.WriteLine("rst:" + Encoding.UTF8.GetString(result, 0, dataLen) + ",bb");
+					}
+
+					//httpListenerContext.Response.Headers.Add("Content-Type", response.Headers.GetValues("Content-Type"));
+					//if(response.Content.Headers.ContentType != null) {
+					//	httpListenerContext.Response.Headers.Add("Content-Type", response.Content.Headers.ContentType.ToString());
+					//}
+					//if(response.Headers.Location != null) {
+					//	string location = response.Headers.Location.ToString();
+					//	location = location.Replace(md.proxyUrl, serverUrl);
+					//	httpListenerContext.Response.Headers.Add("Location", location);
+					//}
+
+					//response.Headers.Location;
+					int statusCode = (int)code;
+					httpListenerContext.Response.StatusCode = statusCode;
+					
+					var lst = response.Headers.ToList();
+					for(int i = 0; i < lst.Count; ++i) {
+						var vals = (lst[i].Value as string[]);
+						if(vals != null && vals.Length > 0) {
+							//Debug.WriteLine($"response:{lst[i].Key},{vals[0]}");
+							try {
+								httpListenerContext.Response.Headers.Add(lst[i].Key, vals[0]);
+							} catch(Exception) { }
+						}
+						//httpListenerContext.Response.Headers.Add(lst[i].Key, lst[i].Value.ToString());
+					}
+					var lst2 = response.Content.Headers.ToList();
+					for(int i = 0; i < lst2.Count; ++i) {
+						var vals = (lst2[i].Value as string[]);
+						if(vals != null && vals.Length > 0) {
+							//Debug.WriteLine($"response2:{lst2[i].Key},{vals[0]}");
+							try {
+								httpListenerContext.Response.Headers.Add(lst2[i].Key, vals[0]);
+							} catch(Exception) { }
+						}
+					}
+				}
+
+				//httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+				var output = httpListenerContext.Response.OutputStream;
+				output.Write(result, 0, dataLen);
+				output.Close();
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
+
+				try {
+					httpListenerContext.Response.StatusCode = 404;
+					var output = httpListenerContext.Response.OutputStream;
+					output.Write(new byte[0], 0, 0);
+				} catch(Exception) { }
+			}
 		}
 
 		private bool parseCtl(string url, HttpListenerContext ctx) {
@@ -339,25 +467,44 @@ namespace httpServer.control {
 
 		private byte[] readStream(Stream stream, out int len) {
 			try {
-				//string result = "";
-				int bufSize = 1024;
-				int totaLen = (int)stream.Length;
-				byte[] data = new byte[totaLen + bufSize];
-				int idx = 0;
-				int readCount = 0;
+				const int bufferSize = 4096;
+				using(var ms = new MemoryStream()) {
+					byte[] buffer = new byte[bufferSize];
+					int count;
+					while((count = stream.Read(buffer, 0, buffer.Length)) != 0) {
+						ms.Write(buffer, 0, count);
+					}
 
-				do {
+					byte[] rst = ms.ToArray();
+					len = rst.Length;
+					return rst;
+				}
 
-					readCount = stream.Read(data, idx, bufSize);
-					idx += readCount;
+				//if(!stream.CanRead || !stream.CanSeek) {
+				//	len = 0;
+				//	return new byte[0];
+				//}
+				////string result = "";
+				//int bufSize = 1024;
+				//int totaLen = 0;
+				//if(stream.CanSeek) {
+				//	totaLen = (int)stream.Length;
+				//}
+				//byte[] data = new byte[totaLen + bufSize];
+				//int idx = 0;
+				//int readCount = 0;
 
-					//result += Encoding.UTF8.GetString(data, 0, readCount);
-				} while(readCount >= bufSize);
+				//do {
+				//	readCount = stream.Read(data, idx, bufSize);
+				//	idx += readCount;
 
-				//result = Encoding.UTF8.GetString(data, 0, totaLen);
+				//	//result += Encoding.UTF8.GetString(data, 0, readCount);
+				//} while(readCount >= bufSize);
 
-				len = totaLen;
-				return data;
+				////result = Encoding.UTF8.GetString(data, 0, totaLen);
+
+				//len = totaLen;
+				//return data;
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 				len = 0;
@@ -367,40 +514,51 @@ namespace httpServer.control {
 
 		private byte[] readStream(Stream stream) {
 			try {
-				List<byte[]> lstData = new List<byte[]>();
-				//string result = "";
-				int bufSize = 10240;
-				byte[] temp = new byte[bufSize];
-
-				int totaLen = 0;
-				int readCount = 0;
-
-				do {
-					readCount = stream.Read(temp, 0, bufSize);
-					totaLen += readCount;
-
-					if(readCount == bufSize) {
-						lstData.Add(temp);
-						temp = new byte[bufSize];
-					} else {
-						byte[] newTemp = new byte[readCount];
-						Array.Copy(temp, newTemp, readCount);
-						lstData.Add(newTemp);
+				const int bufferSize = 4096;
+				using(var ms = new MemoryStream()) {
+					byte[] buffer = new byte[bufferSize];
+					int count;
+					while((count = stream.Read(buffer, 0, buffer.Length)) != 0) {
+						ms.Write(buffer, 0, count);
 					}
-					//result += Encoding.UTF8.GetString(data, 0, readCount);
-				} while(readCount >= bufSize);
-
-				//result = Encoding.UTF8.GetString(data, 0, totaLen);
-
-				byte[] result = new byte[totaLen];
-				int dstIdx = 0;
-				for(int i = 0; i < lstData.Count; ++i) {
-					int srcLen = lstData[i].Length;
-					Array.Copy(lstData[i], 0, result, dstIdx, srcLen);
-					dstIdx += srcLen;
+					
+					return ms.ToArray();
 				}
 
-				return result;
+				//List<byte[]> lstData = new List<byte[]>();
+				////string result = "";
+				//int bufSize = 10240;
+				//byte[] temp = new byte[bufSize];
+
+				//int totaLen = 0;
+				//int readCount = 0;
+
+				//do {
+				//	readCount = stream.Read(temp, 0, bufSize);
+				//	totaLen += readCount;
+
+				//	if(readCount == bufSize) {
+				//		lstData.Add(temp);
+				//		temp = new byte[bufSize];
+				//	} else {
+				//		byte[] newTemp = new byte[readCount];
+				//		Array.Copy(temp, newTemp, readCount);
+				//		lstData.Add(newTemp);
+				//	}
+				//	//result += Encoding.UTF8.GetString(data, 0, readCount);
+				//} while(readCount >= bufSize);
+
+				////result = Encoding.UTF8.GetString(data, 0, totaLen);
+
+				//byte[] result = new byte[totaLen];
+				//int dstIdx = 0;
+				//for(int i = 0; i < lstData.Count; ++i) {
+				//	int srcLen = lstData[i].Length;
+				//	Array.Copy(lstData[i], 0, result, dstIdx, srcLen);
+				//	dstIdx += srcLen;
+				//}
+
+				//return result;
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 				return new byte[0];
