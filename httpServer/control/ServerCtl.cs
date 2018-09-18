@@ -62,6 +62,7 @@ namespace httpServer.control {
 			mapSuffix[".png"] = "image/png";
 			mapSuffix[".xml"] = "application/xml";
 			mapSuffix[".jpg"] = "image/jpeg";
+			mapSuffix[".svg"] = "image/svg+xml";
 		}
 
 		public ServerCtl() {
