@@ -148,16 +148,16 @@ namespace httpServer.control {
 			} catch(Exception) { }
 		}
 
-		private void serverProc() {
-			try {
-				while(!stopServer) {
-					HttpListenerContext httpListenerContext = httpListener.GetContext();
-					responseFile(httpListenerContext);
-				}
-			} catch(Exception) {
+		//private void serverProc() {
+		//	try {
+		//		while(!stopServer) {
+		//			HttpListenerContext httpListenerContext = httpListener.GetContext();
+		//			responseFile(httpListenerContext);
+		//		}
+		//	} catch(Exception) {
 
-			}
-		}
+		//	}
+		//}
 
 		private void responseFile(HttpListenerContext httpListenerContext) {
 			if(md.isProxy) {
@@ -169,12 +169,19 @@ namespace httpServer.control {
 			foreach(string key in md.mapRewrite.Keys) {
 				if(url.IndexOf(key) >= 0) {
 					var arr = md.mapRewrite[key].Split(',');
-					if(arr.Length < 2) {
-						continue;
+					string rewriteUrl = md.mapRewrite[key];
+					string rewriteParam = "";
+
+					if(arr.Length >= 2) {
+						rewriteUrl = arr[0].Trim();
+						rewriteParam = arr[1].Trim();
+						//continue;
 					}
-					string rewriteUrl = arr[0].Trim();
-					string rewriteParam = arr[1].Trim();
-					string newUrl = rewriteUrl + url.Replace(key, rewriteParam);
+					//string rewriteUrl = arr[0].Trim();
+					//string rewriteParam = arr[1].Trim();
+					int idx = url.IndexOf(key);
+					string newUrl = rewriteUrl + url.Substring(0, idx) + rewriteParam + url.Substring(idx + key.Length);
+					//Debug.WriteLine(key + "---" + md.mapRewrite[key] + "---" + rewriteUrl + "---" + rewriteParam + "---" + newUrl);
 
 					//foreach(string aaa in httpListenerContext.Request.Headers.Keys) {
 					//	Debug.WriteLine(httpListenerContext.Request.Headers[aaa]);
@@ -214,9 +221,24 @@ namespace httpServer.control {
 				if(isDeal) {
 					return;
 				} else {
+					//重定向匹配
+					foreach(string key in md.mapAutoRewrite.Keys) {
+						if(url.IndexOf(key) < 0) {
+							continue;
+						}
+						
+						string rewriteUrl = md.mapAutoRewrite[key];
+						int idx = url.IndexOf(key);
+						string newUrl = rewriteUrl + url.Substring(0, idx) + url.Substring(idx + key.Length);
+						//Debug.WriteLine(newUrl);
+						rewrite(newUrl, httpListenerContext);
+						return;
+					}
+					//404
 					httpListenerContext.Response.StatusCode = 404;
 				}
 			} else {
+				//文件存在
 				httpListenerContext.Response.StatusCode = 200;
 
 				string suffix = Path.GetExtension(path).ToLower();

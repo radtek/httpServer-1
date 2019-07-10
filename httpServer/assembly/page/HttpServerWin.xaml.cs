@@ -40,6 +40,7 @@ namespace httpServer.assembly.page {
 		public bool isTransmit = false; //端口转发
 		public string transmitUrl = "";
 		string _rewrite = "";
+		public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
 		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
 
 		public string rewrite {
@@ -51,11 +52,20 @@ namespace httpServer.assembly.page {
 		}
 
 		private void updateRewrite() {
-			string[] arr = _rewrite.Split(new string[] { "\r\n", ";" }, StringSplitOptions.RemoveEmptyEntries);
+			string[] arr = _rewrite.Split(new string[] { "\r\n", ";", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+			mapAutoRewrite = new Dictionary<string, string>();
 			mapRewrite = new Dictionary<string, string>();
 
 			for(int i = 0; i < arr.Length; ++i) {
-				Regex reg = new Regex("^(?:(?:'|\"|‘|“)?)(.*?)(?:(?:'|\"|‘|“)?)(?:\\s?=\\s?)(?:(?:'|\"|‘|“)?)(.*?)(?:(?:'|\"|‘|“)?)$");
+				Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+				Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+
+				Match matchAuto = regAuto.Match(arr[i].Trim());
+				if(matchAuto.Groups.Count >= 3) {
+					mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
+					//Debug.WriteLine(matchAuto.Groups[1].Value + "," + matchAuto.Groups[2].Value);
+					continue;
+				}
 
 				Match match = reg.Match(arr[i].Trim());
 				if(match.Groups.Count < 3) {
@@ -63,6 +73,7 @@ namespace httpServer.assembly.page {
 				}
 
 				mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
+				//Debug.WriteLine(match.Groups[1].Value + "," + match.Groups[2].Value);
 			}
 		}
 

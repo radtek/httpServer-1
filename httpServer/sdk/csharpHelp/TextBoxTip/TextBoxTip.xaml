@@ -22,6 +22,7 @@
 							Background="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}"
 							Foreground="{Binding Foreground,RelativeSource={RelativeSource TemplatedParent}}"
 							TextWrapping="{Binding TextWrapping,RelativeSource={RelativeSource TemplatedParent}}"
+							AcceptsReturn="{Binding AcceptsReturn,RelativeSource={RelativeSource TemplatedParent}}"
 							TextAlignment="{Binding TextAlignment,RelativeSource={RelativeSource TemplatedParent}}" 
 							HorizontalScrollBarVisibility="{Binding HorizontalScrollBarVisibility,RelativeSource={RelativeSource TemplatedParent}}"
 							VerticalScrollBarVisibility="{Binding VerticalScrollBarVisibility,RelativeSource={RelativeSource TemplatedParent}}"
