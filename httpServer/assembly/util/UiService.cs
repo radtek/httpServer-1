@@ -20,7 +20,7 @@ namespace httpServer.assembly.util {
 
 		public List<string> getAllIp() {
 			if (lstIP.Count <= 0) {
-				lstIP = CommonUtil.findAllIp();
+				lstIP = ComUtil.findAllIp();
 			}
 
 			return lstIP;

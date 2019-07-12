@@ -80,6 +80,7 @@
     <Compile Include="control\httpRevProxy\HttpRevClient.cs" />
     <Compile Include="control\httpRevProxy\HttpRevServer.cs" />
     <Compile Include="control\httpRevProxy\HttpPackModel.cs" />
+    <Compile Include="control\HttpServerGroup.cs" />
     <Compile Include="control\IServerCtl.cs" />
     <Compile Include="control\RequestCtl.cs" />
     <Compile Include="control\ServerCtl.cs" />
@@ -384,7 +385,7 @@
     <Compile Include="sdk\WindowsAPICodePack\Shell\Taskbar\ThumbnailToolbarProxyWindow.cs" />
     <Compile Include="sdk\WindowsAPICodePack\Shell\Taskbar\UserRemovedJumpListItemsEventArg.cs" />
     <Compile Include="services\CmdServ.cs" />
-    <Compile Include="util\CommonUtil.cs" />
+    <Compile Include="util\ComUtil.cs" />
     <Compile Include="util\SysConst.cs" />
     <Page Include="assembly\mainWin\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

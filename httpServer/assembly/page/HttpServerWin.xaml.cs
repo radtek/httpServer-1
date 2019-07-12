@@ -25,8 +25,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace httpServer.assembly.page {
-	class HttpModel : ServerModule {
-		public ServerCtl ctl = null;
+	public class HttpModel : ServerModule {
+		public HttpServerGroup ctl = null;
 
 		public string ip = "127.0.0.1";     //
 		public string port = "";
@@ -133,6 +133,7 @@ namespace httpServer.assembly.page {
 
 			//find ip
 			List<string> lstIP = UiService.ins().getAllIp();
+			cbxIp.Items.Add("0.0.0.0");
 			cbxIp.Items.Add("localhost");
 			cbxIp.Items.Add("127.0.0.1");
 			for(int i = 0; i < lstIP.Count; ++i) {
@@ -155,10 +156,14 @@ namespace httpServer.assembly.page {
 			HttpModel md = (HttpModel)_md;
 			//ent.mainModule.updateStartPort(md.port);
 
-			ServerCtl ctl = new ServerCtl();
+			//ServerCtl ctl = new ServerCtl();
+			//ctl.md = md;
+			//md.ctl = ctl;
+
+			HttpServerGroup ctl = new HttpServerGroup();
 			ctl.md = md;
 			md.ctl = ctl;
-			//lstServerClt.Add(ctl);
+
 			if (md.isRun) {
 				ctl.restartServer();
 			}
@@ -199,7 +204,8 @@ namespace httpServer.assembly.page {
 			//txtTransmit.IsChecked = md.isTransmit;
 			//txtTransmit.Text = md.transmitUrl;
 
-			lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+			string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
+			lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
 
 			//Debug.WriteLine("bb");
 			//isEditByCode = false;
@@ -211,7 +217,7 @@ namespace httpServer.assembly.page {
 		}
 
 		private void lblUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-			CommonUtil.runExe("explorer.exe", lblUrl.Content.ToString());
+			ComUtil.runExe("explorer.exe", lblUrl.Content.ToString());
 		}
 
 		private void lblCopyUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -286,7 +292,8 @@ namespace httpServer.assembly.page {
 			case "path": md.path = value; break;
 			case "urlParam": {
 					md.urlParam = value;
-					lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+					string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
+					lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
 					break;
 				}
 			case "rewrite": md.rewrite = value; break;
@@ -314,7 +321,8 @@ namespace httpServer.assembly.page {
 					var lastPort = md.port;
 					md.ip = cbxIp.Text;
 					md.port = txtPort.Text;
-					lblUrl.Content = "http://" + md.ip + ":" + md.port + "/" + md.urlParam;
+					string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
+					lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
 
 					md.desc = md.desc.Replace(lastIp, md.ip);
 					md.desc = md.desc.Replace(lastPort, md.port);

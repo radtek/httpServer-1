@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace httpServer.control {
-	class ServerCtl {
+	public class ServerCtl {
 		public class IpAddr {
 			public string ip = "";
 			public string port = "";
@@ -42,6 +42,7 @@ namespace httpServer.control {
 		//public bool isTransmit = false;
 		//public string transmitUrl = "";
 
+		public string ip = "";
 		public HttpModel md = null;
 
 		string lastServer = "";
@@ -81,8 +82,8 @@ namespace httpServer.control {
 
 					//string ip = cbxIp.Text;
 					//string port = txtPort.Text.Trim();
-					lastServer = md.ip + ":" + md.port;
-					CommonUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + md.ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
+					lastServer = ip + ":" + md.port;
+					ComUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
 					return;
 				}
 				lastStatus = ServerStatus.http;
@@ -118,7 +119,7 @@ namespace httpServer.control {
 				port = "80";
 			}
 
-			string url = "http://" + md.ip + ":" + port;
+			string url = "http://" + ip + ":" + port;
 			//lblUrl.Content = url;
 			serverUrl = url;
 			url += "/";
@@ -406,9 +407,20 @@ namespace httpServer.control {
 				return true;
 			}
 
+			return false;
+
 			try {
 				isDeal = requestCtl.parse(url, ctx);
 
+				//Debug.WriteLine("----");
+				//Debug.WriteLine(ctx.Request.InputStream.CanRead);
+				//Debug.WriteLine(ctx.Request.InputStream.CanSeek);
+				//Debug.WriteLine(ctx.Request.InputStream.Length);
+				//Debug.WriteLine("----");
+				if(ctx.Request.InputStream.CanSeek && ctx.Request.InputStream.Length == 0) {
+					return isDeal;
+				}
+				
 				var parser = new MultipartFormDataParser(ctx.Request.InputStream);
 
 				foreach(var parameter in parser.Parameters) {
@@ -598,7 +610,7 @@ namespace httpServer.control {
 			if(lastStatus == ServerStatus.transmit) {
 				//IpAddr addr = parseServer(lastStatus);
 				IpAddr addr = parseServer(lastServer);
-				CommonUtil.runExeNoWin("netsh", "interface portproxy delete v4tov4 listenaddress=" + addr.ip + " listenport=" + addr.port);
+				ComUtil.runExeNoWin("netsh", "interface portproxy delete v4tov4 listenaddress=" + addr.ip + " listenport=" + addr.port);
 			}
 			lastStatus = ServerStatus.none;
 		}

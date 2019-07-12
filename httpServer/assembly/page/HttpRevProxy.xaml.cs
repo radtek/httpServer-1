@@ -309,7 +309,7 @@ namespace httpServer.assembly.page {
 		}
 
 		private void lblUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-			CommonUtil.runExe("explorer.exe", lblUrl.Content.ToString());
+			ComUtil.runExe("explorer.exe", lblUrl.Content.ToString());
 		}
 
 		private void lblCopyUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {

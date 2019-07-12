@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace httpServer.util {
-	public class CommonUtil {
+	public class ComUtil {
 		public static List<string> findAllIp() {
 			List<string> lstIP = new List<string>();
 			List<string> lstIPv6 = new List<string>();
@@ -26,21 +27,30 @@ namespace httpServer.util {
 						}
 					}
 				}
-
-				//cbxIp.Items.Add("127.0.0.1");
-				////cbxIp.ListItems.Add("127.0.0.1");
-				//for(int i = 0; i < lstIP.Count; ++i) {
-				//	cbxIp.Items.Add(lstIP[i]);
-				//	//cbxIp.ListItems.Add(lstIP[i]);
-				//}
-				//for(int i = 0; i < lstIPv6.Count; ++i) {
-				//	cbxIp.Items.Add(lstIPv6[i]);
-				//}
-			} catch(Exception) {
-
-			}
+				
+			} catch(Exception) { }
 
 			return lstIP;
+		}
+
+		/// <summary>
+		/// 获取操作系统已用的ip+端口号
+		/// </summary>
+		/// <returns></returns>
+		internal static HashSet<string> allUsedIpPort() {
+			//获取本地计算机的网络连接和通信统计数据的信息
+			IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+			//返回本地计算机上的所有Tcp监听程序
+			IPEndPoint[] ipsTCP = ipGlobalProperties.GetActiveTcpListeners();
+			//返回本地计算机上的所有UDP监听程序
+			IPEndPoint[] ipsUDP = ipGlobalProperties.GetActiveUdpListeners();
+			//返回本地计算机上的Internet协议版本4(IPV4 传输控制协议(TCP)连接的信息。
+			TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+			HashSet<string> allPorts = new HashSet<string>();
+			foreach(IPEndPoint ep in ipsTCP) allPorts.Add(ep.Address.ToString() + ":" + ep.Port);
+			foreach(IPEndPoint ep in ipsUDP) allPorts.Add(ep.Address.ToString() + ":" + ep.Port);
+			foreach(TcpConnectionInformation conn in tcpConnInfoArray) allPorts.Add(conn.LocalEndPoint.Address.ToString() + ":" + conn.LocalEndPoint.Port);
+			return allPorts;
 		}
 
 		//运行Exe
