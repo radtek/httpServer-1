@@ -200,7 +200,10 @@ namespace httpServer.control {
 				url += "index.html";
 			}
 
-			string path = Path.GetFullPath(md.path + "/" + url);
+			string path = "";
+			try {
+				path = Path.GetFullPath(md.path + "/" + url);
+			} catch(Exception) { }
 
 			if(!isIndex && !File.Exists(path)) {
 				string newPath = md.path + "/" + url + "/index.html";
