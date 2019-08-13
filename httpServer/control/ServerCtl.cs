@@ -167,6 +167,7 @@ namespace httpServer.control {
 			}
 
 			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+			//Debug.WriteLine("aaa," + url + "," + httpListenerContext.Request.Url.PathAndQuery);
 			foreach(string key in md.mapRewrite.Keys) {
 				if(url.IndexOf(key) >= 0) {
 					var arr = md.mapRewrite[key].Split(',');
@@ -180,6 +181,7 @@ namespace httpServer.control {
 					}
 					//string rewriteUrl = arr[0].Trim();
 					//string rewriteParam = arr[1].Trim();
+					url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.PathAndQuery);
 					int idx = url.IndexOf(key);
 					string newUrl = rewriteUrl + url.Substring(0, idx) + rewriteParam + url.Substring(idx + key.Length);
 					//Debug.WriteLine(key + "---" + md.mapRewrite[key] + "---" + rewriteUrl + "---" + rewriteParam + "---" + newUrl);
@@ -232,6 +234,7 @@ namespace httpServer.control {
 						}
 						
 						string rewriteUrl = md.mapAutoRewrite[key];
+						url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.PathAndQuery);
 						int idx = url.IndexOf(key);
 						string newUrl = rewriteUrl + url.Substring(0, idx) + url.Substring(idx + key.Length);
 						//Debug.WriteLine(newUrl);
@@ -327,6 +330,7 @@ namespace httpServer.control {
 
 					//var response = client.SendAsync(requestMessage).Result;
 					HttpResponseMessage response = null;
+					//Debug.WriteLine(httpListenerContext.Request.HttpMethod.ToLower() + "," + newUrl);
 					if(httpListenerContext.Request.HttpMethod.ToLower() == "post") {
 						//Debug.WriteLine($"input:{Encoding.UTF8.GetString(intputData, 0, inputLen)},bb");
 						var postData = new ByteArrayContent(intputData, 0, inputLen);
