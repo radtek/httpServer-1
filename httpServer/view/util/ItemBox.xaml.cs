@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace httpServer.assembly.util {
+namespace httpServer.view.util {
 	/// <summary>
 	/// viewBox.xaml 的交互逻辑
 	/// </summary>

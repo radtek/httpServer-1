@@ -1,7 +1,7 @@
 ﻿using csharpHelp.util;
 using HttpMultipartParser;
-using httpServer.assembly.page;
-using httpServer.module;
+using httpServer.view.page;
+using httpServer.model;
 using httpServer.util;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -44,7 +44,7 @@ namespace httpServer.control {
 		//public string transmitUrl = "";
 
 		public string ip = "";
-		public HttpModel md = null;
+		public HttpServerMd md = null;
 
 		string lastServer = "";
 		string serverUrl = "";
@@ -76,15 +76,15 @@ namespace httpServer.control {
 		public void restartServer() {
 			try {
 				clear();
-				if(md.isTransmit) {
-					lastStatus = ServerStatus.transmit;
+				//if(md.isTransmit) {
+				//	lastStatus = ServerStatus.transmit;
 
-					IpAddr addr = parseServer(md.transmitUrl);
+				//	IpAddr addr = parseServer(md.transmitUrl);
 					
-					lastServer = ip + ":" + md.port;
-					ComUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
-					return;
-				}
+				//	lastServer = ip + ":" + md.port;
+				//	ComUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
+				//	return;
+				//}
 				lastStatus = ServerStatus.http;
 				//clear();
 				//stopServer = false;
@@ -111,7 +111,7 @@ namespace httpServer.control {
 		}
 
 		private void updateCopyUrlPos() {
-			string port = md.port;
+			string port = ""+md.port;
 			if(port == "") {
 				port = "80";
 			}
@@ -142,10 +142,10 @@ namespace httpServer.control {
 		}
 
 		private void responseFile(HttpListenerContext httpListenerContext) {
-			if(md.isProxy) {
-				resoonseProxy(httpListenerContext);
-				return;
-			}
+			//if(md.isProxy) {
+			//	resoonseProxy(httpListenerContext);
+			//	return;
+			//}
 
 			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
 			foreach(string key in md.mapRewrite.Keys) {
@@ -351,7 +351,7 @@ namespace httpServer.control {
 		}
 
 		private bool parseCtl(string url, HttpListenerContext ctx) {
-			bool isDeal = false;
+			//bool isDeal = false;
 
 			if(ctx.Request.HttpMethod == "OPTIONS") {
 				ctx.Response.StatusCode = 200;
@@ -371,53 +371,53 @@ namespace httpServer.control {
 		/// 反向代理
 		/// </summary>
 		/// <param name="httpListenerContext"></param>
-		private void resoonseProxy(HttpListenerContext httpListenerContext) {
-			string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
-			string realUrl = md.proxyUrl + url;
+		//private void resoonseProxy(HttpListenerContext httpListenerContext) {
+		//	string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
+		//	string realUrl = md.proxyUrl + url;
 
-			byte[] result = new byte[0];
-			int dataLen = 0;
-			try {
-				var handler = new HttpClientHandler() {
-					AllowAutoRedirect = false
-				};
+		//	byte[] result = new byte[0];
+		//	int dataLen = 0;
+		//	try {
+		//		var handler = new HttpClientHandler() {
+		//			AllowAutoRedirect = false
+		//		};
 
-				using(var client = new HttpClient(handler)) {
-					if(_timeout.TotalMilliseconds != 0) {
-						client.Timeout = _timeout;
-					}
+		//		using(var client = new HttpClient(handler)) {
+		//			if(_timeout.TotalMilliseconds != 0) {
+		//				client.Timeout = _timeout;
+		//			}
 					
-					var response = client.GetAsync(realUrl).Result;
-					bool isResponseOk = response.IsSuccessStatusCode;
-					HttpStatusCode code = response.StatusCode;
-					if(!isResponseOk) {
-						//result = "";
-					} else {
-						Stream sResult = response.Content.ReadAsStreamAsync().Result;
-						result = readStream(sResult, out dataLen);
-					}
+		//			var response = client.GetAsync(realUrl).Result;
+		//			bool isResponseOk = response.IsSuccessStatusCode;
+		//			HttpStatusCode code = response.StatusCode;
+		//			if(!isResponseOk) {
+		//				//result = "";
+		//			} else {
+		//				Stream sResult = response.Content.ReadAsStreamAsync().Result;
+		//				result = readStream(sResult, out dataLen);
+		//			}
 					
-					if(response.Content.Headers.ContentType != null) {
-						httpListenerContext.Response.Headers.Add("Content-Type", response.Content.Headers.ContentType.ToString());
-					}
-					if(response.Headers.Location != null) {
-						string location = response.Headers.Location.ToString();
-						location = location.Replace(md.proxyUrl, serverUrl);
-						httpListenerContext.Response.Headers.Add("Location", location);
-					}
+		//			if(response.Content.Headers.ContentType != null) {
+		//				httpListenerContext.Response.Headers.Add("Content-Type", response.Content.Headers.ContentType.ToString());
+		//			}
+		//			if(response.Headers.Location != null) {
+		//				string location = response.Headers.Location.ToString();
+		//				location = location.Replace(md.proxyUrl, serverUrl);
+		//				httpListenerContext.Response.Headers.Add("Location", location);
+		//			}
 					
-					int statusCode = (int)code;
-					httpListenerContext.Response.StatusCode = statusCode;
-				}
-			} catch(Exception ex) {
-				Debug.WriteLine(realUrl + "," + ex.ToString());
-			}
+		//			int statusCode = (int)code;
+		//			httpListenerContext.Response.StatusCode = statusCode;
+		//		}
+		//	} catch(Exception ex) {
+		//		Debug.WriteLine(realUrl + "," + ex.ToString());
+		//	}
 
-			httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-			var output = httpListenerContext.Response.OutputStream;
-			output.Write(result, 0, dataLen);
-			output.Close();
-		}
+		//	httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+		//	var output = httpListenerContext.Response.OutputStream;
+		//	output.Write(result, 0, dataLen);
+		//	output.Close();
+		//}
 
 		private byte[] readStream(Stream stream, out int len) {
 			try {

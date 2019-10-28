@@ -1,7 +1,7 @@
 ﻿using csharpHelp.util;
-using httpServer.assembly.page;
+using httpServer.view.page;
 using httpServer.entity;
-using httpServer.module;
+using httpServer.model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +19,7 @@ namespace httpServer.control.httpRevProxy {
 	/// http反向代理客户端
 	/// </summary>
 	class HttpRevClient : IServerCtl {
-		HttpRevModel md = null;
+		RevProxyMd md = null;
 
 		Thread thCtl = null;
 		TcpCtl tcpClient = null;
@@ -31,12 +31,12 @@ namespace httpServer.control.httpRevProxy {
 			httpClient.Timeout = TimeSpan.FromMilliseconds(5000);
 			httpClient.MaxResponseContentBufferSize = 10 * 1024 * 1024;
 		}
-		public HttpRevClient(ServerModule _md):this() {
+		public HttpRevClient(ServerMd _md) : this() {
 			setModel(_md);
 		}
 
-		public void setModel(ServerModule _md) {
-			md = (HttpRevModel)_md;
+		public void setModel(ServerMd _md) {
+			md = (RevProxyMd)_md;
 		}
 
 		public void restartServer() {
@@ -45,7 +45,7 @@ namespace httpServer.control.httpRevProxy {
 
 				thCtl = new Thread(cltProc);
 				thCtl.Start();
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}
@@ -54,24 +54,24 @@ namespace httpServer.control.httpRevProxy {
 			try {
 				tcpClient = new TcpCtl(md.localCtlIp, md.localCtlPort);
 				tcpClient.connect();
-				tcpClient.listenData((data)=> {
+				tcpClient.listenData((data) => {
 					if(data.Length == 0) {
 						return;
 					}
-					
-					Task.Run(() =>{
+
+					Task.Run(() => {
 						dealOne(data);
 					});
 				});
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}
-		
+
 		private void dealOne(byte[] data) {
 			HttpPackModel httpModel = new HttpPackModel();
 			httpModel.unPack(data);
-			
+
 			string strUrl = httpModel.url;
 			strUrl = "http://" + md.localHttpIp + ":" + md.localHttpPort + strUrl;
 
@@ -81,7 +81,7 @@ namespace httpServer.control.httpRevProxy {
 				HttpStatusCode code = response.StatusCode;
 				int len = 0;
 				byte[] result = new byte[0];
-				if (!isResponseOk) {
+				if(!isResponseOk) {
 				} else {
 					Stream sResult = response.Content.ReadAsStreamAsync().Result;
 					result = readStreamByte(sResult, out len);
@@ -93,17 +93,17 @@ namespace httpServer.control.httpRevProxy {
 				//httpModelRst.mapHead["type"] = response.typ;
 				var arr = response.Headers.ToList();
 				//Debug.WriteLine("bbb:" + arr.Count);
-				for (int j = 0; j < arr.Count; ++j) {
+				for(int j = 0; j < arr.Count; ++j) {
 					string key = arr[j].Key;
 					string val = "";
-					if (arr[j].Value.Count() > 0) {
+					if(arr[j].Value.Count() > 0) {
 						//val = ((List<string>)arr[i].Value)[0];
 						val = arr[j].Value.FirstOrDefault();
 					}
 					httpModelRst.mapHead[key] = val;
 				}
 				httpModelRst.mapHead["Status"] = ((int)code).ToString();
-				if (response.Content.Headers.ContentType != null) {
+				if(response.Content.Headers.ContentType != null) {
 					httpModelRst.mapHead["Content-Type"] = response.Content.Headers.ContentType.ToString();
 				} else {
 					httpModelRst.mapHead["Content-Type"] = "";
@@ -114,11 +114,11 @@ namespace httpServer.control.httpRevProxy {
 
 				byte[] rst = httpModelRst.pack();
 				rst = httpModelRst.pack();
-				
+
 				Task.Run(() => {
 					tcpClient.sendAsync(rst);
 				});
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}
@@ -134,8 +134,8 @@ namespace httpServer.control.httpRevProxy {
 			do {
 				readCount = stream.Read(data, idx, bufSize);
 				idx += readCount;
-				
-			} while (readCount >= bufSize);
+
+			} while(readCount >= bufSize);
 
 			len = totaLen;
 			return data;
@@ -150,7 +150,7 @@ namespace httpServer.control.httpRevProxy {
 				thCtl = null;
 
 				lstData = new List<byte[]>();
-			} catch (Exception) {
+			} catch(Exception) {
 
 			}
 		}

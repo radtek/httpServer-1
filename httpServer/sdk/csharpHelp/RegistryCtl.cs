@@ -369,6 +369,21 @@ namespace csharpHelp.util {
 			return result;
 		}
 
+		public bool exist(string path) {
+			RegistryKey root = getPath(path, false);
+
+			return root != null;
+		}
+
+		public int getValueInt(string path, int def = 0) {
+			string result = getValue(path);
+			if(result == "") {
+				return def;
+			}
+			bool isOk = int.TryParse(result, out int rst);
+			return isOk ? rst : def;
+		}
+
 		public bool getValueBool(string path, bool initData = false) {
 			string result = getValue(path);
 			if(result == "") {

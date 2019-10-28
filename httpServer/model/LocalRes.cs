@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace httpServer.module {
+namespace httpServer.model {
 	public class LocalRes {
 		public static string rootPath() {
 			return "/httpServer;component/resource/";

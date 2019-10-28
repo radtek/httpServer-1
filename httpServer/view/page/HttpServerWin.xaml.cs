@@ -1,9 +1,10 @@
-﻿using csharpHelp.util;
+﻿using csharpHelp;
+using csharpHelp.util;
 using csharpHelp.util.action;
-using httpServer.assembly.util;
+using httpServer.view.util;
 using httpServer.control;
 using httpServer.entity;
-using httpServer.module;
+using httpServer.model;
 using httpServer.services;
 using httpServer.util;
 using System;
@@ -24,22 +25,109 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace httpServer.assembly.page {
-	public class HttpModel : ServerModule {
+namespace httpServer.view.page {
+	//public class HttpModel : ServerMd {
+	//	public HttpServerGroup ctl = null;
+
+	//	public ServerDataMd md = new ServerDataMd();
+
+	//	public string ip = "localhost";     //
+	//	public string port = "";
+	//	public string urlParam = "";
+
+	//	public string path = "";    //路径
+
+	//	public bool isProxy = false;    //反向代理
+	//	public string proxyUrl = "";
+
+	//	public bool isTransmit = false; //端口转发
+	//	public string transmitUrl = "";
+	//	string _rewrite = "";
+	//	public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
+	//	public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
+
+	//	public string rewrite {
+	//		get { return _rewrite; }
+	//		set {
+	//			_rewrite = value;
+	//			updateRewrite();
+	//		}
+	//	}
+
+	//	private void updateRewrite() {
+	//		string[] arr = _rewrite.Split(new string[] { "\r\n", ";", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+	//		mapAutoRewrite = new Dictionary<string, string>();
+	//		mapRewrite = new Dictionary<string, string>();
+
+	//		for(int i = 0; i < arr.Length; ++i) {
+	//			Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+	//			Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+
+	//			Match matchAuto = regAuto.Match(arr[i].Trim());
+	//			if(matchAuto.Groups.Count >= 3) {
+	//				mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
+	//				//Debug.WriteLine(matchAuto.Groups[1].Value + "," + matchAuto.Groups[2].Value);
+	//				continue;
+	//			}
+
+	//			Match match = reg.Match(arr[i].Trim());
+	//			if(match.Groups.Count < 3) {
+	//				continue;
+	//			}
+
+	//			mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
+	//			//Debug.WriteLine(match.Groups[1].Value + "," + match.Groups[2].Value);
+	//		}
+	//	}
+
+	//	public override void load(RegistryCtl regCtl, string subPath) {
+	//		base.load(regCtl, subPath);
+
+	//		string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+
+	//		ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
+	//		port = regCtl.getValue(subPath + "port", "8091");
+	//		path = regCtl.getValue(subPath + "path", rootPath);
+	//		urlParam = regCtl.getValue(subPath + "urlParam", "");
+	//		_rewrite = regCtl.getValue(subPath + "rewrite", "");
+	//	}
+
+	//	public override void save(RegistryCtl regCtl, string subPath) {
+	//		base.save(regCtl, subPath);
+
+	//		regCtl.setValue(subPath + "ip", ip);
+	//		regCtl.setValue(subPath + "port", port);
+	//		regCtl.setValue(subPath + "path", path);
+	//		regCtl.setValue(subPath + "urlParam", urlParam);
+	//		regCtl.setValue(subPath + "rewrite", _rewrite);
+	//	}
+
+	//	public override int getMaxPort() {
+	//		try {
+	//			return int.Parse(port);
+	//		} catch(Exception) {
+	//			return base.getMaxPort();
+	//		}
+	//	}
+	//};
+
+	public class HttpServerMd : ServerMd {
+		//[XmlValue("desc")] public string desc = "";
+		[XmlAttr("ip")] public string ip = "localhost";
+		[XmlAttr("port")] public int port = 0;
+		[XmlValue("urlParam")] public string urlParam = "";
+
+		[XmlValue("path")] public string path = "";
+
+		//[XmlAttr("isRun")] public bool isRun = false;
+		[XmlValue("rewrite")] public string _rewrite = "";
+
+		//public bool isProxy = false;
+		//public string proxyUrl = "";
+
 		public HttpServerGroup ctl = null;
+		//public ServerItem serverItem = null;
 
-		public string ip = "127.0.0.1";     //
-		public string port = "";
-		public string urlParam = "";
-
-		public string path = "";    //路径
-
-		public bool isProxy = false;    //反向代理
-		public string proxyUrl = "";
-
-		public bool isTransmit = false; //端口转发
-		public string transmitUrl = "";
-		string _rewrite = "";
 		public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
 		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
 
@@ -77,36 +165,22 @@ namespace httpServer.assembly.page {
 			}
 		}
 
-		public override void load(RegistryCtl regCtl, string subPath) {
-			base.load(regCtl, subPath);
+		public override void load(XmlCtl xmlCtl) {
+			base.load(xmlCtl);
 
 			string rootPath = AppDomain.CurrentDomain.BaseDirectory;
 
-			ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
-			port = regCtl.getValue(subPath + "port", "8091");
-			path = regCtl.getValue(subPath + "path", rootPath);
-			urlParam = regCtl.getValue(subPath + "urlParam", "");
-			_rewrite = regCtl.getValue(subPath + "rewrite", "");
-		}
-
-		public override void save(RegistryCtl regCtl, string subPath) {
-			base.save(regCtl, subPath);
-
-			regCtl.setValue(subPath + "ip", ip);
-			regCtl.setValue(subPath + "port", port);
-			regCtl.setValue(subPath + "path", path);
-			regCtl.setValue(subPath + "urlParam", urlParam);
-			regCtl.setValue(subPath + "rewrite", _rewrite);
+			ip = xmlCtl.attr( "ip", "127.0.0.1");
+			port = xmlCtl.attrInt( "port", 8091);
+			path = xmlCtl.value("path", rootPath);
+			urlParam = xmlCtl.value("urlParam", "");
+			_rewrite = xmlCtl.value("rewrite", "");
 		}
 
 		public override int getMaxPort() {
-			try {
-				return Int32.Parse(port);
-			} catch(Exception) {
-				return base.getMaxPort();
-			}
+			return port;
 		}
-	};
+	}
 
 	/// <summary>
 	/// HttpServerWin.xaml 的交互逻辑
@@ -118,7 +192,8 @@ namespace httpServer.assembly.page {
 
 		//int dataIndex = 0;
 		//ServerItem serverItem = null;
-		private HttpModel nowData = null;
+		//private HttpModel nowData = null;
+		private HttpServerMd nowData = new HttpServerMd();
 		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
 
 		public HttpServerWin() {
@@ -141,9 +216,9 @@ namespace httpServer.assembly.page {
 			}
 		}
 
-		public ServerModule createNewModel() {
-			HttpModel md = new HttpModel();
-			md.port = SystemCtl.getFreePort(ent.mainModule.maxStartPort()).ToString();
+		public ServerMd createNewModel() {
+			HttpServerMd md = new HttpServerMd();
+			md.port = SystemCtl.getFreePort(ent.mainMd.maxStartPort());
 			//ent.mainModule.updateStartPort(md.port);
 
 			md.desc = md.ip + ":" + md.port;
@@ -152,8 +227,8 @@ namespace httpServer.assembly.page {
 			//return data;
 		}
 
-		public void initData(ServerModule _md) {
-			HttpModel md = (HttpModel)_md;
+		public void initData(ServerMd _md) {
+			HttpServerMd md = (HttpServerMd)_md;
 			//ent.mainModule.updateStartPort(md.port);
 
 			//ServerCtl ctl = new ServerCtl();
@@ -177,13 +252,13 @@ namespace httpServer.assembly.page {
 			updateData("isRun", false);
 		}
 
-		public void clear(ServerModule _md) {
-			HttpModel md = (HttpModel)_md;
+		public void clear(ServerMd _md) {
+			HttpServerMd md = (HttpServerMd)_md;
 			md.ctl.clear();
 		}
 
-		public void updateData(ServerModule _md) {
-			HttpModel md = (HttpModel)_md;
+		public void updateData(ServerMd _md) {
+			HttpServerMd md = (HttpServerMd)_md;
 			nowData = md;
 
 			//isEditByCode = true;
@@ -192,7 +267,7 @@ namespace httpServer.assembly.page {
 			txtDesc.Text = md.desc;
 
 			cbxIp.Text = md.ip;
-			txtPort.Text = md.port;
+			txtPort.Text = "" + md.port;
 
 			txtPath.Text = md.path;
 			txtUrlParam.Text = md.urlParam;
@@ -211,8 +286,8 @@ namespace httpServer.assembly.page {
 			//isEditByCode = false;
 		}
 
-		public ServerModule createModel() {
-			return new HttpModel();
+		public ServerMd createModel() {
+			return new HttpServerMd();
 			//return data;
 		}
 
@@ -228,35 +303,6 @@ namespace httpServer.assembly.page {
 			//serverPath = txtPath.Text + "/";
 			updateData("path", txtPath.Text);
 		}
-
-		//private void txtProxy_TextChanged(object sender, TextChangedEventArgs e) {
-		//	//proxyUrl = txtProxy.Text;
-		//	updateData("proxyUrl", txtProxy.Text);
-		//}
-
-		//private void txtProxy_Checked(object sender, RoutedEventArgs e) {
-		//	//isProxy = true;
-		//	updateData("isProxy", true);
-		//}
-
-		//private void txtProxy_Unchecked(object sender, RoutedEventArgs e) {
-		//	//isProxy = false;
-		//	updateData("isProxy", false);
-		//}
-
-		//private void txtTransmit_Checked(object sender, RoutedEventArgs e) {
-		//	//isTransmit = true;
-		//	updateData("isTransmit", true);
-		//}
-
-		//private void txtTransmit_Unchecked(object sender, RoutedEventArgs e) {
-		//	//isTransmit = false;
-		//	updateData("isTransmit", false);
-		//}
-
-		//private void txtTransmit_TextChanged(object sender, TextChangedEventArgs e) {
-		//	updateData("transmitUrl", txtTransmit.Text);
-		//}
 
 		private void txtDesc_TextChanged(object sender, TextChangedEventArgs e) {
 			updateData("desc", txtDesc.Text);
@@ -279,7 +325,7 @@ namespace httpServer.assembly.page {
 				return;
 			}
 
-			HttpModel md = nowData;
+			HttpServerMd md = nowData;
 
 			switch(name) {
 			case "desc": {
@@ -287,8 +333,8 @@ namespace httpServer.assembly.page {
 					md.serverItem.Content = value;
 					break;
 				}
-			case "transmitUrl": md.transmitUrl = value; break;
-			case "proxyUrl": md.proxyUrl = value; break;
+			//case "transmitUrl": md.transmitUrl = value; break;
+			//case "proxyUrl": md.proxyUrl = value; break;
 			case "path": md.path = value; break;
 			case "urlParam": {
 					md.urlParam = value;
@@ -300,6 +346,14 @@ namespace httpServer.assembly.page {
 			}
 		}
 
+		private int toInt(string str, int def = 0) {
+			bool isOk = int.TryParse(str, out int rst);
+			if(!isOk) {
+				rst = def;
+			}
+			return rst;
+		}
+
 		private void updateData(string name, bool value) {
 			//int idx = dataIndex;
 			//if(idx < 0 || serverItem == null) {
@@ -309,23 +363,23 @@ namespace httpServer.assembly.page {
 				return;
 			}
 
-			HttpModel md = nowData;
+			HttpServerMd md = nowData;
 
 			switch (name) {
-			case "isTransmit": md.isTransmit = value; break;
-			case "isProxy": md.isProxy = value; break;
+			//case "isTransmit": md.isTransmit = value; break;
+			//case "isProxy": md.isProxy = value; break;
 			case "isRun": {
 					md.isRun = value;
 					//md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
 					var lastIp = md.ip;
 					var lastPort = md.port;
 					md.ip = cbxIp.Text;
-					md.port = txtPort.Text;
+					md.port = toInt(txtPort.Text, md.port);
 					string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
 					lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
 
 					md.desc = md.desc.Replace(lastIp, md.ip);
-					md.desc = md.desc.Replace(lastPort, md.port);
+					md.desc = md.desc.Replace(""+lastPort, ""+md.port);
 					txtDesc.Text = md.desc;
 					md.serverItem.Content = md.desc;
 
@@ -353,7 +407,7 @@ namespace httpServer.assembly.page {
 		}
 
 		private void txtPort_TextChanged(object sender, TextChangedEventArgs e) {
-			if(nowData == null || txtPort.Text == nowData.port) {
+			if(nowData == null || txtPort.Text == ""+nowData.port) {
 				return;
 			}
 			CmdServ.cfgWaitSave.send();

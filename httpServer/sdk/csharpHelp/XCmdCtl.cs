@@ -36,7 +36,7 @@ namespace csharpHelp.util {
 		}
 
 		private void _run(XmlCtl node) {
-			node.eachChild(node.name(), (idx, ctl) => {
+			node.eachAllChild(node.name(), (idx, ctl) => {
 				string name = ctl.name();
 				if(mapParser.ContainsKey(name)) {
 					mapParser[name].parse(ctl);

@@ -33,6 +33,9 @@
 						<Trigger Property="IsMouseOver" Value="True">
 							<Setter Property="Background" TargetName="bd" Value="{Binding OverColor,RelativeSource={RelativeSource TemplatedParent}}"/>
 						</Trigger>
+						<Trigger Property="IsSelect" Value="True">
+							<Setter Property="Background" TargetName="bd" Value="{Binding SelectColor,RelativeSource={RelativeSource TemplatedParent}}"/>
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>

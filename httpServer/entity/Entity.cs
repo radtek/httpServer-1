@@ -1,5 +1,5 @@
 ﻿using csharpHelp.util;
-using httpServer.module;
+using httpServer.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace httpServer.entity {
 			return instance;
 		}
 
-		public MainModule mainModule = null;
+		public MainMd mainMd = null;
 		public MainWindow mainWin = null;
 	}
 }

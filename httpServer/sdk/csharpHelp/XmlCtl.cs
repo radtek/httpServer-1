@@ -56,7 +56,7 @@ namespace csharpHelp.util {
 			//Encoding saveEncoding = encoding == null ? new UTF8Encoding() : encoding;
 
 			string dir = Path.GetDirectoryName(savePath);
-			if(!Directory.Exists(dir)) {
+			if(dir != "" && !Directory.Exists(dir)) {
 				Directory.CreateDirectory(dir);
 			}
 
@@ -435,6 +435,61 @@ namespace csharpHelp.util {
 			}
 		}
 
+		public XmlCtl removeInTarget(string strNode, int removeIdx = 0, int removeCount = 1) {
+			try {
+				int idx = strNode.LastIndexOf(".");
+				XmlCtl xml = this;
+				if(idx >= 0) {
+					xml = child(strNode.Substring(0, idx));
+				}
+
+				string name = strNode.Substring(idx + 1);
+				XmlNodeList xLst = xml.doc.SelectNodes(name);
+
+				if(removeIdx < 0 || removeIdx >= xLst.Count) {
+					return this;
+				}
+
+				int count = Math.Max(xLst.Count, removeIdx + removeCount);
+				for(int i = removeIdx; i < count; ++i) {
+					xml.doc.RemoveChild(xLst[i]);
+				}
+				//xml.doc.RemoveChild(xLst[removeIdx]);
+			} catch(Exception) {
+
+			}
+			return this;
+		}
+
+		public XmlCtl removeInAllChild(string strNode, int removeIdx = 0, int removeCount = 1) {
+			try {
+				XmlCtl ele = child(strNode);
+				int idx = 0;
+				List<XmlNode> lstRemove = new List<XmlNode>();
+				for(int i = 0; i < ele.doc.ChildNodes.Count; ++i) {
+					if(ele.doc.ChildNodes[i].NodeType != XmlNodeType.Element) {
+						continue;
+					}
+
+					if(idx >= removeIdx && idx < removeIdx + removeCount) {
+						lstRemove.Add(ele.doc.ChildNodes[i]);
+					}
+
+					//if(idx == removeIdx) {
+					//	ele.doc.RemoveChild(ele.doc.ChildNodes[i]);
+					//	break;
+					//}
+					++idx;
+				}
+				for(int i = 0; i < lstRemove.Count; ++i) {
+					ele.doc.RemoveChild(lstRemove[i]);
+				}
+			} catch(Exception) {
+
+			}
+			return this;
+		}
+
 		private void createChild(string strNode) {
 			child(strNode);
 			//string[] arr = strNode.Split('.');
@@ -475,7 +530,7 @@ namespace csharpHelp.util {
 			return this;
 		}
 
-		public XmlCtl eachChild(string strNode, Action<int, XmlCtl> fun) {
+		public XmlCtl eachAllChild(string strNode, Action<int, XmlCtl> fun) {
 			try {
 				XmlCtl ele = child(strNode);
 				for(int i = 0; i < ele.doc.ChildNodes.Count; ++i) {

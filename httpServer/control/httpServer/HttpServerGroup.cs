@@ -1,4 +1,5 @@
-﻿using httpServer.assembly.page;
+﻿using httpServer.view.page;
+using httpServer.model;
 using httpServer.util;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace httpServer.control {
 	public class HttpServerGroup {
 		//HttpHandler handler = new HttpHandler();
-		public HttpModel md = null;
+		public HttpServerMd md = null;
 
 		int[] arrPort = new int[] { 4042, 4124, 4282 };
 

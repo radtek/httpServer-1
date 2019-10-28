@@ -37,5 +37,19 @@ namespace csharpHelp.ui {
 			get { return (Brush)GetValue(OverColorProperty); }
 			set { SetCurrentValue(OverColorProperty, value); }
 		}
+
+		//IsSelect
+		public static readonly DependencyProperty IsSelectProperty = DependencyProperty.Register("IsSelect", typeof(bool), typeof(MiniButton), new PropertyMetadata(false));
+		public bool IsSelect {
+			get { return (bool)GetValue(IsSelectProperty); }
+			set { SetCurrentValue(IsSelectProperty, value); }
+		}
+
+		//Select color
+		public static readonly DependencyProperty SelectColorProperty = DependencyProperty.Register("SelectColor", typeof(Brush), typeof(MiniButton), new PropertyMetadata(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#b8b8b8"))));
+		public Brush SelectColor {
+			get { return (Brush)GetValue(SelectColorProperty); }
+			set { SetCurrentValue(SelectColorProperty, value); }
+		}
 	}
 }

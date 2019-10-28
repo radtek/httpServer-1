@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace httpServer.assembly.util {
+namespace httpServer.view.util {
 	class UiService {
 		public static UiService _ins = null;
 		public static UiService ins() {

@@ -1,7 +1,7 @@
 ﻿using csharpHelp.util;
-using httpServer.assembly.page;
+using httpServer.view.page;
 using httpServer.entity;
-using httpServer.module;
+using httpServer.model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +17,7 @@ namespace httpServer.control.httpRevProxy {
 	/// http反向代理服务端
 	/// </summary>
 	class HttpRevServer : IServerCtl {
-		HttpRevModel md = null;
+		RevProxyMd md = null;
 
 		Thread thCtl = null;
 		Thread thListen = null;
@@ -35,10 +35,10 @@ namespace httpServer.control.httpRevProxy {
 		object syncHttp = new object();
 
 		public HttpRevServer() { }
-		public HttpRevServer(ServerModule _md) { setModel(_md); }
-		
-		public void setModel(ServerModule _md) {
-			md = (HttpRevModel)_md;
+		public HttpRevServer(ServerMd _md) { setModel(_md); }
+
+		public void setModel(ServerMd _md) {
+			md = (RevProxyMd)_md;
 		}
 
 		public void restartServer() {
@@ -51,17 +51,17 @@ namespace httpServer.control.httpRevProxy {
 
 				//http server
 				initHttpServer();
-			} catch (Exception) {
+			} catch(Exception) {
 
 			}
 		}
 
 		private void initHttpServer() {
-			string port = md.httpPort;
-			if (port == "") {
-				port = "80";
-			}
-			string url = "http://" + md.httpIp + ":" + port + "/";
+			//string port = md.httpPort;
+			//if(port == "") {
+			//	port = "80";
+			//}
+			string url = "http://" + md.httpIp + ":" + md.httpPort + "/";
 			httpListener = new HttpListener();
 
 			httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
@@ -82,7 +82,7 @@ namespace httpServer.control.httpRevProxy {
 
 				ctl.responseFile(context);
 
-			} catch (Exception) { }
+			} catch(Exception) { }
 		}
 
 		private void responseFile(HttpListenerContext httpListenerContext) {
@@ -98,12 +98,12 @@ namespace httpServer.control.httpRevProxy {
 				HttpPackModel mdHttp = new HttpPackModel();
 				mdHttp.url = url;
 				//Debug.WriteLine("ccc:" + url + "," + httpCnt.Response.Headers.Count);
-				foreach (string key in httpCnt.Response.Headers.Keys) {
+				foreach(string key in httpCnt.Response.Headers.Keys) {
 					mdHttp.mapHead[key] = httpCnt.Response.Headers[key];
 				}
 
 				Int64 idx = 0;
-				lock (syncHttp) {
+				lock(syncHttp) {
 					idx = ++httpCtxIdx;
 					mapHttpCtx[idx] = httpCnt;
 				}
@@ -114,7 +114,7 @@ namespace httpServer.control.httpRevProxy {
 				Task.Run(() => {
 					tcpServer?.sendAsync(buffer);
 				});
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}
@@ -146,7 +146,7 @@ namespace httpServer.control.httpRevProxy {
 						httpDealOne(data);
 					});
 				});
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}
@@ -156,22 +156,22 @@ namespace httpServer.control.httpRevProxy {
 			httpModel.unPack(data);
 
 			HttpListenerContext httpCnt = null;
-			lock (syncHttp) {
-				if (mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
+			lock(syncHttp) {
+				if(mapHttpCtx.ContainsKey(httpModel.httpIdx)) {
 					httpCnt = mapHttpCtx[httpModel.httpIdx];
 					mapHttpCtx.Remove(httpModel.httpIdx);
 				}
 			}
 
-			if (httpCnt == null) {
+			if(httpCnt == null) {
 				return;
 			}
 
 			var accName = "Access-Control-Allow-Origin";
-			if (httpModel.mapHead.ContainsKey(accName)) {
+			if(httpModel.mapHead.ContainsKey(accName)) {
 				httpCnt.Response.Headers.Add(accName, httpModel.mapHead[accName]);
 			}
-			if (httpModel.mapHead.ContainsKey("Content-Type")) {
+			if(httpModel.mapHead.ContainsKey("Content-Type")) {
 				httpCnt.Response.Headers.Add("Content-Type", httpModel.mapHead["Content-Type"]);
 			}
 			httpCnt.Response.StatusCode = Int32.Parse(httpModel.mapHead["Status"]);
@@ -195,7 +195,7 @@ namespace httpServer.control.httpRevProxy {
 				//httpCnt = null;
 				//lstHttpCxt = new List<HttpListenerContext>();
 				mapHttpCtx = new Dictionary<long, HttpListenerContext>();
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
 			}
 		}

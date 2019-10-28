@@ -66,32 +66,33 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="assembly\page\HttpServerWin.xaml.cs">
+    <Compile Include="view\page\HttpServerWin.xaml.cs">
       <DependentUpon>HttpServerWin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="assembly\page\IPage.cs" />
-    <Compile Include="assembly\page\HttpRevProxy.xaml.cs">
+    <Compile Include="view\page\IPage.cs" />
+    <Compile Include="view\page\HttpRevProxy.xaml.cs">
       <DependentUpon>HttpRevProxy.xaml</DependentUpon>
     </Compile>
-    <Compile Include="assembly\util\ListBoxServer\ListBoxServer.cs" />
-    <Compile Include="assembly\util\UiService.cs" />
-    <Compile Include="control\Cache.cs" />
-    <Compile Include="control\ComServerCtl.cs" />
+    <Compile Include="view\util\ListBoxServer\ListBoxServer.cs" />
+    <Compile Include="view\util\UiService.cs" />
+    <Compile Include="control\httpServer\Cache.cs" />
+    <Compile Include="control\httpServer\ComServerCtl.cs" />
     <Compile Include="control\httpRevProxy\HttpRevClient.cs" />
     <Compile Include="control\httpRevProxy\HttpRevServer.cs" />
     <Compile Include="control\httpRevProxy\HttpPackModel.cs" />
-    <Compile Include="control\HttpServerGroup.cs" />
-    <Compile Include="control\IServerCtl.cs" />
-    <Compile Include="control\RequestCtl.cs" />
-    <Compile Include="control\ServerCtl.cs" />
+    <Compile Include="control\httpServer\HttpServerGroup.cs" />
+    <Compile Include="control\httpRevProxy\IServerCtl.cs" />
+    <Compile Include="control\httpServer\RequestCtl.cs" />
+    <Compile Include="control\httpServer\ServerCtl.cs" />
     <Compile Include="control\ServerDataCtl.cs" />
     <Compile Include="entity\Entity.cs" />
-    <Compile Include="module\MainModule.cs" />
-    <Compile Include="module\ServerModule.cs" />
-    <Compile Include="assembly\util\ItemBox.xaml.cs">
+    <Compile Include="model\ConfigMd.cs" />
+    <Compile Include="model\MainMd.cs" />
+    <Compile Include="model\ServerMd.cs" />
+    <Compile Include="view\util\ItemBox.xaml.cs">
       <DependentUpon>ItemBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="module\LocalRes.cs" />
+    <Compile Include="model\LocalRes.cs" />
     <Compile Include="sdk\csharpHelp\ButtonLabel\ButtonLabel.cs" />
     <Compile Include="sdk\csharpHelp\CheckBoxBan\CheckBoxBan.cs" />
     <Compile Include="sdk\csharpHelp\Cmd.cs" />
@@ -111,6 +112,8 @@
     <Compile Include="sdk\csharpHelp\miniButton\MiniButton.cs" />
     <Compile Include="sdk\csharpHelp\MultiAsyn.cs" />
     <Compile Include="sdk\csharpHelp\RegistryCtl.cs" />
+    <Compile Include="sdk\csharpHelp\ClassLink.cs" />
+    <Compile Include="sdk\csharpHelp\XmlSerialize.cs" />
     <Compile Include="sdk\csharpHelp\SingleEvent.cs" />
     <Compile Include="sdk\csharpHelp\StringReplace.cs" />
     <Compile Include="sdk\csharpHelp\SupWinTitle\BaseWinTitle.cs" />
@@ -387,7 +390,7 @@
     <Compile Include="services\CmdServ.cs" />
     <Compile Include="util\ComUtil.cs" />
     <Compile Include="util\SysConst.cs" />
-    <Page Include="assembly\mainWin\MainWindow.xaml">
+    <Page Include="view\mainWin\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -395,23 +398,23 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="assembly\mainWin\MainWindow.xaml.cs">
+    <Compile Include="view\mainWin\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="assembly\page\HttpServerWin.xaml">
+    <Page Include="view\page\HttpServerWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="assembly\page\HttpRevProxy.xaml">
+    <Page Include="view\page\HttpRevProxy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="assembly\util\ItemBox.xaml">
+    <Page Include="view\util\ItemBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="assembly\util\ListBoxServer\ListBoxServer.xaml">
+    <Page Include="view\util\ListBoxServer\ListBoxServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -509,9 +512,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resource\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resource\icon.ico.bak" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resource\icon.ico" />

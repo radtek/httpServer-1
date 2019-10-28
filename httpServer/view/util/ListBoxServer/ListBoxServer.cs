@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace httpServer.assembly.util {
+namespace httpServer.view.util {
 	class RelayCommand : ICommand {
 		private Action<object> _action;
 		public RelayCommand(Action<object> action) {

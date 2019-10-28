@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace csharpHelp.util {
     class TcpCtl {
 		public string ip = "";
-		public string port = "";
+		public int port = 0;
 		//Thread thCtl = null;
 		//Thread thDeal = null;
 		int rcvSize = 30 * 1024 * 1024;
@@ -38,16 +38,16 @@ namespace csharpHelp.util {
 			
 		}
 
-		public TcpCtl(string _ip, string _port) {
+		public TcpCtl(string _ip, int _port) {
 			ip = _ip;
 			port = _port;
 		}
 
 		public void listen() {
 			IPAddress ipAddr = IPAddress.Parse(ip);
-			int iPort = Int32.Parse(port);
+			//int iPort = int.Parse(port);
 
-			server = new TcpListener(ipAddr, iPort);
+			server = new TcpListener(ipAddr, port);
 			server.Start();
 
 			client?.Close();
@@ -73,12 +73,12 @@ namespace csharpHelp.util {
 
 		public void connect() {
 			IPAddress ipAddr = IPAddress.Parse(ip);
-			int iPort = Int32.Parse(port);
+			//int iPort = int.Parse(port);
 
 			client?.Close();
 
 			client = new TcpClient();
-			client.Connect(ipAddr, iPort);
+			client.Connect(ipAddr, port);
 			client.ReceiveBufferSize = rcvSize;
 			client.SendBufferSize = sedSize;
 
