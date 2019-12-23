@@ -474,6 +474,8 @@ namespace csharpHelp {
 							}
 						}
 					}
+				} else if(mi.IsDefined(typeof(XmlMap), false)) {
+					
 				}
 			}
 		}

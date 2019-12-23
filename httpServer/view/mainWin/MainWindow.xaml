@@ -23,57 +23,54 @@
 		</Grid.ColumnDefinitions>
 
 		<Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,0" Name="grdMainBox">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="70"/>
-				<RowDefinition Height="8"/>
-				<RowDefinition Height="229*"/>
-			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="160" MinWidth="150" MaxWidth="350" Name="colServer"/>
 				<ColumnDefinition Width="8"/>
-				<ColumnDefinition Width="50*"/>
+				<ColumnDefinition Width="50*" MinWidth="100"/>
 				<ColumnDefinition Width="8"/>
 				<ColumnDefinition Width="150"/>
 			</Grid.ColumnDefinitions>
 
-			<util:ListBoxServer Grid.RowSpan="3" Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" SelectionChanged="lstItem_SelectionChanged" UpClick="lstItem_UpClick" DownClick="lstItem_DownClick"/>
+			<util:ListBoxServer Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" SelectionChanged="lstItem_SelectionChanged" UpClick="lstItem_UpClick" DownClick="lstItem_DownClick"/>
 
-			<StackPanel Grid.RowSpan="3" VerticalAlignment="Bottom" >
+			<StackPanel VerticalAlignment="Bottom" >
 				<Grid Margin="0,4,0,0" Height="25">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="2"/>
 						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="2"/>
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
-					<!--<Label Margin="0,0,2,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Content="重启" x:Name="btnRestart" MouseLeftButtonUp="btnRestart_MouseLeftButtonUp"/>-->
-					<!--<Label Margin="2,0,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Content="停止" x:Name="btnStop" MouseLeftButtonUp="btnStop_MouseLeftButtonUp"/>-->
-					<!--<Label Margin="2,0,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" Content="删除" x:Name="btnDel" MouseLeftButtonUp="btnDel_MouseLeftButtonUp"/>-->
-					<supUI:MiniButton Margin="0,0,0,0" Grid.Column="0" Content="重启" x:Name="btnRestart" Click="BtnRestart_Click"/>
-					<supUI:MiniButton Margin="2,0,0,0" Grid.Column="1" Content="停止" x:Name="btnStop" Click="BtnStop_Click"/>
-					<supUI:MiniButton Margin="2,0,0,0" Grid.Column="2" Content="删除" x:Name="btnDel" Click="BtnDel_Click"/>
+					<supUI:MiniButton Grid.Column="0" Content="重启" x:Name="btnRestart" Click="BtnRestart_Click"/>
+					<supUI:MiniButton Grid.Column="2" Content="停止" x:Name="btnStop" Click="BtnStop_Click"/>
+					<supUI:MiniButton Grid.Column="4" Content="日志" x:Name="btnLog" IsSelect="False" Click="BtnLog_Click"/>
 				</Grid>
 				<Grid Margin="0,4,0,0" Height="25">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="2"/>
 						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="2"/>
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
-					<supUI:ComboBoxLabel Grid.ColumnSpan="2" LeftWidth="0" Content="" x:Name="cbxType"/>
-					<!--<Label Margin="2,0,0,0" Background="#6ceff7" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" Content="新建" x:Name="btnNew" MouseLeftButtonUp="btnNew_MouseLeftButtonUp"/>-->
-					<!--<supUI:MiniButton Margin="2,0,0,0" Grid.Column="1" Content="日志" x:Name="btnLog" IsSelect="False" Click="BtnLog_Click"/>-->
-					<supUI:MiniButton Margin="2,0,0,0" Grid.Column="2" Content="新建" x:Name="btnNew" Click="BtnNew_Click"/>
+					<supUI:MiniButton Grid.Column="0" Content="删除" x:Name="btnDel" Click="BtnDel_Click" Background="#f76c6c" OverColor="#cc5656" SelectColor="#cc5656"/>
+					<supUI:MiniButton Grid.Column="2" Content="新建" x:Name="btnNew" Click="BtnNew_Click"/>
 				</Grid>
 			</StackPanel>
 
-			<Grid Grid.Column="2" Grid.RowSpan="3" Name="grdPage">
-				<!--<page:HttpServerWin x:Name="httpServerWin"/>-->
+			<Grid Grid.Column="2" Name="grdPage">
+				<page:HttpServerWin x:Name="httpServerWin"/>
 			</Grid>
 
-			<Label Grid.Column="4" Grid.RowSpan="3" Content="日志："/>
-			<TextBox Grid.Column="4" Grid.RowSpan="3" Margin="0,27,0,0" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="txtLog" />
+			<Label Grid.Column="4" VerticalAlignment="Top" Height="24" Padding="5, 0" VerticalContentAlignment="Center" Content="日志：" Name="lblLog"/>
+			<TextBox Grid.Column="4" Margin="0,24,0,0" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Name="txtLog" />
 
-			<Border BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" Grid.Column="1" Grid.RowSpan="3" IsHitTestVisible="False"/>
-			<GridSplitter Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
+			<Border Grid.Column="1" BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" IsHitTestVisible="False"/>
+			<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+			<Border Grid.Column="3" BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" IsHitTestVisible="False"/>
+			<GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="Transparent"/>
 
 		</Grid>
 	</Grid>

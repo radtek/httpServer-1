@@ -52,6 +52,7 @@ namespace httpServer.control {
 				return result;
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.ToString());
+				MainWindow.ins.log(ex);
 				return new byte[0];
 			}
 		}

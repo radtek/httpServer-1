@@ -1,4 +1,5 @@
-﻿using httpServer.view.page;
+﻿using csharpHelp;
+using httpServer.view.page;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,18 @@ using System.Threading.Tasks;
 
 namespace httpServer.model {
 	class MainMd {
+		public static MainMd ins = new MainMd();
+
+		public XmlSerialize xmlConfig = new XmlSerialize();
+		public ClassLink mdLink = new ClassLink();
+
 		public int startPort = 8091;
 		public int maxPort = 8200;
 
 		public ConfigMd configMd = new ConfigMd();
+		public Lang lang = new Lang();
 
-		public Dictionary<string, IPage> mapServer = new Dictionary<string, IPage>();
+		//public Dictionary<string, IPage> mapServer = new Dictionary<string, IPage>();
 
 		//public List<ServerMd> lstServer = new List<ServerMd>();
 

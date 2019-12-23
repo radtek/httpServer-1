@@ -3,7 +3,6 @@ using csharpHelp.util.action;
 using httpServer.view.page;
 using httpServer.view.util;
 using httpServer.control;
-using httpServer.entity;
 using httpServer.model;
 using httpServer.services;
 using httpServer.util;
@@ -61,9 +60,9 @@ namespace httpServer {
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class MainWindow : Window {
-		private static MainWindow ins = null;
+		public static MainWindow ins = null;
 
-		private Entity ent = null;
+		//private Entity ent = null;
 		//private ServerDataCtl serverDataCtl = null;
 
 		private string title = "";
@@ -73,11 +72,11 @@ namespace httpServer {
 
 		private List<ServerItem> serverItem = new List<ServerItem>();
 
-		private string nowType = "";
+		//private string nowType = "";
 
-		Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
+		//Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
 
-		bool isShowLog = false;
+		public bool isShowLog = false;
 		string strLog = "";
 		private int itemTag = 0;
 
@@ -86,71 +85,29 @@ namespace httpServer {
 			ins = this;
 
 			//
-			ent = Entity.getInstance();
-			ent.mainMd = new MainMd();
-			ent.mainWin = this;
+			//ent = Entity.ins;
+			//ent.mainMd = new MainMd();
+			//ent.mainWin = this;
 
-			//ent.mainMd.mapServer["httpServer"] = new HttpServerWin();
-			//ent.mainMd.mapServer["httpRevProxy"] = new HttpRevProxy();
-
-			registPage("httpServer", "http服务器", new HttpServerWin());
-			registPage("httpRevProxy", "http反向代理", new HttpRevProxy());
-
-			ent.mainMd.configMd.xmlConfig.load(ent.mainMd.configMd, "config.xml");
+			MainMd.ins.xmlConfig.load(MainMd.ins.configMd, "config.xml");
 			loadServerConfig();
 			convertOldConfig();
 
-			ent.mainMd.configMd.mdLink.sendTo(ent.mainMd.configMd, this);
+			MainMd.ins.mdLink.sendTo(MainMd.ins.configMd, this);
 
-			colServer.Width = new GridLength(ent.mainMd.configMd.colServerWidth);
+			colServer.Width = new GridLength(MainMd.ins.configMd.colServerWidth);
+			
+			//set language
+			new ClassLink().sendTo(Lang.ins, this, "", LinkType.All);
 
-			//serverDataCtl = new ServerDataCtl();
-			//serverDataCtl.load();
-			//int x = 100;
-			//int y = 100;
-			//int w = 400;
-			//int h = 200;
-			//double colServerWidth = 0;
-			//try {
-			//	x = int.Parse(regCtl.getValue(regPath + "x", "100"));
-			//	y = int.Parse(regCtl.getValue(regPath + "y", "100"));
-			//	w = int.Parse(regCtl.getValue(regPath + "width", "680"));
-			//	h = int.Parse(regCtl.getValue(regPath + "height", "270"));
-			//	colServerWidth = int.Parse(regCtl.getValue(regPath + "colServer", "160"));
-			//} catch(Exception) {
+			ServerCtl.setContentType(MainMd.ins.configMd.mapContextType);
+			ServerCtl.timeout = Math.Max(500, MainMd.ins.configMd.timeout);
+			MainMd.ins.configMd.timeout = ServerCtl.timeout;
+			MainMd.ins.configMd.mapContextType = ServerCtl.mapSuffix;
 
-			//}
-
-			//this.Left = x;
-			//this.Top = y;
-			//this.Width = w;
-			//this.Height = h;
-			//colServer.Width = new GridLength(colServerWidth);
-
-			//foreach (var key in ent.mainMd.mapServer.Keys) {
-			//	IPage page = ent.mainMd.mapServer[key];
-			//	page.init();
-			//	grdPage.Children.Add(page as UserControl);
-			//	(page as UserControl).Visibility = Visibility.Collapsed;
-			//}
-
-			//string[] lstType = {
-			//	"httpServer", "http服务器",
-			//	"httpRevProxy", "http反向代理"
-			//};
-
-			//for (int i = 0; i < lstType.Length ; i += 2) {
-			//	cbxType.Items.Add(lstType[i + 1]);
-			//	mapIdxToType[i / 2] = lstType[i];
-			//}
-
-			cbxType.SelectedIndex = 0;
-
-			//隐藏日志
-			if (!isShowLog) {
-				grdMainBox.ColumnDefinitions[3].Width = new GridLength(0);
-				grdMainBox.ColumnDefinitions[4].Width = new GridLength(0);
-			}
+			getPage().init();
+			
+			showLog(isShowLog);
 
 			//
 			title = Title;
@@ -158,40 +115,28 @@ namespace httpServer {
 			CmdServ.cfgSaved.listen(() => cfgSaved());
 
 			//
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			initServerItem(lst);
 			//lstItem.SelectedIndex = int.Parse(regCtl.getValue(regPath + "selectItem", "0"));
-			lstItem.SelectedIndex = ent.mainMd.configMd.selectItem;
-		}
-
-		private void registPage(string type, string desc, IPage page) {
-			ent.mainMd.mapServer[type] = page;
-			
-			page.init();
-			grdPage.Children.Add(page as UserControl);
-			(page as UserControl).Visibility = Visibility.Collapsed;
-
-			cbxType.Items.Add(desc);
-			mapIdxToType[cbxType.Items.Count-1] = type;
+			lstItem.SelectedIndex = MainMd.ins.configMd.selectItem;
 		}
 
 		private void loadServerConfig() {
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			lst.Clear();
 
-			var xmlCtl = ent.mainMd.configMd.xmlConfig.xml;
+			var xmlCtl = MainMd.ins.xmlConfig.xml;
 			var xmlServerBox = xmlCtl.child("httpServer.serverBox");
 
 			var server = new XmlSerialize();
 
 			xmlServerBox.each("server", (idx, ctl) => {
 				string type = ctl.attr("type");
-				IPage page = getPage(type);
-				if(page == null) {
+				if(type != "" && type != "httpServer") {
 					return;
 				}
 
-				var md = page.createModel();
+				var md = getPage().createModel();
 				server.load(md, ctl);
 				lst.Add(md);
 			});
@@ -205,7 +150,7 @@ namespace httpServer {
 				return;
 			}
 
-			var md = Entity.getInstance().mainMd.configMd;
+			var md = MainMd.ins.configMd;
 			try {
 				md.x = int.Parse(regCtl.getValue(regPath + "x", "100"));
 				md.y = int.Parse(regCtl.getValue(regPath + "y", "100"));
@@ -214,61 +159,34 @@ namespace httpServer {
 				md.colServerWidth = int.Parse(regCtl.getValue(regPath + "colServer", "160"));
 				md.selectItem = int.Parse(regCtl.getValue(regPath + "selectItem", "0"));
 
-				md.lstHttpServer = new List<ServerMd>();
+				md.lstHttpServer = new List<HttpServerMd>();
 
 				regCtl.eachItem(regPath, (name) => {
 					string subPath = regPath + name + "\\";
 
 					string type = regCtl.getValue(subPath + "type", "httpServer");
-
-					if(type == "httpServer") {
-						HttpServerMd tmp = new HttpServerMd();
-						tmp.type = regCtl.getValue(subPath + "type");
-						tmp.desc = regCtl.getValue(subPath + "desc");
-						tmp.isRun = regCtl.getValueBool(subPath + "isRun");
-
-						string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-
-						tmp.ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
-						tmp.port = regCtl.getValueInt(subPath + "port", 8091);
-						tmp.path = regCtl.getValue(subPath + "path", rootPath);
-						tmp.urlParam = regCtl.getValue(subPath + "urlParam", "");
-						tmp.rewrite = regCtl.getValue(subPath + "rewrite", "");
-
-						md.lstHttpServer.Add(tmp);
-					} else if(type == "httpRevProxy") {
-						RevProxyMd tmp = new RevProxyMd();
-						tmp.type = regCtl.getValue(subPath + "type");
-						tmp.desc = regCtl.getValue(subPath + "desc");
-						tmp.isRun = regCtl.getValueBool(subPath + "isRun");
-
-						string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-
-						//tmp.ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
-						//tmp.port = regCtl.getValueInt(subPath + "port", 8091);
-						//tmp.path = regCtl.getValue(subPath + "path", rootPath);
-						//tmp.urlParam = regCtl.getValue(subPath + "urlParam", "");
-						//tmp.rewrite = regCtl.getValue(subPath + "rewrite", "");
-
-						tmp.revType = regCtl.getValue(subPath + "revType", "local");
-
-						tmp.localCtlIp = regCtl.getValue(subPath + "localCtlIp", "127.0.0.1");
-						tmp.localCtlPort = regCtl.getValueInt(subPath + "localCtlPort", 8091);
-						tmp.localHttpIp = regCtl.getValue(subPath + "localHttpIp", "127.0.0.1");
-						tmp.localHttpPort = regCtl.getValueInt(subPath + "localHttpPort", 8091);
-						tmp.urlParam = regCtl.getValue(subPath + "urlParam", "");
-
-						tmp.ctlIp = regCtl.getValue(subPath + "ctlIp", "127.0.0.1");
-						tmp.ctlPort = regCtl.getValueInt(subPath + "ctlPort", 8091);
-						tmp.httpIp = regCtl.getValue(subPath + "httpIp", "127.0.0.1");
-						tmp.httpPort = regCtl.getValueInt(subPath + "httpPort", 8092);
-
-						md.lstHttpServer.Add(tmp);
+					if(type != "" && type != "httpServer") {
+						return;
 					}
+					
+					HttpServerMd tmp = new HttpServerMd();
+					//tmp.type = regCtl.getValue(subPath + "type");
+					tmp.desc = regCtl.getValue(subPath + "desc");
+					tmp.isRun = regCtl.getValueBool(subPath + "isRun");
+
+					string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+
+					tmp.ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
+					tmp.port = regCtl.getValueInt(subPath + "port", 8091);
+					tmp.path = regCtl.getValue(subPath + "path", rootPath);
+					tmp.urlParam = regCtl.getValue(subPath + "urlParam", "");
+					tmp.rewrite = regCtl.getValue(subPath + "rewrite", "");
+
+					md.lstHttpServer.Add(tmp);
 
 				});
-			} catch(Exception) {
-
+			} catch(Exception ex) {
+				log(ex);
 			}
 		}
 
@@ -288,24 +206,23 @@ namespace httpServer {
 			Title = title;
 		}
 
-		private IPage getPage(string type) {
-			if(!ent.mainMd.mapServer.ContainsKey(type)) {
-				return null;
-			}
-			return ent.mainMd.mapServer[type];
+		private HttpServerWin getPage() {
+			//if(!ent.mainMd.mapServer.ContainsKey(type)) {
+			//	return null;
+			//}
+			//return ent.mainMd.mapServer[type];
+			return httpServerWin;
 		}
 
-		private void initServerItem(List<ServerMd> lstServer) {
+		private void initServerItem(List<HttpServerMd> lstServer) {
 			for(int i = 0; i < lstServer.Count; ++i) {
-				ServerMd md = lstServer[i];
+				HttpServerMd md = lstServer[i];
 
 				ServerItem item = new ServerItem() { Tag = ++itemTag, Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 				md.serverItem = item;
 
-				//ent.mainMd.mapServer[md.type].initData(md);
-				getPage(md.type).initData(md);
-
-				//lstItem.Items.Add(md.desc);
+				getPage().initData(md);
+				
 				serverItem.Add(item);
 			}
 
@@ -320,43 +237,29 @@ namespace httpServer {
 			clear();
 
 			try {
-				ent.mainMd.configMd.selectItem = lstItem.SelectedIndex;
-				ent.mainMd.configMd.colServerWidth = (int)colServer.Width.Value;
+				MainMd.ins.configMd.selectItem = lstItem.SelectedIndex;
+				MainMd.ins.configMd.colServerWidth = (int)colServer.Width.Value;
 
-				ent.mainMd.configMd.mdLink.sendBack();
-				ent.mainMd.configMd.xmlConfig.save();
-			} catch(Exception) { }
-
-			//regCtl.setValue(regPath + "x", this.Left.ToString());
-			//regCtl.setValue(regPath + "y", this.Top.ToString());
-			//regCtl.setValue(regPath + "width", this.Width.ToString());
-			//regCtl.setValue(regPath + "height", this.Height.ToString());
-			//regCtl.setValue(regPath + "selectItem", lstItem.SelectedIndex.ToString());
-			//regCtl.setValue(regPath + "colServer", ((int)colServer.Width.Value).ToString());
-
-			//serverDataCtl.save();
+				MainMd.ins.mdLink.sendBack();
+				MainMd.ins.xmlConfig.save();
+			} catch(Exception ex) { log(ex); }
+			
 		}
 
 		private void clear() {
-			//List<ServerMd> server = ent.mainMd.lstServer;
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			for(int i = 0; i < lst.Count; ++i) {
-				//ent.mainMd.mapServer[server[i].type].clear(server[i]);
-				//httpServerWin.clear(lst[i]);
-				getPage(lst[i].type).clear(lst[i]);
+				getPage().clear(lst[i]);
 			}
 		}
 
 		private void BtnRestart_Click(object sender, RoutedEventArgs e) {
 			int idx = lstItem.SelectedIndex;
+			
+			var md = MainMd.ins.configMd.lstHttpServer[idx];
 
-			//ServerMd md = ent.mainMd.lstServer[idx];
-			var md = ent.mainMd.configMd.lstHttpServer[idx];
-
-			//ent.mainMd.mapServer[md.type].start();
-			//httpServerWin.start();
-			getPage(md.type).start();
-			btnRestart.Content = md.isRun ? "重启" : "启动";
+			getPage().start();
+			btnRestart.Content = md.isRun ? Lang.ins.restart : Lang.ins.start;
 			md.serverItem.Source = getServerStatusImgPath(md.isRun);
 
 			cfgSaved();
@@ -368,52 +271,31 @@ namespace httpServer {
 		
 		private void lstItem_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 			int idx = lstItem.SelectedIndex;
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			if(idx < 0 || idx >= lst.Count) {
-				btnRestart.Content = "启动";
+				btnRestart.Content = Lang.ins.start;
 				return;
 			}
-
-			//var map = ent.mainMd.mapServer;
 
 			var md = lst[idx];
 
-			//if(!map.ContainsKey(md.type)) {
+			//IPage newPage = getPage(md.type);
+			//if(newPage == null) {
 			//	return;
 			//}
 
-			IPage newPage = getPage(md.type);
-			if(newPage == null) {
-				return;
-			}
-
-			IPage oldPage = getPage(nowType);
-			if(oldPage != null) {
-				(oldPage as UserControl).Visibility = Visibility.Collapsed;
-			}
-			(newPage as UserControl).Visibility = Visibility.Visible;
-			nowType = md.type;
-
-			//update page
-			//if(nowType != md.type) {
-			//	if(map.ContainsKey(nowType)) {
-			//		IPage oldPage = ent.mainMd.mapServer[nowType];
-			//		(oldPage as UserControl).Visibility = Visibility.Collapsed;
-			//	}
-
-			//	IPage newPage = ent.mainMd.mapServer[md.type];
-			//	(newPage as UserControl).Visibility = Visibility.Visible;
+			//IPage oldPage = getPage(nowType);
+			//if(oldPage != null) {
+			//	(oldPage as UserControl).Visibility = Visibility.Collapsed;
 			//}
-
+			//(newPage as UserControl).Visibility = Visibility.Visible;
 			//nowType = md.type;
 
 			serverItem[idx].Source = getServerStatusImgPath(md.isRun);
 
-			//ent.mainMd.mapServer[md.type].updateData(md);
-			//httpServerWin.updateData(md);
-			getPage(md.type).updateData(md);
+			getPage().updateData(md);
 
-			btnRestart.Content = md.isRun ? "重启" : "启动";
+			btnRestart.Content = md.isRun ? Lang.ins.restart : Lang.ins.start;
 
 			cfgSaved();
 		}
@@ -421,13 +303,11 @@ namespace httpServer {
 		private void BtnStop_Click(object sender, RoutedEventArgs e) {
 			int idx = lstItem.SelectedIndex;
 
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			var md = lst[idx];
-
-			//ent.mainMd.mapServer[md.type].stop();
-			//httpServerWin.stop();
-			getPage(md.type).stop();
-			btnRestart.Content = md.isRun ? "重启" : "启动";
+			
+			getPage().stop();
+			btnRestart.Content = md.isRun ? Lang.ins.restart : Lang.ins.start;
 			md.serverItem.Source = getServerStatusImgPath(md.isRun);
 
 			cfgSaved();
@@ -435,22 +315,14 @@ namespace httpServer {
 
 		private void BtnNew_Click(object sender, RoutedEventArgs e) {
 			//List<ServerMd> lstServer = ent.mainMd.lstServer;
-			var lst = ent.mainMd.configMd.lstHttpServer;
-
-			string type = mapIdxToType[cbxType.SelectedIndex];
-
-			//var md = httpServerWin.createNewModel();
-			var md = getPage(type).createNewModel();
-			//ServerMd md = ent.mainMd.mapServer[type].createNewModel();
-			md.type = type;
+			var lst = MainMd.ins.configMd.lstHttpServer;
+			
+			var md = getPage().createNewModel();
 
 			ServerItem item = new ServerItem() { Tag = ++itemTag, Content = md.desc, Source = md.isRun ? LocalRes.statusRun() : LocalRes.statusStop() };
 			md.serverItem = item;
-
-			//ent.mainMd.mapServer[md.type].initData(md);
-			//httpServerWin.initData(md);
-			getPage(md.type).initData(md);
-			//serverItem.Add(item);
+			
+			getPage().initData(md);
 			serverItem.Insert(0, item);
 
 			//lstServer.Add(md);
@@ -458,9 +330,7 @@ namespace httpServer {
 
 			lstItem.ItemsSource = null;
 			lstItem.ItemsSource = serverItem;
-
-			//lstItem.SelectedIndex = serverItem.Count - 1;
-			//lstItem.ScrollIntoView(lstItem.Items[serverItem.Count - 1]);
+			
 			lstItem.SelectedIndex = 0;
 			lstItem.ScrollIntoView(lstItem.Items[0]);
 		}
@@ -470,18 +340,13 @@ namespace httpServer {
 			if(idx < 0 || idx >= serverItem.Count) {
 				return;
 			}
-
-			//List<ServerMd> lstServer = ent.mainMd.lstServer;
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			var md = lst[idx];
-			//ent.mainMd.mapServer[md.type].clear(md);
-			//httpServerWin.clear(md);
-			getPage(md.type).clear(md);
-			//lstServerClt[idx].clear();
+			getPage().clear(md);
 
 			lst.RemoveAt(idx);
 			serverItem.RemoveAt(idx);
-			//lstServerClt.RemoveAt(idx);
 
 			if(serverItem.Count <= 0) {
 				return;
@@ -497,18 +362,34 @@ namespace httpServer {
 			lstItem.SelectedIndex = newIdx;
 		}
 
+		public void log(Exception ex) {
+			if(!isShowLog) {
+				return;
+			}
+
+			log(ex.ToString());
+		}
+
 		public void log(string info) {
+			if(!isShowLog) {
+				return;
+			}
+
 			strLog += info + "\r\n";
 			if(strLog.Length > 5000) {
 				strLog = strLog.Substring(5000);
 			}
 
-			if(!isShowLog) {
-				return;
-			}
-			Dispatcher.Invoke(() => {
-				txtLog.Text = strLog;
-			});
+			//if(!isShowLog) {
+			//	return;
+			//}
+			try {
+				Dispatcher.Invoke(() => {
+					try {
+						txtLog.Text = strLog;
+					} catch(Exception) { }
+				});
+			} catch(Exception) { }
 		}
 
 		private void lstItem_UpClick(object sender, UpDownEvent e) {
@@ -547,7 +428,7 @@ namespace httpServer {
 			}
 
 			//List<ServerMd> lstServer = ent.mainMd.lstServer;
-			var lst = ent.mainMd.configMd.lstHttpServer;
+			var lst = MainMd.ins.configMd.lstHttpServer;
 			var md = lst[idx];
 			lst[idx] = lst[nextIex];
 			lst[nextIex] = md;
@@ -560,12 +441,22 @@ namespace httpServer {
 			lstItem.SelectedIndex = sltIdx;
 		}
 
+		private void showLog(bool isShow) {
+			isShowLog = isShow;
+			btnLog.IsSelect = isShowLog;
+			if(isShowLog) {
+				grdMainBox.ColumnDefinitions[3].Width = new GridLength(8);
+				grdMainBox.ColumnDefinitions[4].Width = new GridLength(150);
+			} else {
+				grdMainBox.ColumnDefinitions[3].Width = new GridLength(0);
+				grdMainBox.ColumnDefinitions[4].Width = new GridLength(0);
+			}
+		}
+
 		private void BtnLog_Click(object sender, RoutedEventArgs e) {
-			//isShowLog = !isShowLog;
-			//btnLog.IsSelect = isShowLog;
-			//grdMainBox.ColumnDefinitions[3].Width = new GridLength(8);
-			//grdMainBox.ColumnDefinitions[4].Width = new GridLength(150);
+			showLog(!isShowLog);
 			//txtLog.Text = strLog;
 		}
+		
 	}
 }

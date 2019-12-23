@@ -3,7 +3,6 @@ using csharpHelp.util;
 using csharpHelp.util.action;
 using httpServer.view.util;
 using httpServer.control;
-using httpServer.entity;
 using httpServer.model;
 using httpServer.services;
 using httpServer.util;
@@ -26,94 +25,15 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace httpServer.view.page {
-	//public class HttpModel : ServerMd {
-	//	public HttpServerGroup ctl = null;
 
-	//	public ServerDataMd md = new ServerDataMd();
+	public class HttpServerMd {
+		public ServerItem serverItem = null;
 
-	//	public string ip = "localhost";     //
-	//	public string port = "";
-	//	public string urlParam = "";
+		[XmlValue("desc")] public string desc = "";    //描述
+		[XmlAttr("isRun")] public bool isRun = false;  //是否启动
 
-	//	public string path = "";    //路径
-
-	//	public bool isProxy = false;    //反向代理
-	//	public string proxyUrl = "";
-
-	//	public bool isTransmit = false; //端口转发
-	//	public string transmitUrl = "";
-	//	string _rewrite = "";
-	//	public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
-	//	public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
-
-	//	public string rewrite {
-	//		get { return _rewrite; }
-	//		set {
-	//			_rewrite = value;
-	//			updateRewrite();
-	//		}
-	//	}
-
-	//	private void updateRewrite() {
-	//		string[] arr = _rewrite.Split(new string[] { "\r\n", ";", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-	//		mapAutoRewrite = new Dictionary<string, string>();
-	//		mapRewrite = new Dictionary<string, string>();
-
-	//		for(int i = 0; i < arr.Length; ++i) {
-	//			Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
-	//			Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
-
-	//			Match matchAuto = regAuto.Match(arr[i].Trim());
-	//			if(matchAuto.Groups.Count >= 3) {
-	//				mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
-	//				//Debug.WriteLine(matchAuto.Groups[1].Value + "," + matchAuto.Groups[2].Value);
-	//				continue;
-	//			}
-
-	//			Match match = reg.Match(arr[i].Trim());
-	//			if(match.Groups.Count < 3) {
-	//				continue;
-	//			}
-
-	//			mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
-	//			//Debug.WriteLine(match.Groups[1].Value + "," + match.Groups[2].Value);
-	//		}
-	//	}
-
-	//	public override void load(RegistryCtl regCtl, string subPath) {
-	//		base.load(regCtl, subPath);
-
-	//		string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-
-	//		ip = regCtl.getValue(subPath + "ip", "127.0.0.1");
-	//		port = regCtl.getValue(subPath + "port", "8091");
-	//		path = regCtl.getValue(subPath + "path", rootPath);
-	//		urlParam = regCtl.getValue(subPath + "urlParam", "");
-	//		_rewrite = regCtl.getValue(subPath + "rewrite", "");
-	//	}
-
-	//	public override void save(RegistryCtl regCtl, string subPath) {
-	//		base.save(regCtl, subPath);
-
-	//		regCtl.setValue(subPath + "ip", ip);
-	//		regCtl.setValue(subPath + "port", port);
-	//		regCtl.setValue(subPath + "path", path);
-	//		regCtl.setValue(subPath + "urlParam", urlParam);
-	//		regCtl.setValue(subPath + "rewrite", _rewrite);
-	//	}
-
-	//	public override int getMaxPort() {
-	//		try {
-	//			return int.Parse(port);
-	//		} catch(Exception) {
-	//			return base.getMaxPort();
-	//		}
-	//	}
-	//};
-
-	public class HttpServerMd : ServerMd {
-		//[XmlValue("desc")] public string desc = "";
-		[XmlAttr("ip")] public string ip = "localhost";
+													   //[XmlValue("desc")] public string desc = "";
+		[XmlAttr("ip")] public string ip = "0.0.0.0";
 		[XmlAttr("port")] public int port = 0;
 		[XmlValue("urlParam")] public string urlParam = "";
 
@@ -130,7 +50,7 @@ namespace httpServer.view.page {
 
 		public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
 		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
-
+		
 		public string rewrite {
 			get { return _rewrite; }
 			set {
@@ -144,10 +64,10 @@ namespace httpServer.view.page {
 			mapAutoRewrite = new Dictionary<string, string>();
 			mapRewrite = new Dictionary<string, string>();
 
-			for(int i = 0; i < arr.Length; ++i) {
-				Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
-				Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+			Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+			Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
 
+			for(int i = 0; i < arr.Length; ++i) {
 				Match matchAuto = regAuto.Match(arr[i].Trim());
 				if(matchAuto.Groups.Count >= 3) {
 					mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
@@ -165,8 +85,9 @@ namespace httpServer.view.page {
 			}
 		}
 
-		public override void load(XmlCtl xmlCtl) {
-			base.load(xmlCtl);
+		public void load(XmlCtl xmlCtl) {
+			desc = xmlCtl.value("desc");
+			isRun = xmlCtl.attrBool("isRun");
 
 			string rootPath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -177,7 +98,7 @@ namespace httpServer.view.page {
 			_rewrite = xmlCtl.value("rewrite", "");
 		}
 
-		public override int getMaxPort() {
+		public int getMaxPort() {
 			return port;
 		}
 	}
@@ -186,9 +107,9 @@ namespace httpServer.view.page {
 	/// HttpServerWin.xaml 的交互逻辑
 	/// http服务器
 	/// </summary>
-	public partial class HttpServerWin : UserControl, IPage {
+	public partial class HttpServerWin : UserControl {
 		//HttpModel data = new HttpModel();
-		Entity ent = null;
+		//Entity ent = null;
 
 		//int dataIndex = 0;
 		//ServerItem serverItem = null;
@@ -198,10 +119,13 @@ namespace httpServer.view.page {
 
 		public HttpServerWin() {
 			InitializeComponent();
+
+			//set language
+			new ClassLink().sendTo(Lang.ins, this, "", LinkType.All);
 		}
 
 		public void init() {
-			ent = Entity.getInstance();
+			//ent = Entity.ins;
 
 			//txtProxy.Visibility = Visibility.Collapsed;
 			//txtTransmit.Visibility = Visibility.Collapsed;
@@ -216,25 +140,17 @@ namespace httpServer.view.page {
 			}
 		}
 
-		public ServerMd createNewModel() {
+		public HttpServerMd createNewModel() {
 			HttpServerMd md = new HttpServerMd();
-			md.port = SystemCtl.getFreePort(ent.mainMd.maxStartPort());
+			md.port = SystemCtl.getFreePort(MainMd.ins.maxStartPort());
 			//ent.mainModule.updateStartPort(md.port);
 
 			md.desc = md.ip + ":" + md.port;
 			md.path = SysConst.rootPath();
 			return md;
-			//return data;
 		}
 
-		public void initData(ServerMd _md) {
-			HttpServerMd md = (HttpServerMd)_md;
-			//ent.mainModule.updateStartPort(md.port);
-
-			//ServerCtl ctl = new ServerCtl();
-			//ctl.md = md;
-			//md.ctl = ctl;
-
+		public void initData(HttpServerMd md) {
 			HttpServerGroup ctl = new HttpServerGroup();
 			ctl.md = md;
 			md.ctl = ctl;
@@ -252,13 +168,11 @@ namespace httpServer.view.page {
 			updateData("isRun", false);
 		}
 
-		public void clear(ServerMd _md) {
-			HttpServerMd md = (HttpServerMd)_md;
+		public void clear(HttpServerMd md) {
 			md.ctl.clear();
 		}
 
-		public void updateData(ServerMd _md) {
-			HttpServerMd md = (HttpServerMd)_md;
+		public void updateData(HttpServerMd md) {
 			nowData = md;
 
 			//isEditByCode = true;
@@ -286,7 +200,7 @@ namespace httpServer.view.page {
 			//isEditByCode = false;
 		}
 
-		public ServerMd createModel() {
+		public HttpServerMd createModel() {
 			return new HttpServerMd();
 			//return data;
 		}

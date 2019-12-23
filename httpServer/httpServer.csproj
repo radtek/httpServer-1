@@ -66,29 +66,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="model\Lang.cs" />
     <Compile Include="view\page\HttpServerWin.xaml.cs">
       <DependentUpon>HttpServerWin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\page\IPage.cs" />
-    <Compile Include="view\page\HttpRevProxy.xaml.cs">
-      <DependentUpon>HttpRevProxy.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\util\ListBoxServer\ListBoxServer.cs" />
     <Compile Include="view\util\UiService.cs" />
     <Compile Include="control\httpServer\Cache.cs" />
     <Compile Include="control\httpServer\ComServerCtl.cs" />
-    <Compile Include="control\httpRevProxy\HttpRevClient.cs" />
-    <Compile Include="control\httpRevProxy\HttpRevServer.cs" />
-    <Compile Include="control\httpRevProxy\HttpPackModel.cs" />
     <Compile Include="control\httpServer\HttpServerGroup.cs" />
-    <Compile Include="control\httpRevProxy\IServerCtl.cs" />
     <Compile Include="control\httpServer\RequestCtl.cs" />
     <Compile Include="control\httpServer\ServerCtl.cs" />
-    <Compile Include="control\ServerDataCtl.cs" />
-    <Compile Include="entity\Entity.cs" />
     <Compile Include="model\ConfigMd.cs" />
     <Compile Include="model\MainMd.cs" />
-    <Compile Include="model\ServerMd.cs" />
     <Compile Include="view\util\ItemBox.xaml.cs">
       <DependentUpon>ItemBox.xaml</DependentUpon>
     </Compile>
@@ -403,10 +393,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="view\page\HttpServerWin.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\page\HttpRevProxy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

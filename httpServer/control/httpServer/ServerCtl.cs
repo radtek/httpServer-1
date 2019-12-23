@@ -25,11 +25,12 @@ namespace httpServer.control {
 			public string ip = "";
 			public string port = "";
 		};
-		public enum ServerStatus {
-			none, http, transmit
-		}
+		//public enum ServerStatus {
+		//	none, http, transmit
+		//}
 
-		static Dictionary<string, string> mapSuffix = new Dictionary<string, string>();
+		public static Dictionary<string, string> mapSuffix = new Dictionary<string, string>();
+		public static int timeout = 3000;
 		static Cache cache = new Cache();
 
 		//public string ip;
@@ -46,10 +47,10 @@ namespace httpServer.control {
 		public string ip = "";
 		public HttpServerMd md = null;
 
-		string lastServer = "";
+		//string lastServer = "";
 		string serverUrl = "";
 
-		ServerStatus lastStatus = ServerStatus.none;
+		//ServerStatus lastStatus = ServerStatus.none;
 		private TimeSpan _timeout = new TimeSpan(0, 0, 0, 0, 0);
 		//bool stopServer = false;
 		Thread thServer = null;
@@ -67,8 +68,14 @@ namespace httpServer.control {
 			mapSuffix[".svg"] = "image/svg+xml";
 		}
 
+		public static void setContentType(Dictionary<string, string> map) {
+			foreach(string key in map.Keys) {
+				mapSuffix[key] = map[key];
+			}
+		}
+
 		public ServerCtl() {
-			_timeout = TimeSpan.FromMilliseconds(3000);
+			_timeout = TimeSpan.FromMilliseconds(timeout);
 
 			requestCtl = new RequestCtl();
 		}
@@ -85,12 +92,12 @@ namespace httpServer.control {
 				//	ComUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
 				//	return;
 				//}
-				lastStatus = ServerStatus.http;
+				//lastStatus = ServerStatus.http;
 				//clear();
 				//stopServer = false;
 				updateCopyUrlPos();
-			} catch(Exception) {
-
+			} catch(Exception ex) {
+				MainWindow.ins.log(ex);
 			}
 		}
 
@@ -138,7 +145,9 @@ namespace httpServer.control {
 
 				ctl.responseFile(context);
 
-			} catch(Exception) { }
+			} catch(Exception ex) {
+				MainWindow.ins.log(ex);
+			}
 		}
 
 		private void responseFile(HttpListenerContext httpListenerContext) {
@@ -176,7 +185,9 @@ namespace httpServer.control {
 			string path = "";
 			try {
 				path = Path.GetFullPath(md.path + "/" + url);
-			} catch(Exception) { }
+			} catch(Exception ex) {
+				MainWindow.ins.log(ex);
+			}
 
 			if(!isIndex && !File.Exists(path)) {
 				string newPath = md.path + "/" + url + "/index.html";
@@ -467,12 +478,12 @@ namespace httpServer.control {
 			thServer?.Abort();
 			thServer = null;
 
-			if(lastStatus == ServerStatus.transmit) {
-				//IpAddr addr = parseServer(lastStatus);
-				IpAddr addr = parseServer(lastServer);
-				ComUtil.runExeNoWin("netsh", "interface portproxy delete v4tov4 listenaddress=" + addr.ip + " listenport=" + addr.port);
-			}
-			lastStatus = ServerStatus.none;
+			//if(lastStatus == ServerStatus.transmit) {
+			//	//IpAddr addr = parseServer(lastStatus);
+			//	IpAddr addr = parseServer(lastServer);
+			//	ComUtil.runExeNoWin("netsh", "interface portproxy delete v4tov4 listenaddress=" + addr.ip + " listenport=" + addr.port);
+			//}
+			//lastStatus = ServerStatus.none;
 		}
 
 	}
