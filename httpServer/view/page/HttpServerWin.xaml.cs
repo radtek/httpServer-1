@@ -33,20 +33,15 @@ namespace httpServer.view.page {
 		[XmlAttr("isRun")] public bool isRun = false;  //是否启动
 
 													   //[XmlValue("desc")] public string desc = "";
-		[XmlAttr("ip")] public string ip = "0.0.0.0";
-		[XmlAttr("port")] public int port = 0;
-		[XmlValue("urlParam")] public string urlParam = "";
+		[XmlAttr("ip")]		public string ip = "0.0.0.0";
+		[XmlAttr("port")]	public int port = 0;
 
-		[XmlValue("path")] public string path = "";
-
-		//[XmlAttr("isRun")] public bool isRun = false;
-		[XmlValue("rewrite")] public string _rewrite = "";
-
-		//public bool isProxy = false;
-		//public string proxyUrl = "";
+		[XmlValue("urlParam")]		public string urlParam = "";
+		[XmlValue("path")]			public string path = "";
+		[XmlValue("virtualDir")]	public string virtualDir = "";
+		[XmlValue("rewrite")]		public string _rewrite = "";
 
 		public HttpServerGroup ctl = null;
-		//public ServerItem serverItem = null;
 
 		public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
 		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
@@ -71,7 +66,6 @@ namespace httpServer.view.page {
 				Match matchAuto = regAuto.Match(arr[i].Trim());
 				if(matchAuto.Groups.Count >= 3) {
 					mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
-					//Debug.WriteLine(matchAuto.Groups[1].Value + "," + matchAuto.Groups[2].Value);
 					continue;
 				}
 
@@ -81,7 +75,6 @@ namespace httpServer.view.page {
 				}
 
 				mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
-				//Debug.WriteLine(match.Groups[1].Value + "," + match.Groups[2].Value);
 			}
 		}
 
@@ -108,14 +101,9 @@ namespace httpServer.view.page {
 	/// http服务器
 	/// </summary>
 	public partial class HttpServerWin : UserControl {
-		//HttpModel data = new HttpModel();
-		//Entity ent = null;
-
-		//int dataIndex = 0;
-		//ServerItem serverItem = null;
-		//private HttpModel nowData = null;
 		private HttpServerMd nowData = new HttpServerMd();
-		//private List<ServerCtl> lstServerClt = new List<ServerCtl>();
+
+		List<string> lstIPCache = new List<string>();
 
 		public HttpServerWin() {
 			InitializeComponent();
@@ -124,14 +112,17 @@ namespace httpServer.view.page {
 			new ClassLink().sendTo(Lang.ins, this, "", LinkType.All);
 		}
 
+		public List<string> getAllIp() {
+			if(lstIPCache.Count <= 0) {
+				lstIPCache = ComUtil.findAllIp();
+			}
+
+			return lstIPCache;
+		}
+
 		public void init() {
-			//ent = Entity.ins;
-
-			//txtProxy.Visibility = Visibility.Collapsed;
-			//txtTransmit.Visibility = Visibility.Collapsed;
-
 			//find ip
-			List<string> lstIP = UiService.ins().getAllIp();
+			List<string> lstIP = getAllIp();
 			cbxIp.Items.Add("0.0.0.0");
 			cbxIp.Items.Add("localhost");
 			cbxIp.Items.Add("127.0.0.1");
@@ -143,7 +134,6 @@ namespace httpServer.view.page {
 		public HttpServerMd createNewModel() {
 			HttpServerMd md = new HttpServerMd();
 			md.port = SystemCtl.getFreePort(MainMd.ins.maxStartPort());
-			//ent.mainModule.updateStartPort(md.port);
 
 			md.desc = md.ip + ":" + md.port;
 			md.path = SysConst.rootPath();
@@ -175,34 +165,21 @@ namespace httpServer.view.page {
 		public void updateData(HttpServerMd md) {
 			nowData = md;
 
-			//isEditByCode = true;
-			//Debug.WriteLine("aa");
-
 			txtDesc.Text = md.desc;
 
 			cbxIp.Text = md.ip;
 			txtPort.Text = "" + md.port;
 
 			txtPath.Text = md.path;
+			txtVirtualDir.Text = md.virtualDir;
 			txtUrlParam.Text = md.urlParam;
 			txtRewrite.Text = md.rewrite;
-
-			//txtProxy.IsChecked = md.isProxy;
-			//txtProxy.Text = md.proxyUrl;
-
-			//txtTransmit.IsChecked = md.isTransmit;
-			//txtTransmit.Text = md.transmitUrl;
-
-			string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
-			lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
-
-			//Debug.WriteLine("bb");
-			//isEditByCode = false;
+			
+			lblUrl.Content = getUrl();
 		}
 
 		public HttpServerMd createModel() {
 			return new HttpServerMd();
-			//return data;
 		}
 
 		private void lblUrl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -214,12 +191,14 @@ namespace httpServer.view.page {
 		}
 
 		private void txtPath_TextChanged(object sender, TextChangedEventArgs e) {
-			//serverPath = txtPath.Text + "/";
 			updateData("path", txtPath.Text);
 		}
 
 		private void txtDesc_TextChanged(object sender, TextChangedEventArgs e) {
 			updateData("desc", txtDesc.Text);
+		}
+		private void TxtVirtualDir_TextChanged(object sender, TextChangedEventArgs e) {
+			updateData("virtualDir", txtVirtualDir.Text);
 		}
 
 		private void txtUrlParam_TextChanged(object sender, TextChangedEventArgs e) {
@@ -231,10 +210,6 @@ namespace httpServer.view.page {
 		}
 
 		private void updateData(string name, string value) {
-			//int idx = dataIndex;
-			//if(idx < 0 || serverItem == null) {
-			//	return;
-			//}
 			if (nowData == null) {
 				return;
 			}
@@ -243,21 +218,36 @@ namespace httpServer.view.page {
 
 			switch(name) {
 			case "desc": {
-					md.desc = value;
-					md.serverItem.Content = value;
-					break;
-				}
-			//case "transmitUrl": md.transmitUrl = value; break;
-			//case "proxyUrl": md.proxyUrl = value; break;
+				md.desc = value;
+				md.serverItem.Content = value;
+				break;
+			}
 			case "path": md.path = value; break;
 			case "urlParam": {
-					md.urlParam = value;
-					string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
-					lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
-					break;
-				}
-			case "rewrite": md.rewrite = value; break;
+				md.urlParam = value;
+				lblUrl.Content = getUrl();
+				break;
 			}
+			case "rewrite": md.rewrite = value; break;
+			case "virtualDir": {
+				md.virtualDir = value;
+				lblUrl.Content = getUrl();
+				break;
+			}
+			}
+			MainWindow.ins.delaySaveConfig();
+			//Debug.WriteLine("aaa");
+		}
+
+		private string getUrl() {
+			HttpServerMd md = nowData;
+
+			string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
+			string dir = md.virtualDir.Trim();
+			if(dir != "") {
+				dir = dir + "/";
+			}
+			return "http://" + ip + ":" + md.port + "/" + dir + md.urlParam;
 		}
 
 		private int toInt(string str, int def = 0) {
@@ -269,10 +259,6 @@ namespace httpServer.view.page {
 		}
 
 		private void updateData(string name, bool value) {
-			//int idx = dataIndex;
-			//if(idx < 0 || serverItem == null) {
-			//	return;
-			//}
 			if (nowData == null) {
 				return;
 			}
@@ -280,17 +266,13 @@ namespace httpServer.view.page {
 			HttpServerMd md = nowData;
 
 			switch (name) {
-			//case "isTransmit": md.isTransmit = value; break;
-			//case "isProxy": md.isProxy = value; break;
 			case "isRun": {
 					md.isRun = value;
-					//md.serverItem.Source = ent.mainWin.getServerStatusImgPath(md.isRun);
 					var lastIp = md.ip;
 					var lastPort = md.port;
 					md.ip = cbxIp.Text;
 					md.port = toInt(txtPort.Text, md.port);
-					string ip = (md.ip == "0.0.0.0" ? "localhost" : md.ip);
-					lblUrl.Content = "http://" + ip + ":" + md.port + "/" + md.urlParam;
+					lblUrl.Content = getUrl();
 
 					md.desc = md.desc.Replace(lastIp, md.ip);
 					md.desc = md.desc.Replace(""+lastPort, ""+md.port);
@@ -298,38 +280,32 @@ namespace httpServer.view.page {
 					md.serverItem.Content = md.desc;
 
 					if(value == true) {
-						//lstServerClt[idx].restartServer();
 						md.ctl.restartServer();
 					} else {
-						//lstServerClt[idx].clear();
 						md.ctl.clear();
 					}
-					//if(md.desc == "" || ComServerCtl.isDescIp(md.desc)) {
-					//	txtDesc.Text = md.ip + ":" + md.port;
-					//	updateData("desc", md.ip + ":" + md.port);
-					//}
 					break;
 				}
 			}
+			MainWindow.ins.delaySaveConfig();
+			//Debug.WriteLine("bbb");
 		}
 
 		private void cbxIp_TextChanged(object sender, TextChangedEventArgs e) {
 			if(nowData == null || cbxIp.Text == nowData.ip) {
 				return;
 			}
-			CmdServ.cfgWaitSave.send();
+			nowData.serverItem.Content = nowData.desc + " *";
+			//CmdServ.cfgWaitSave.send();
 		}
 
 		private void txtPort_TextChanged(object sender, TextChangedEventArgs e) {
 			if(nowData == null || txtPort.Text == ""+nowData.port) {
 				return;
 			}
-			CmdServ.cfgWaitSave.send();
+			nowData.serverItem.Content = nowData.desc + " *";
+			//CmdServ.cfgWaitSave.send();
 		}
-
-		//private bool isDescIp(string desc) {
-		//	return Regex.IsMatch(desc, "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
-		//}
 
 	}
 }

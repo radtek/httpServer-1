@@ -154,14 +154,15 @@ namespace csharpHelp.util {
 				}
 
 				if(isPath) {
-					root.DeleteSubKey(name);
+					root.DeleteSubKeyTree(name);
 				} else {
 					root.DeleteValue(name);
 				}
 
 				result = true;
 
-			} catch(Exception) {
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.ToString());
 				//return "";
 				//Debug.WriteLine(ex.ToString());
 			}
@@ -225,7 +226,7 @@ namespace csharpHelp.util {
 					return result;
 				}
 
-				root.DeleteSubKey(name);
+				root.DeleteSubKeyTree(name);
 
 				result = true;
 

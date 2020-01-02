@@ -475,7 +475,40 @@ namespace csharpHelp {
 						}
 					}
 				} else if(mi.IsDefined(typeof(XmlMap), false)) {
-					
+					//map
+					XmlMap mapInfo = mi.GetCustomAttribute<XmlMap>();
+
+					string path = formatPath(rootPath, mapInfo.rootPath);
+
+					IDictionary objVal = (val as IDictionary);
+					if(objVal != null) {
+						int i = 0;
+						foreach(var key in objVal.Keys) {
+							string keyPath = formatPath(path + $"[{i}]", mapInfo.keyPath);
+							switch(mapInfo.keyType) {
+								case XmlKeyType.Attr: _xml.setAttr(keyPath, key.ToString()); break;
+								case XmlKeyType.Value: _xml.setValue(keyPath, key.ToString()); break;
+							}
+
+							string valPath = formatPath(path + $"[{i}]", mapInfo.valuePath);
+							switch(mapInfo.valueType) {
+								case XmlValueType.Attr: _xml.setAttr(valPath, objVal[key].ToString()); break;
+								case XmlValueType.Value: _xml.setValue(valPath, objVal[key].ToString()); break;
+								case XmlValueType.Child: {
+									_saveToXml(objVal[key], valPath);
+									break;
+								}
+							}
+							++i;
+						}
+						//remove out of range
+						List<XmlCtl> lst = _xml.children(path);
+						if(i < lst.Count) {
+							for(int j = i; j < lst.Count; ++j) {
+								_xml.removeInTarget(path, i);
+							}
+						}
+					}
 				}
 			}
 		}

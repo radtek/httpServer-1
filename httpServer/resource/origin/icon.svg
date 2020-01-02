@@ -18,9 +18,9 @@
    id="svg8"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="icon.svg"
-   inkscape:export-filename="E:\00workself\csharp\project\httpServer\httpServer\resource\icon2.png"
-   inkscape:export-xdpi="72"
-   inkscape:export-ydpi="72">
+   inkscape:export-filename="E:\00workself\csharp\project\httpServer\httpServer\resource\upDown.png"
+   inkscape:export-xdpi="36"
+   inkscape:export-ydpi="36">
   <defs
      id="defs2">
     <linearGradient
@@ -252,8 +252,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8284271"
-     inkscape:cx="29.861632"
-     inkscape:cy="75.260568"
+     inkscape:cx="-5.8199595"
+     inkscape:cy="32.834161"
      inkscape:document-units="px"
      inkscape:current-layer="layer8"
      inkscape:showpageshadow="false"
@@ -346,7 +346,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="arrow"
-     style="display:none">
+     style="display:inline">
     <path
        style="fill:#0096e6;fill-opacity:1;stroke:#0096e6;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 0.12694799,1.8102311 1.8007766,0.1249818 V 3.8750002 L 1.3605278,3.8677086 V 1.3428458 L 0.49286265,2.2147056 Z"
@@ -366,7 +366,7 @@
      inkscape:groupmode="layer"
      id="layer8"
      inkscape:label="icon"
-     style="display:inline">
+     style="display:none">
     <ellipse
        style="opacity:1;fill:url(#radialGradient3230);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.0625;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers"
        id="path3222"

@@ -32,6 +32,7 @@
 			</Grid.ColumnDefinitions>
 
 			<util:ListBoxServer Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" SelectionChanged="lstItem_SelectionChanged" UpClick="lstItem_UpClick" DownClick="lstItem_DownClick"/>
+			<!--<util:ListServer Margin="0,0,0,60" BorderThickness="1,0,0,0" BorderBrush="#6ceff7" x:Name="lstItem" ListBox.SelectionChanged="lstItem_SelectionChanged"/>-->
 
 			<StackPanel VerticalAlignment="Bottom" >
 				<Grid Margin="0,4,0,0" Height="25">
@@ -42,9 +43,8 @@
 						<ColumnDefinition Width="2"/>
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
-					<supUI:MiniButton Grid.Column="0" Content="重启" x:Name="btnRestart" Click="BtnRestart_Click"/>
-					<supUI:MiniButton Grid.Column="2" Content="停止" x:Name="btnStop" Click="BtnStop_Click"/>
-					<supUI:MiniButton Grid.Column="4" Content="日志" x:Name="btnLog" IsSelect="False" Click="BtnLog_Click"/>
+					<supUI:MiniButton Grid.Column="0" Content="新建" x:Name="btnNew" Click="BtnNew_Click"/>
+					<supUI:MiniButton Grid.Column="2" Content="重启" x:Name="btnRestart" Click="BtnRestart_Click"/>
 				</Grid>
 				<Grid Margin="0,4,0,0" Height="25">
 					<Grid.ColumnDefinitions>
@@ -55,7 +55,8 @@
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
 					<supUI:MiniButton Grid.Column="0" Content="删除" x:Name="btnDel" Click="BtnDel_Click" Background="#f76c6c" OverColor="#cc5656" SelectColor="#cc5656"/>
-					<supUI:MiniButton Grid.Column="2" Content="新建" x:Name="btnNew" Click="BtnNew_Click"/>
+					<supUI:MiniButton Grid.Column="2" Content="停止" x:Name="btnStop" Click="BtnStop_Click"/>
+					<supUI:MiniButton Grid.Column="4" Content="日志" x:Name="btnLog" IsSelect="False" Click="BtnLog_Click"/>
 				</Grid>
 			</StackPanel>
 
@@ -64,6 +65,16 @@
 			</Grid>
 
 			<Label Grid.Column="4" VerticalAlignment="Top" Height="24" Padding="5, 0" VerticalContentAlignment="Center" Content="日志：" Name="lblLog"/>
+			<Grid Grid.Column="4" VerticalAlignment="Top" HorizontalAlignment="Right">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="50*"/>
+					<ColumnDefinition Width="50*"/>
+					<ColumnDefinition Width="50*"/>
+				</Grid.ColumnDefinitions>
+				<supUI:MiniButton Grid.Column="0" Radius="0" Background="Transparent" Padding="4,2" Content="错误" x:Name="btnLogError" IsSelect="True" Click="BtnLogError_Click"/>
+				<supUI:MiniButton Grid.Column="1" Radius="0" Background="Transparent" Padding="4,2" Content="调试" x:Name="btnLogDebug" IsSelect="False" Click="BtnLogDebug_Click"/>
+				<supUI:MiniButton Grid.Column="2" Radius="0" Background="Transparent" Padding="4,2" Content="清空" x:Name="btnLogClear" Click="BtnLogClear_Click"/>
+			</Grid>
 			<TextBox Grid.Column="4" Margin="0,24,0,0" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Name="txtLog" />
 
 			<Border Grid.Column="1" BorderThickness="0,0,1,0" BorderBrush="#0bd5e1" IsHitTestVisible="False"/>

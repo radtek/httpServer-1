@@ -25,38 +25,21 @@ namespace httpServer.control {
 			public string ip = "";
 			public string port = "";
 		};
-		//public enum ServerStatus {
-		//	none, http, transmit
-		//}
 
 		public static Dictionary<string, string> mapSuffix = new Dictionary<string, string>();
 		public static int timeout = 3000;
 		static Cache cache = new Cache();
 
-		//public string ip;
-		//public string port;
-
-		//public string serverPath = "";
-
-		//public bool isProxy = false;
-		//public string proxyUrl = "";
-
-		//public bool isTransmit = false;
-		//public string transmitUrl = "";
-
 		public string ip = "";
 		public HttpServerMd md = null;
-
-		//string lastServer = "";
+		
 		string serverUrl = "";
-
-		//ServerStatus lastStatus = ServerStatus.none;
+		
 		private TimeSpan _timeout = new TimeSpan(0, 0, 0, 0, 0);
-		//bool stopServer = false;
 		Thread thServer = null;
 		HttpListener httpListener = null;
 
-		RequestCtl requestCtl = null;
+		//RequestCtl requestCtl = null;
 
 		static ServerCtl(){
 			mapSuffix[".css"] = "text/css";
@@ -77,27 +60,15 @@ namespace httpServer.control {
 		public ServerCtl() {
 			_timeout = TimeSpan.FromMilliseconds(timeout);
 
-			requestCtl = new RequestCtl();
+			//requestCtl = new RequestCtl();
 		}
 
 		public void restartServer() {
 			try {
 				clear();
-				//if(md.isTransmit) {
-				//	lastStatus = ServerStatus.transmit;
-
-				//	IpAddr addr = parseServer(md.transmitUrl);
-					
-				//	lastServer = ip + ":" + md.port;
-				//	ComUtil.runExeNoWin("netsh", "interface portproxy add v4tov4 listenaddress=" + ip + " listenport=" + md.port + " connectaddress=" + addr.ip + "  connectport=" + addr.port);
-				//	return;
-				//}
-				//lastStatus = ServerStatus.http;
-				//clear();
-				//stopServer = false;
 				updateCopyUrlPos();
 			} catch(Exception ex) {
-				MainWindow.ins.log(ex);
+				MainWindow.ins.error(ex);
 			}
 		}
 
@@ -139,6 +110,9 @@ namespace httpServer.control {
 			try {
 				ServerCtl ctl = ar.AsyncState as ServerCtl;
 				HttpListener sSocket = ctl.httpListener;
+				if(sSocket == null || !sSocket.IsListening) {
+					return;
+				}
 				HttpListenerContext context = sSocket.EndGetContext(ar);
 				
 				sSocket.BeginGetContext(new AsyncCallback(GetContextCallBack), ctl);
@@ -146,7 +120,7 @@ namespace httpServer.control {
 				ctl.responseFile(context);
 
 			} catch(Exception ex) {
-				MainWindow.ins.log(ex);
+				MainWindow.ins.error(ex);
 			}
 		}
 
@@ -184,13 +158,13 @@ namespace httpServer.control {
 
 			string path = "";
 			try {
-				path = Path.GetFullPath(md.path + "/" + url);
+				path = Path.GetFullPath(md.path + "/" + url.Substring(md.virtualDir.Length + 1));
 			} catch(Exception ex) {
-				MainWindow.ins.log(ex);
+				MainWindow.ins.error(ex);
 			}
 
 			if(!isIndex && !File.Exists(path)) {
-				string newPath = md.path + "/" + url + "/index.html";
+				string newPath = md.path + "/" + url.Substring(md.virtualDir.Length + 1) + "/index.html";
 				if(File.Exists(newPath)) {
 					httpListenerContext.Response.StatusCode = 302;
 					httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -314,15 +288,11 @@ namespace httpServer.control {
 
 					bool isResponseOk = response.IsSuccessStatusCode;
 					HttpStatusCode code = response.StatusCode;
-					if(!isResponseOk) {
-						//result = "";
-					} else {
+					if(isResponseOk) {
 						Stream sResult = await response.Content.ReadAsStreamAsync();
 						result = readStream(sResult, out dataLen);
-						//Debug.WriteLine("rst:" + Encoding.UTF8.GetString(result, 0, dataLen) + ",bb");
 					}
-
-					//response.Headers.Location;
+					
 					int statusCode = (int)code;
 					httpListenerContext.Response.StatusCode = statusCode;
 
@@ -330,7 +300,6 @@ namespace httpServer.control {
 					for(int i = 0; i < lst.Count; ++i) {
 						var vals = (lst[i].Value as string[]);
 						if(vals != null && vals.Length > 0) {
-							//Debug.WriteLine($"response:{lst[i].Key},{vals[0]}");
 							try {
 								httpListenerContext.Response.Headers.Add(lst[i].Key, vals[0]);
 							} catch(Exception) { }
@@ -352,12 +321,15 @@ namespace httpServer.control {
 				output.Close();
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
+				MainWindow.ins.debug(ex);
 
 				try {
 					httpListenerContext.Response.StatusCode = 404;
 					var output = httpListenerContext.Response.OutputStream;
 					output.Close();
-				} catch(Exception) { }
+				} catch(Exception ex2) {
+					MainWindow.ins.debug(ex2);
+				}
 			}
 		}
 
@@ -378,58 +350,6 @@ namespace httpServer.control {
 			return false;
 		}
 
-		/// <summary>
-		/// 反向代理
-		/// </summary>
-		/// <param name="httpListenerContext"></param>
-		//private void resoonseProxy(HttpListenerContext httpListenerContext) {
-		//	string url = System.Web.HttpUtility.UrlDecode(httpListenerContext.Request.Url.AbsolutePath);
-		//	string realUrl = md.proxyUrl + url;
-
-		//	byte[] result = new byte[0];
-		//	int dataLen = 0;
-		//	try {
-		//		var handler = new HttpClientHandler() {
-		//			AllowAutoRedirect = false
-		//		};
-
-		//		using(var client = new HttpClient(handler)) {
-		//			if(_timeout.TotalMilliseconds != 0) {
-		//				client.Timeout = _timeout;
-		//			}
-					
-		//			var response = client.GetAsync(realUrl).Result;
-		//			bool isResponseOk = response.IsSuccessStatusCode;
-		//			HttpStatusCode code = response.StatusCode;
-		//			if(!isResponseOk) {
-		//				//result = "";
-		//			} else {
-		//				Stream sResult = response.Content.ReadAsStreamAsync().Result;
-		//				result = readStream(sResult, out dataLen);
-		//			}
-					
-		//			if(response.Content.Headers.ContentType != null) {
-		//				httpListenerContext.Response.Headers.Add("Content-Type", response.Content.Headers.ContentType.ToString());
-		//			}
-		//			if(response.Headers.Location != null) {
-		//				string location = response.Headers.Location.ToString();
-		//				location = location.Replace(md.proxyUrl, serverUrl);
-		//				httpListenerContext.Response.Headers.Add("Location", location);
-		//			}
-					
-		//			int statusCode = (int)code;
-		//			httpListenerContext.Response.StatusCode = statusCode;
-		//		}
-		//	} catch(Exception ex) {
-		//		Debug.WriteLine(realUrl + "," + ex.ToString());
-		//	}
-
-		//	httpListenerContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-		//	var output = httpListenerContext.Response.OutputStream;
-		//	output.Write(result, 0, dataLen);
-		//	output.Close();
-		//}
-
 		private byte[] readStream(Stream stream, out int len) {
 			try {
 				const int bufferSize = 4096;
@@ -447,6 +367,7 @@ namespace httpServer.control {
 				
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
+				MainWindow.ins.debug(ex);
 				len = 0;
 				return new byte[0];
 			}
@@ -467,23 +388,16 @@ namespace httpServer.control {
 				
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());
+				MainWindow.ins.debug(ex);
 				return new byte[0];
 			}
 		}
 
 		public void clear() {
-			//stopServer = true;
 			httpListener?.Abort();
 			httpListener = null;
 			thServer?.Abort();
 			thServer = null;
-
-			//if(lastStatus == ServerStatus.transmit) {
-			//	//IpAddr addr = parseServer(lastStatus);
-			//	IpAddr addr = parseServer(lastServer);
-			//	ComUtil.runExeNoWin("netsh", "interface portproxy delete v4tov4 listenaddress=" + addr.ip + " listenport=" + addr.port);
-			//}
-			//lastStatus = ServerStatus.none;
 		}
 
 	}

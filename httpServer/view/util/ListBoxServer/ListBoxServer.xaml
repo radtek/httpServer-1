@@ -15,14 +15,14 @@
 					<MouseBinding Command="{Binding CmdUpClick, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBox}}}" CommandParameter="{Binding Tag}" MouseAction="LeftClick" />
 				</Image.InputBindings>
 			</Image>
-			<!--<Button Grid.Column="0" Name="btn"/>-->
 			<Image Grid.Column="0" Visibility="Collapsed" Width="9" Height="18" HorizontalAlignment="Right" Source="/httpServer;component/resource/down.png" Name="imgDown">
 				<Image.InputBindings>
 					<MouseBinding Command="{Binding CmdDownClick, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBox}}}" CommandParameter="{Binding Tag}" MouseAction="LeftClick" />
 				</Image.InputBindings>
 			</Image>
+			<!--<Image Grid.Column="0" Visibility="Collapsed" Width="18" Height="18" HorizontalAlignment="Left" Source="/httpServer;component/resource/drag.png" Name="imgDrag">
+			</Image>-->
 			<Label Grid.Column="1" Padding="0" VerticalContentAlignment="Center" Content="{Binding Content}"/>
-			<!--<Image Grid.Column="2" Source="/httpServer;component/resource/up.png" />-->
 		</Grid>
 		
 		<DataTemplate.Triggers>
@@ -31,7 +31,11 @@
 				<Setter TargetName="imgStatus" Property="Visibility" Value="Collapsed"/>
 				<Setter TargetName="imgUp" Property="Visibility" Value="Visible"/>
 				<Setter TargetName="imgDown" Property="Visibility" Value="Visible"/>
+				<!--<Setter TargetName="imgDrag" Property="Visibility" Value="Visible"/>-->
 			</DataTrigger>
+			<!--<DataTrigger Binding="{Binding ElementName=imgUp, Path=IsMouseDown}" Value="True">
+				<Setter Property="DragMode" Value="True"/>
+			</DataTrigger>-->
 			<DataTrigger Binding="{Binding ElementName=imgUp, Path=IsMouseOver}" Value="True">
 				<Setter TargetName="imgDown" Property="Visibility" Value="Collapsed"/>
 			</DataTrigger>

@@ -91,6 +91,13 @@ namespace httpServer.view.util {
 		public ICommand CmdDownClick { get; set; }
 		//public IEnumerable<string> Items { get; private set; }
 
+		//Radius
+		public static readonly DependencyProperty DragModeProperty = DependencyProperty.Register("DragMode", typeof(bool), typeof(ListBoxServer), new PropertyMetadata(false));
+		public bool DragMode {
+			get { return (bool)GetValue(DragModeProperty); }
+			set { SetCurrentValue(DragModeProperty, value); }
+		}
+
 		private void onUpClick(object tag) {
 			//Debug.WriteLine(sender.GetType());
 			UpDownEvent arg = new UpDownEvent(UpClickProperty, this, tag);

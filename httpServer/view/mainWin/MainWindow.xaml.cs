@@ -54,16 +54,17 @@ namespace httpServer {
 		public virtual void FirePropertyChanged(string propertyName) {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
-	};
+
+		public void onMouseDown(object sender, MouseButtonEventArgs e) {
+			Debug.WriteLine("down:" + _Tag);
+		}
+	}
 
 	/// <summary>
 	/// MainWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class MainWindow : Window {
 		public static MainWindow ins = null;
-
-		//private Entity ent = null;
-		//private ServerDataCtl serverDataCtl = null;
 
 		private string title = "";
 		private bool isWaitSave = false;
@@ -72,29 +73,30 @@ namespace httpServer {
 
 		private List<ServerItem> serverItem = new List<ServerItem>();
 
-		//private string nowType = "";
-
-		//Dictionary<int, string> mapIdxToType = new Dictionary<int, string>();
-
 		public bool isShowLog = false;
+		public bool isShowLogError = true;
+		public bool isShowLogDebug = false;
 		string strLog = "";
 		private int itemTag = 0;
+
+		private bool isWatiSave = false;
+		private SetTimeout timeout = new SetTimeout();
 
 		public MainWindow() {
 			InitializeComponent();
 			ins = this;
+			isWatiSave = true;
 
-			//
-			//ent = Entity.ins;
-			//ent.mainMd = new MainMd();
-			//ent.mainWin = this;
-
+			//set icon
+			Uri iconUri = new Uri(LocalRes.icon16(), UriKind.RelativeOrAbsolute);
+			Icon = BitmapFrame.Create(iconUri, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+			
+			//load config
 			MainMd.ins.xmlConfig.load(MainMd.ins.configMd, "config.xml");
 			loadServerConfig();
 			convertOldConfig();
 
 			MainMd.ins.mdLink.sendTo(MainMd.ins.configMd, this);
-
 			colServer.Width = new GridLength(MainMd.ins.configMd.colServerWidth);
 			
 			//set language
@@ -108,6 +110,8 @@ namespace httpServer {
 			getPage().init();
 			
 			showLog(isShowLog);
+			btnLogError.IsSelect = isShowLogError;
+			btnLogDebug.IsSelect = isShowLogDebug;
 
 			//
 			title = Title;
@@ -119,6 +123,8 @@ namespace httpServer {
 			initServerItem(lst);
 			//lstItem.SelectedIndex = int.Parse(regCtl.getValue(regPath + "selectItem", "0"));
 			lstItem.SelectedIndex = MainMd.ins.configMd.selectItem;
+			
+			isWatiSave = false;
 		}
 
 		private void loadServerConfig() {
@@ -183,10 +189,11 @@ namespace httpServer {
 					tmp.rewrite = regCtl.getValue(subPath + "rewrite", "");
 
 					md.lstHttpServer.Add(tmp);
-
 				});
+
+				regCtl.remove(regPath);
 			} catch(Exception ex) {
-				log(ex);
+				error(ex);
 			}
 		}
 
@@ -206,11 +213,27 @@ namespace httpServer {
 			Title = title;
 		}
 
+		public void delaySaveConfig() {
+			if(isWatiSave || timeout == null) {
+				return;
+			}
+
+			isWatiSave = true;
+			//Debug.WriteLine("save");
+
+			timeout.wait(new Action(() => {
+				try {
+					Dispatcher.Invoke(() => {
+						isWatiSave = false;
+						try {
+							MainMd.ins.xmlConfig.save();
+						} catch(Exception) { }
+					});
+				} catch(Exception) { }
+			}), 2000);
+		}
+
 		private HttpServerWin getPage() {
-			//if(!ent.mainMd.mapServer.ContainsKey(type)) {
-			//	return null;
-			//}
-			//return ent.mainMd.mapServer[type];
 			return httpServerWin;
 		}
 
@@ -242,11 +265,14 @@ namespace httpServer {
 
 				MainMd.ins.mdLink.sendBack();
 				MainMd.ins.xmlConfig.save();
-			} catch(Exception ex) { log(ex); }
+			} catch(Exception ex) { error(ex); }
 			
 		}
 
 		private void clear() {
+			timeout.clear();
+			timeout = null;
+
 			var lst = MainMd.ins.configMd.lstHttpServer;
 			for(int i = 0; i < lst.Count; ++i) {
 				getPage().clear(lst[i]);
@@ -278,18 +304,6 @@ namespace httpServer {
 			}
 
 			var md = lst[idx];
-
-			//IPage newPage = getPage(md.type);
-			//if(newPage == null) {
-			//	return;
-			//}
-
-			//IPage oldPage = getPage(nowType);
-			//if(oldPage != null) {
-			//	(oldPage as UserControl).Visibility = Visibility.Collapsed;
-			//}
-			//(newPage as UserControl).Visibility = Visibility.Visible;
-			//nowType = md.type;
 
 			serverItem[idx].Source = getServerStatusImgPath(md.isRun);
 
@@ -379,10 +393,7 @@ namespace httpServer {
 			if(strLog.Length > 5000) {
 				strLog = strLog.Substring(5000);
 			}
-
-			//if(!isShowLog) {
-			//	return;
-			//}
+			
 			try {
 				Dispatcher.Invoke(() => {
 					try {
@@ -392,13 +403,36 @@ namespace httpServer {
 			} catch(Exception) { }
 		}
 
+		public void error(Exception ex) {
+			if(isShowLog && isShowLogError) {
+				log(ex.ToString());
+			}
+		}
+
+		public void error(string info) {
+			if(isShowLog && isShowLogError) {
+				log(info);
+			}
+		}
+
+		public void debug(Exception ex) {
+			if(isShowLog && isShowLogDebug) {
+				log(ex.ToString());
+			}
+		}
+
+		public void debug(string info) {
+			if(isShowLog && isShowLogDebug) {
+				log(info);
+			}
+		}
+
 		private void lstItem_UpClick(object sender, UpDownEvent e) {
 			int idx = findItemIdx((int)e.tag);
 			if(idx <= 0) {
 				return;
 			}
-
-			//Debug.WriteLine(idx);
+			
 			switchItem(idx - 1, idx);
 		}
 
@@ -426,8 +460,7 @@ namespace httpServer {
 			} else if(sltIdx == nextIex) {
 				sltIdx = idx;
 			}
-
-			//List<ServerMd> lstServer = ent.mainMd.lstServer;
+			
 			var lst = MainMd.ins.configMd.lstHttpServer;
 			var md = lst[idx];
 			lst[idx] = lst[nextIex];
@@ -455,8 +488,21 @@ namespace httpServer {
 
 		private void BtnLog_Click(object sender, RoutedEventArgs e) {
 			showLog(!isShowLog);
-			//txtLog.Text = strLog;
 		}
-		
+
+		private void BtnLogError_Click(object sender, RoutedEventArgs e) {
+			isShowLogError = !isShowLogError;
+			btnLogError.IsSelect = isShowLogError;
+		}
+
+		private void BtnLogDebug_Click(object sender, RoutedEventArgs e) {
+			isShowLogDebug = !isShowLogDebug;
+			btnLogDebug.IsSelect = isShowLogDebug;
+		}
+
+		private void BtnLogClear_Click(object sender, RoutedEventArgs e) {
+			strLog = "";
+			txtLog.Text = strLog;
+		}
 	}
 }

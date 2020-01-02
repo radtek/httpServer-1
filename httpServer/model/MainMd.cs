@@ -19,10 +19,6 @@ namespace httpServer.model {
 		public ConfigMd configMd = new ConfigMd();
 		public Lang lang = new Lang();
 
-		//public Dictionary<string, IPage> mapServer = new Dictionary<string, IPage>();
-
-		//public List<ServerMd> lstServer = new List<ServerMd>();
-
 		public int maxStartPort() {
 			var lst = configMd.lstHttpServer;
 
