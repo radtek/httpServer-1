@@ -56,16 +56,24 @@ namespace csharpHelp.util {
 			}
 
 			try {
+				List<SetTimeoutItem> lstTimeout = new List<SetTimeoutItem>();
+
 				for(int i = lstData.Count - 1; i >= 0; --i) {
 					if(lstData[i].startTime + lstData[i].waitTime > nowTime) {
 						continue;
 					}
-					lstData[i].cb?.Invoke();
+					lstTimeout.Add(lstData[i]);
+					//Debug.WriteLine("" + i + "," + lstData.Count);
+					//lstData[i].cb?.Invoke();
+					//Debug.WriteLine("--" + i + "," + lstData.Count);
 					lstData.RemoveAt(i);
 				}
 				if(lstData.Count <= 0) {
 					timer.Dispose();
 					timer = null;
+				}
+				for(int i = 0; i < lstTimeout.Count; ++i) {
+					lstTimeout[i].cb?.Invoke();
 				}
 			} catch(Exception ex) {
 				Debug.WriteLine(ex.ToString());

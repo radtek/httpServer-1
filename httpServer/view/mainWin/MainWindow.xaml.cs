@@ -29,6 +29,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using csharpHelp;
+using httpServer.dll;
+using System.Runtime.InteropServices;
 
 namespace httpServer {
 	public class ServerItem : INotifyPropertyChanged {
@@ -102,10 +104,20 @@ namespace httpServer {
 			//set language
 			new ClassLink().sendTo(Lang.ins, this, "", LinkType.All);
 
-			ServerCtl.setContentType(MainMd.ins.configMd.mapContextType);
-			ServerCtl.timeout = Math.Max(500, MainMd.ins.configMd.timeout);
-			MainMd.ins.configMd.timeout = ServerCtl.timeout;
-			MainMd.ins.configMd.mapContextType = ServerCtl.mapSuffix;
+			MainMd.ins.configMd.timeout = Math.Max(500, MainMd.ins.configMd.timeout);
+			//MainMd.ins.configMd.mapContextType = ServerCtl.mapSuffix;
+			//ServerCtl.setContentType(MainMd.ins.configMd.mapContextType);
+			//ServerCtl.timeout = Math.Max(500, MainMd.ins.configMd.timeout);
+
+			//http server init
+			HttpServerGo.Init();
+			
+			HttpServerGo.HttpGlobalInfo globalInfo = new HttpServerGo.HttpGlobalInfo();
+			globalInfo.HttpsCrt = getAsmbText("server.crt");
+			globalInfo.HttpsKey = getAsmbText("server.key");
+			globalInfo.MapContextType = contextTypeToSting();
+			globalInfo.Timeout = MainMd.ins.configMd.timeout;
+			HttpServerGo.SetHttpGlobalInfo(ref globalInfo);
 
 			getPage().init();
 			
@@ -125,6 +137,50 @@ namespace httpServer {
 			lstItem.SelectedIndex = MainMd.ins.configMd.selectItem;
 			
 			isWatiSave = false;
+
+			//try {
+			//	HttpServerGo.HttpParamMd md = new HttpServerGo.HttpParamMd();
+			//	md.Ip = MainCtl.createStrPtr("192.168.0.139");
+			//	md.Port = MainCtl.createStrPtr("");
+			//	md.IsHttps = true;
+			//	md.Path = MainCtl.createStrPtr("");
+			//	md.VirtualPath = MainCtl.createStrPtr("");
+			//	md.Proxy = MainCtl.createStrPtr("");
+			//	long id = HttpServerGo.Aaa(ref md);
+			//	Debug.WriteLine("aaa:" + id);
+			//} catch(Exception ex) { Debug.WriteLine(ex.ToString()); }
+		}
+
+		IntPtr contextTypeToSting() {
+			string rst = "";
+			var map = MainMd.ins.configMd.mapContextType;
+			foreach(string key in map.Keys) {
+				string val = map[key];
+				if(key == "" || val == "") {
+					continue;
+				}
+				rst += $"{key}!{val}!!";
+			}
+			return MainCtl.createStrPtr(rst);
+		}
+
+		IntPtr getAsmbText(string fileName) {
+			System.Reflection.Assembly Asmb = System.Reflection.Assembly.GetExecutingAssembly();
+			string strName = Asmb.GetName().Name + ".resource.data." + fileName.Replace("/", ".");
+
+			try {
+				using(Stream ManifestStream = Asmb.GetManifestResourceStream(strName)) {
+					if(ManifestStream != null) {
+						//Debug.WriteLine($"res:{strName}");
+						byte[] StreamData = new byte[ManifestStream.Length];
+						ManifestStream.Read(StreamData, 0, (int)ManifestStream.Length);
+
+						return Marshal.UnsafeAddrOfPinnedArrayElement(StreamData, 0);
+					}
+				}
+			} catch(Exception ex) { Debug.WriteLine(ex.ToString()); }
+
+			return IntPtr.Zero;
 		}
 
 		private void loadServerConfig() {
@@ -179,6 +235,7 @@ namespace httpServer {
 					//tmp.type = regCtl.getValue(subPath + "type");
 					tmp.desc = regCtl.getValue(subPath + "desc");
 					tmp.isRun = regCtl.getValueBool(subPath + "isRun");
+					tmp.isHttps = regCtl.getValueBool(subPath + "isHttps");
 
 					string rootPath = AppDomain.CurrentDomain.BaseDirectory;
 

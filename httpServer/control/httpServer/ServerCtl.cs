@@ -94,7 +94,11 @@ namespace httpServer.control {
 				port = "80";
 			}
 
-			string url = "http://" + ip + ":" + port;
+			string protocol = "http";
+			if(md.isHttps) {
+				protocol = "https";
+			}
+			string url = protocol + "://" + ip + ":" + port;
 			serverUrl = url;
 			url += "/";
 

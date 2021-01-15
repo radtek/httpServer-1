@@ -67,6 +67,9 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="PresentationFramework.Aero" />
@@ -96,6 +99,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="control\MainCtl.cs" />
+    <Compile Include="dll\HttpServerGo.cs" />
     <Compile Include="model\Lang.cs" />
     <Compile Include="sdk\csharpHelp\SetTimeout.cs" />
     <Compile Include="view\page\HttpServerWin.xaml.cs">
@@ -519,6 +524,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="resource\data\server.crt" />
+    <EmbeddedResource Include="resource\data\server.key" />
     <None Include="sdk\WindowsAPICodePack\Shell\Design\ShellObjects.cd" />
     <None Include="sdk\WindowsAPICodePack\Shell\Design\ShellThumbnailClassDiagram.cd" />
     <None Include="sdk\WindowsAPICodePack\Shell\ExplorerBrowser\ExplorerBrowserDiagram.cd" />
@@ -557,4 +564,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y /d "$(SolutionDir)httpServerGo\bin\release\httpServerGo.dll" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

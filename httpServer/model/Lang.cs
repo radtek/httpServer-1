@@ -26,8 +26,8 @@ namespace httpServer.model {
 		//[Bridge("txtVirtualDir.Content")]	public string virtualDir1 = "Virtual Dir:";
 		//[Bridge("txtUrlParam.Content")]	public string urlParam1 = "url param：";
 		//[Bridge("lblCopyUrl.Content")]	public string copy = "Copy";
-		//[Bridge("lblRewrite.Content")]	public string redirect1 = "Rewrite:";
-		//[Bridge("txtRewrite.Content")]  public string redirectDesc = "start with '-'：redirect only if file not exist&#x0a;'/originUrl'='http://rewriteDomain:80/rewriteUrl';&#x0a;-'/originUrl'='http://rewriteDomain:80/rewriteUrl';";
+		//[Bridge("lblRewrite.Content")]	public string redirect1 = "Proxy:";
+		//[Bridge("txtRewrite.Content")]  public string redirectDesc = "start with '-'：proxy only if file not exist&#x0a;'/originUrl'='http://rewriteDomain:80/rewriteUrl';&#x0a;-'/originUrl'='http://rewriteDomain:80/rewriteUrl';";
 
 		public string start = "启动";
 		[Bridge("btnRestart.Content")]	public string restart = "重启";
@@ -46,7 +46,7 @@ namespace httpServer.model {
 		[Bridge("txtVirtualDir.Content")] public string virtualDir1 = "虚拟目录：";
 		[Bridge("txtUrlParam.Content")]		public string urlParam1 = "url参数：";
 		[Bridge("lblCopyUrl.Content")]		public string copy = "复制";
-		[Bridge("lblRewrite.Content")]		public string redirect1 = "重定向：";
-		[Bridge("txtRewrite.Content")]		public string redirectDesc = "'-'号开头：只有文件不存在时才会重定向&#x0a;'/originUrl'='http://rewriteDomain:80/rewriteUrl';&#x0a;-'/originUrl'='http://rewriteDomain:80/rewriteUrl';";
+		[Bridge("lblRewrite.Content")]		public string redirect1 = "代理：";
+		[Bridge("txtRewrite.Content")]		public string redirectDesc = "'-'号开头：只有文件不存在时才会代理&#x0a;'/originUrl'='http://rewriteDomain:80/rewriteUrl';&#x0a;-'/originUrl'='http://rewriteDomain:80/rewriteUrl';";
 	}
 }

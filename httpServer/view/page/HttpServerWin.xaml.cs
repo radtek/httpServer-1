@@ -23,6 +23,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using httpServer.dll;
 
 namespace httpServer.view.page {
 
@@ -31,8 +32,9 @@ namespace httpServer.view.page {
 
 		[XmlValue("desc")] public string desc = "";    //描述
 		[XmlAttr("isRun")] public bool isRun = false;  //是否启动
+		[XmlAttr("isHttps")] public bool isHttps = false;  //是否是https
 
-													   //[XmlValue("desc")] public string desc = "";
+		//[XmlValue("desc")] public string desc = "";
 		[XmlAttr("ip")]		public string ip = "0.0.0.0";
 		[XmlAttr("port")]	public int port = 0;
 
@@ -41,7 +43,8 @@ namespace httpServer.view.page {
 		[XmlValue("virtualDir")]	public string virtualDir = "";
 		[XmlValue("rewrite")]		public string _rewrite = "";
 
-		public HttpServerGroup ctl = null;
+		//public HttpServerGroup ctl = null;
+		public long ctlId = -1;
 
 		public Dictionary<string, string> mapAutoRewrite = new Dictionary<string, string>();
 		public Dictionary<string, string> mapRewrite = new Dictionary<string, string>();
@@ -50,37 +53,38 @@ namespace httpServer.view.page {
 			get { return _rewrite; }
 			set {
 				_rewrite = value;
-				updateRewrite();
+				//updateRewrite();
 			}
 		}
 
-		private void updateRewrite() {
-			string[] arr = _rewrite.Split(new string[] { "\r\n", ";", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-			mapAutoRewrite = new Dictionary<string, string>();
-			mapRewrite = new Dictionary<string, string>();
+		//private void updateRewrite() {
+		//	string[] arr = _rewrite.Split(new string[] { "\r\n", ";", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+		//	mapAutoRewrite = new Dictionary<string, string>();
+		//	mapRewrite = new Dictionary<string, string>();
 
-			Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
-			Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+		//	Regex regAuto = new Regex("^(?:-['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
+		//	Regex reg = new Regex("^(?:['\"‘“]?)(.*?)(?:['\"‘“]?)(?:[\\s]*=[\\s]*)(?:['\"‘“]?)([^'\"‘“]*)(?:['\"‘“]?)");
 
-			for(int i = 0; i < arr.Length; ++i) {
-				Match matchAuto = regAuto.Match(arr[i].Trim());
-				if(matchAuto.Groups.Count >= 3) {
-					mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
-					continue;
-				}
+		//	for(int i = 0; i < arr.Length; ++i) {
+		//		Match matchAuto = regAuto.Match(arr[i].Trim());
+		//		if(matchAuto.Groups.Count >= 3) {
+		//			mapAutoRewrite[matchAuto.Groups[1].Value] = matchAuto.Groups[2].Value;
+		//			continue;
+		//		}
 
-				Match match = reg.Match(arr[i].Trim());
-				if(match.Groups.Count < 3) {
-					continue;
-				}
+		//		Match match = reg.Match(arr[i].Trim());
+		//		if(match.Groups.Count < 3) {
+		//			continue;
+		//		}
 
-				mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
-			}
-		}
+		//		mapRewrite[match.Groups[1].Value] = match.Groups[2].Value;
+		//	}
+		//}
 
 		public void load(XmlCtl xmlCtl) {
 			desc = xmlCtl.value("desc");
 			isRun = xmlCtl.attrBool("isRun");
+			isHttps = xmlCtl.attrBool("isHttps");
 
 			string rootPath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -140,13 +144,37 @@ namespace httpServer.view.page {
 			return md;
 		}
 
+		HttpServerGo.HttpParamMd createParam(HttpServerMd md) {
+			HttpServerGo.HttpParamMd param = new HttpServerGo.HttpParamMd();
+			param.Ip = MainCtl.createStrPtr(md.ip);
+			param.Port = MainCtl.createStrPtr("" + md.port);
+			param.IsHttps = md.isHttps;
+			param.Path = MainCtl.createStrPtr(md.path);
+			param.VirtualPath = MainCtl.createStrPtr(md.virtualDir);
+			param.Proxy = MainCtl.createStrPtr(md.rewrite);
+
+			return param;
+		}
+
+		void updateServer(HttpServerMd md) {
+			var param = createParam(md);
+
+			HttpServerGo.UpdateServer(md.ctlId, ref param);
+		}
+
 		public void initData(HttpServerMd md) {
-			HttpServerGroup ctl = new HttpServerGroup();
-			ctl.md = md;
-			md.ctl = ctl;
+			//HttpServerGroup ctl = new HttpServerGroup();
+			//ctl.md = md;
+			//md.ctl = ctl;
+
+			var param = createParam(md);
+
+			long id = HttpServerGo.CreateServer(ref param);
+			md.ctlId = id;
 
 			if (md.isRun) {
-				ctl.restartServer();
+				HttpServerGo.RestartServer(id);
+				//ctl.restartServer();
 			}
 		}
 
@@ -159,7 +187,8 @@ namespace httpServer.view.page {
 		}
 
 		public void clear(HttpServerMd md) {
-			md.ctl.clear();
+			//md.ctl.clear();
+			HttpServerGo.StopServer(md.ctlId);
 		}
 
 		public void updateData(HttpServerMd md) {
@@ -174,6 +203,7 @@ namespace httpServer.view.page {
 			txtVirtualDir.Text = md.virtualDir;
 			txtUrlParam.Text = md.urlParam;
 			txtRewrite.Text = md.rewrite;
+			chkHttps.IsChecked = md.isHttps;
 			
 			lblUrl.Content = getUrl();
 		}
@@ -222,16 +252,25 @@ namespace httpServer.view.page {
 				md.serverItem.Content = value;
 				break;
 			}
-			case "path": md.path = value; break;
+			case "path": {
+					md.path = value;
+					updateServer(md);
+					break;
+			}
 			case "urlParam": {
 				md.urlParam = value;
 				lblUrl.Content = getUrl();
 				break;
 			}
-			case "rewrite": md.rewrite = value; break;
+			case "rewrite": {
+				md.rewrite = value;
+				updateServer(md);
+				break;
+			}
 			case "virtualDir": {
 				md.virtualDir = value;
 				lblUrl.Content = getUrl();
+				updateServer(md);
 				break;
 			}
 			}
@@ -247,7 +286,11 @@ namespace httpServer.view.page {
 			if(dir != "") {
 				dir = dir + "/";
 			}
-			return "http://" + ip + ":" + md.port + "/" + dir + md.urlParam;
+			string protocol = "http";
+			if(md.isHttps) {
+				protocol = "https";
+			}
+			return protocol + "://" + ip + ":" + md.port + "/" + dir + md.urlParam;
 		}
 
 		private int toInt(string str, int def = 0) {
@@ -265,27 +308,37 @@ namespace httpServer.view.page {
 
 			HttpServerMd md = nowData;
 
-			switch (name) {
-			case "isRun": {
+			switch(name) {
+				case "isRun": {
 					md.isRun = value;
 					var lastIp = md.ip;
 					var lastPort = md.port;
 					md.ip = cbxIp.Text;
 					md.port = toInt(txtPort.Text, md.port);
+					md.isHttps = (chkHttps.IsChecked == true);
 					lblUrl.Content = getUrl();
 
 					md.desc = md.desc.Replace(lastIp, md.ip);
-					md.desc = md.desc.Replace(""+lastPort, ""+md.port);
+					md.desc = md.desc.Replace("" + lastPort, "" + md.port);
 					txtDesc.Text = md.desc;
 					md.serverItem.Content = md.desc;
 
+					updateServer(md);
+
 					if(value == true) {
-						md.ctl.restartServer();
+						//md.ctl.restartServer();
+						HttpServerGo.RestartServer(md.ctlId);
 					} else {
-						md.ctl.clear();
+						//md.ctl.clear();
+						HttpServerGo.StopServer(md.ctlId);
 					}
 					break;
 				}
+				//case "isHttps": {
+				//	md.isHttps = value;
+				//	nowData.serverItem.Content = nowData.desc + " *";
+				//	break;
+				//}
 			}
 			MainWindow.ins.delaySaveConfig();
 			//Debug.WriteLine("bbb");
@@ -307,5 +360,20 @@ namespace httpServer.view.page {
 			//CmdServ.cfgWaitSave.send();
 		}
 
+		private void ChkHttps_Checked(object sender, RoutedEventArgs e) {
+			if(nowData == null || chkHttps.IsChecked == nowData.isHttps) {
+				return;
+			}
+			nowData.serverItem.Content = nowData.desc + " *";
+			//updateData("isHttps", true);
+		}
+
+		private void ChkHttps_Unchecked(object sender, RoutedEventArgs e) {
+			if(nowData == null || chkHttps.IsChecked == nowData.isHttps) {
+				return;
+			}
+			nowData.serverItem.Content = nowData.desc + " *";
+			//updateData("isHttps", false);
+		}
 	}
 }
